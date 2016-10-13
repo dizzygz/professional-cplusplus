@@ -2,8 +2,8 @@
 
 * Links
 [[http://www.nuonsoft.com/blog/][Author Blog]]
-[[http://www.cppreference.com][C++ Reference]]
-[[http://www.cplusplus.com/reference/][C++ Reference]]
+[[http://www.cppreference.com][cppreference.com]]
+[[http://www.cplusplus.com/reference/][cplusplus.com/reference]]
 
 * Part I - Introduction to Professional C++
 ** Chapter 01 - A Crash Course in C++ and the STL
