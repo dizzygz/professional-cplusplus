@@ -1,0 +1,42 @@
+*Professional C++ Third Edition by Marc Gregoire*
+
+* Links
+- Author Blog :: http://www.nuonsoft.com/blog/
+
+* Part I - Introduction to Professional C++
+** Chapter 01 - A Crash Course in C++ and the STL
+** Chapter 02 - Working with Strings
+** Chapter 03 - Coding with Style
+* Part II - Professional C++ Software Design
+** Chapter 04 - Designing Professional C++ Programs
+** Chapter 05 - Designing with Objects
+** Chapter 06 - Designing for Reuse
+* Part III - Coding The Professional Way
+** Chapter 07 - Gaining Proficiency with Classes and Objects
+** Chapter 08 - Mastering Classes and Objects
+** Chapter 09 - Discovering Inheritance Techniques
+** Chapter 10 - C++ Quirks, Oddities, and Incidentals
+** Chapter 11 - Writing Generic Code with Templates
+** Chapter 12 - Demystifying C++ I/O
+** Chapter 13 - Handling Errors
+** Chapter 14 - Overloading C++ Operators
+** Chapter 15 - Overview of the C++ Standard Library
+** Chapter 16 - Understanding Containers and Iterators
+** Chapter 17 - Mastering STL Algorithms
+** Chapter 18 - String Localization and Regular Expressions
+** Chapter 19 - Additional Library Utilities
+* Part IV - Mastering Advanced Features of C++
+** Chapter 20 - Customizing and Extending the STL
+** Chapter 21 - Advanced Templates
+** Chapter 22 - Memory Management
+** Chapter 23 - Multithreaded Programming with C++
+* Part V - C++ Software Engineering
+** Chapter 24 - Maximizing Software Engineering Methods
+** Chapter 25 - Writing Efficient C++
+** Chapter 26 - Conquering Debugging
+* Appendix A - C++ Interviews
+* Appendix B - Annotated Bibliography
+* Appendix C - Standard Library Header Files
+
+
+* Stuff
