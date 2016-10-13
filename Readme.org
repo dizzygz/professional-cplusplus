@@ -1,42 +1,105 @@
 *Professional C++ Third Edition by Marc Gregoire*
 
 * Links
-- Author Blog :: http://www.nuonsoft.com/blog/
+[[http://www.nuonsoft.com/blog/][Author Blog]]
+[[http://www.cppreference.com][C++ Reference]]
+[[http://www.cplusplus.com/reference/][C++ Reference]]
 
 * Part I - Introduction to Professional C++
 ** Chapter 01 - A Crash Course in C++ and the STL
+*** Notes
+- A function declaration tells the compiler how a function is called, declaring the number and types of
+  parameters, and the function return type. A definition contains the actual code for the function. In C++,
+  declarations usually go into files with extension =.h=, known as =header files=, while definitions usually
+  go into files with extension =.cpp=, known as =source files=. A lot of other programming languages do not
+  separate declarations and definitions into separate files, for example =C#= and =Java=.
+- In =C=, header files usually end in =.h= as =<stdio.h>=. In =C++=, the suffix is ommitted for standard
+  library headers, such as =<iostream>. Standard headers from =C= still exist in =C++=, but with new names.
+  For example, you can access the functionality from =<stdio.h>= by including =<cstdio>=.
+
+*** Warnings
+
 ** Chapter 02 - Working with Strings
+*** Notes
+*** Warnings
 ** Chapter 03 - Coding with Style
+*** Notes
+*** Warnings
 * Part II - Professional C++ Software Design
 ** Chapter 04 - Designing Professional C++ Programs
+*** Notes
+*** Warnings
 ** Chapter 05 - Designing with Objects
+*** Notes
+*** Warnings
 ** Chapter 06 - Designing for Reuse
+*** Notes
+*** Warnings
 * Part III - Coding The Professional Way
 ** Chapter 07 - Gaining Proficiency with Classes and Objects
+*** Notes
+*** Warnings
 ** Chapter 08 - Mastering Classes and Objects
+*** Notes
+*** Warnings
 ** Chapter 09 - Discovering Inheritance Techniques
+*** Notes
+*** Warnings
 ** Chapter 10 - C++ Quirks, Oddities, and Incidentals
+*** Notes
+*** Warnings
 ** Chapter 11 - Writing Generic Code with Templates
+*** Notes
+*** Warnings
 ** Chapter 12 - Demystifying C++ I/O
+*** Notes
+*** Warnings
 ** Chapter 13 - Handling Errors
+*** Notes
+*** Warnings
 ** Chapter 14 - Overloading C++ Operators
+*** Notes
+*** Warnings
 ** Chapter 15 - Overview of the C++ Standard Library
+*** Notes
+*** Warnings
 ** Chapter 16 - Understanding Containers and Iterators
+*** Notes
+*** Warnings
 ** Chapter 17 - Mastering STL Algorithms
+*** Notes
+*** Warnings
 ** Chapter 18 - String Localization and Regular Expressions
+*** Notes
+*** Warnings
 ** Chapter 19 - Additional Library Utilities
+*** Notes
+*** Warnings
 * Part IV - Mastering Advanced Features of C++
 ** Chapter 20 - Customizing and Extending the STL
+*** Notes
+*** Warnings
 ** Chapter 21 - Advanced Templates
+*** Notes
+*** Warnings
 ** Chapter 22 - Memory Management
+*** Notes
+*** Warnings
 ** Chapter 23 - Multithreaded Programming with C++
+*** Notes
+*** Warnings
 * Part V - C++ Software Engineering
 ** Chapter 24 - Maximizing Software Engineering Methods
+*** Notes
+*** Warnings
 ** Chapter 25 - Writing Efficient C++
+*** Notes
+*** Warnings
 ** Chapter 26 - Conquering Debugging
+*** Notes
+*** Warnings
 * Appendix A - C++ Interviews
 * Appendix B - Annotated Bibliography
 * Appendix C - Standard Library Header Files
-
 
 * Stuff

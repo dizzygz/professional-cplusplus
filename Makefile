@@ -1,14 +1,12 @@
 CC=clang++
-CFLAGS=-std=c++14 -Wall -Wextra -Wpedantic -g -O3
-PTHREAD=-pthread
+CFLAGS=-std=c++14 -Wall -Wextra -Wpedantic -g -O0
 SRC=src
 BIN=bin
-CP=cp -rf
 RM=rm -rf
 
 # The Cleaner
 clean:
 	@$(RM) $(BIN)/*
 
-ch00: clean
-	$(CC) $(CFLAGS) -o $(BIN)/HelloWorld $(SRC)/ch00/HelloWorld/main.cpp
+ch01: clean
+	$(CC) $(CFLAGS) -o $(BIN)/01_helloworld $(SRC)/ch01/01_helloworld/main.cpp
