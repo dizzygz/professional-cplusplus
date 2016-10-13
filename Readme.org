@@ -1,8 +1,8 @@
 #+TITLE: Professional C++ Third Edition by Marc Gregoire
 
 * Links
-[[http://www.nuonsoft.com/blog/][Author Blog]]
-[[http://www.cppreference.com][cppreference.com]]
+[[http://www.nuonsoft.com/blog/][Author Blog]] |
+[[http://www.cppreference.com][cppreference.com]] |
 [[http://www.cplusplus.com/reference/][cplusplus.com/reference]]
 
 * Part I - Introduction to Professional C++
