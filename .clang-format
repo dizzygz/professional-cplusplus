@@ -23,14 +23,14 @@ BinPackArguments: true
 ColumnLimit:     110
 ConstructorInitializerAllOnOneLineOrOnePerLine: true
 ConstructorInitializerIndentWidth: 4
-DerivePointerAlignment: true
+DerivePointerAlignment: false
 ExperimentalAutoDetectBinPacking: false
 IndentCaseLabels: true
 IndentWrappedFunctionNames: false
 IndentFunctionDeclarationAfterType: false
 MaxEmptyLinesToKeep: 1
 KeepEmptyLinesAtTheStartOfBlocks: false
-NamespaceIndentation: None
+NamespaceIndentation: All
 ObjCBlockIndentWidth: 2
 ObjCSpaceAfterProperty: false
 ObjCSpaceBeforeProtocolList: false

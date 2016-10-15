@@ -16,8 +16,40 @@
 - In =C=, header files usually end in =.h= as =<stdio.h>=. In =C++=, the suffix is ommitted for standard
   library headers, such as =<iostream>. Standard headers from =C= still exist in =C++=, but with new names.
   For example, you can access the functionality from =<stdio.h>= by including =<cstdio>=.
+- Namespaces address the problem of naming conflicts between different pieces of code.
+- Most compilers will issue a warning or an error when code is using uninitialized variables. Some compilers
+  will generate code that will report and error at run time.
+- C++ does not provide a basic string type. However, a standard implementation of a string is provided as part
+  of the standard library.
+- Both C-style arrays and the =std::array=s have a fixed size, which should be known at compile time. They
+  cannot grow or shrink at run time.
+- Function declarations are often called "function prototypes" or "signatures" to emphasize that they
+  represent how the function can be accessed, but not the code behind it.
+- In C++, unlike C, a function that takes no parameters just has an empty parameter list. It is not necessary
+  to use =void= to indicate that no parameters are taken. However, you must still use =void= to indicate when
+  no value is returned.
+- Avoid using =malloc()= and =free()= from C. Instead, use =new= and =delete=, or =new[]= and =delete[]=.
+- Naked, plain old pointers are only allowed if there is no ownership involved. Otherwise, use =unique_ptr= by
+  default, and =shared_ptr= if you need shared ownership. If you know about =auto_ptr=, forget it because the
+  C++ standard has deprecated it.
+- In C++ a class defines the characteristics of an object. Classes are usually defined in a header file
+  (=.h=), while the definitions of its non-inline methods and of any static data members is in a corresponding
+  source file (=.cpp=).
+- To follow the const-correctness principle, it's always a good idea to declare member functions that do not
+  change any data member of the object as being =const=. These member functions are also called "inspectors,"
+  compared to "mutators" for non-const member functions.
 
 *** Warnings
+- Never put a =using= directive or =using= declaration in a header file, otherwise you force it on everyone
+  that is including your header.
+- In C++, the first element of an array is always at position 0, not position 1! The last position of the
+  array is always the size of the array minus 1!
+- A pointer must be valid before dereferencing it. A =null= or uninitialized pointer will cause a crash if
+  dereferenced.
+- To prevent memory leaks, every call to =new= should be paired with a call to =delete=, and every call to
+  =new[]= should be paired with a call to =delete[]=. Pairing a =new[]= with a =delete= also causes a memory
+  leak.
+
 
 ** Chapter 02 - Working with Strings
 *** Notes
@@ -103,3 +135,231 @@
 * Appendix C - Standard Library Header Files
 
 * Stuff
+** Type Inference
+Type inference allows the compiler to automatically deduce the type of an expression. There are two keywords
+for type inference: =auto= and =decltype= and C++14 add =decltype(auto)=.
+
+*** The =auto= keyword
+The =auto= keyword has four completely different meanings:
+  1. The first meaning is to tell the compiler to automatically deduce the type of a variable at compile time.
+  2. The second use of the =auto= keyword is for the =alternative function syntax=.
+  3. The third use of the =auto= keyword is for =function return type deduction=
+  4. The fourth use of =auto= is for generic lambda expressions.
+
+*** The =decltype= keyword
+The =decltype= keyword takes an expression as argument, and computes the type of that expression. For example:
+#+BEGIN_SRC C++
+  int x = 123;
+  decltype(x) y = 456; // The compiler deduces the type of y to be int because that's the type of x
+#+END_SRC
+
+*** =decltype(auto)=
+Using =auto= to deduce the type of an expression strips away reference qualifiers and const qualifiers.
+=decltype= does not strip those, but might cause code duplication. C++14 solves this by introducing
+=decltype(auto)=.
+#+BEGIN_SRC c++
+  const string message = "Test";
+  const string& foo() { return message; }
+
+  auto f1 = foo();            // f1 is of type string and thus a copy is made.
+  const auto& f1 = foo();     // explicitely make it a reference and mark it const.
+  decltype(foo()) f1 = foo(); // f1 is of type const string& but the syntax is ugly.
+  decltype(auto) f1 = foo();  // f1 is of type const string&.
+#+END_SRC
+
+** Smart Pointers
+To avoid common memory problems, you should use smart pointers instead of normal "naked" C-style pointers.
+Smart pointers automatically deallocate memory when the smart pointer object goes out of scope, for example
+when the function has finished executing.
+
+The difference between =shared_ptr= and =unique_ptr= is that =shared_ptr= is a reference-counted smart
+pointer, while =unique_ptr= is not reference counted. This means that you can have several =shared_ptr=
+instances pointing to the same dynamically allocated memory and the memory will only be deallocated when the
+last =shared_ptr= goes out of scope. =shared_ptr= is also thread-safe.
+
+=unique_ptr= on the other hand means ownership. When the single =unique_ptr= goes out of scope, the underlying
+memory is freed. Your default smart pointer should be =unique_ptr=. Use only =shared_ptr= when you need to
+share the resource.
+
+*** std::unique_ptr
+The =unique_ptr= is analogous to an ordinary pointer, except that it will automatically free the memory or
+resource when the =unique_ptr= goes out of scope or is deleted. A =unique_ptr= has sole ownership of the
+object pointed to.
+
+=unique_ptr= does not support the normal copy assignment operator and copy constructor, but it does support
+the move assignment operator and move constructor, which explains why you can return a =unique_ptr= from a
+function.
+
+#+BEGIN_SRC C++
+  Employee *emp = new Employee;               // normal "naked" pointer
+  auto emp = std::make_unique<Employee>();    // std::unique_ptr smart pointer (C++14)
+  std::unique_ptr<Employee> emp(new Employee) // std::unique_ptr smart pointer (C++11)
+
+  auto p1 = std::make_unique<int>(42);
+  std::unique_ptr<int> p2 = p1;              // Error: does not compile. No copy constructor.
+  std::unique_ptr<int> p3 = std::move(p1);   // OK. Ownership has been moved from p1 to p3.
+#+END_SRC
+
+*** std::shared_ptr
+=shared_ptr= allows for distributed "ownership" of data. Each time a =shared_ptr= is assigned, a reference
+count is incremented indicating there is one more "owner" of the data. When a =shared_ptr= goes out of scope,
+the reference count is decremented. When the reference count goes to zero it means there is no longer any
+owner of the data, and the object referenced by the pointer is freed. You can't store an array in a
+=shared_ptr=.
+
+=const_pointer_cast()=, =dynamic_pointer_cast()=, and =static_pointer_cast()= are functions available to cast
+=shared_ptrs=.
+
+#+BEGIN_SRC c++
+  auto emp = std::make_shared<Employee>();    // std::shared_ptr smart pointer (C++14)
+  std::shared_ptr<Employee> emp(new Employee) // std::shared_ptr smart pointer (C++11)
+
+  std::shared_ptr<Base> myBasePtr(new Derived);
+  std::shared_ptr<Derived> myDerivedPtr = std::dynamic_pointer_cast<Derived>(myBasePtr);
+#+END_SRC
+
+*** std::weak_ptr
+You can use a =weak_ptr= to observe a =shared_ptr= without incrementing or decrementing the reference count of
+the linked =shared_ptr=.
+
+A =weak_ptr= can contain a reference to memory managed by a =shared_ptr=. The =weak_ptr= does not own the
+memory, so the =shared_ptr= is not prevented from deallocating the memory. A =weak_ptr= does not destroy the
+pointed to memory when it goes out of scope; however, it can be used to determine if the memory has been
+deallocated by the associated =shared_ptr= or not. The constructor of a =weak_ptr= requires a =shared_ptr= or
+another =weak_ptr= as argument. To get access to the pointer stored in a =weak_ptr= you need to convert it to
+a =shared_ptr=. There are two ways to do this:
+  - Use the =lock()= method on a =weak_ptr= instance, which returns a =shared_ptr=.
+  - Create a new =shared_ptr= instance and give a =weak_ptr= as argument to the =shared_ptr= constructor.
+In both cases, this new =shared_ptr= will be =nullptr= if the =shared_ptr= associated with the =weak_ptr= has
+been deallocated in the meantime.
+
+** Exceptions
+An exception is an unexpected situation. Exceptions come with some new terminology. When a piece of code
+detects an exceptional situation, it =throws= an exception. Another piece of code =catches= the exception and
+takes appropriate action. Exceptions can get tricky in C++. To use exceptions properly, you need to understand
+what happens to the stack variables when an exception is thrown, and you have to be careful to properly catch
+and handle the necessary exceptions. Unlike the Java language, the C++ compiler doesn't force you to catch
+every exception that might occur. If your code never catches any exceptions but an exception is thrown, it
+will be caught by the program itself, which will be terminated.
+
+** The =const= keyword
+The keyword =const= is short for "constant" and specifies that something remains unchanged. The compiler will
+enforce this requirement by marking any attempt to change it as an error. Furthermore, when optimizations are
+enabled, the compiler can take advantage of this knowledge to produce better code. The keyword has two related
+roles. It can mark variables or parameters, and it can mark methods.
+
+*** =const= Variables and Parameters
+You can use =const= to "protect" variables by specifying that they cannot be modified. You can mark any
+variable =const=, including global variables and class data members. Defining a constant with =const= is just
+like defining a variable, except that the compiler guarantees that code cannot change the value.
+#+BEGIN_SRC c++
+  const double PI = 3.141592653589793238462;
+  const std::string productName = "Super Hyper Net Modulator";
+#+END_SRC
+
+You can also use =const= to specify that parameters to functions or methods should remain unchanged.
+#+BEGIN_SRC c++
+  void mysteryFunction(const std::string* someString) {
+    *someString = "Test"; // Will not compile
+  }
+#+END_SRC
+
+**** =const= Pointers
+#+BEGIN_SRC c++
+  int const* ip; // Same as const int* ip;
+  ip = new int[10];
+  ip[4] = 5; // DOES NOT COMPILE! (Cannot change the value to wich ip points)
+
+  int* const ip = nullptr; // mark ip itself const (not the values to which it points)
+  ip = new int[10];        // DOES NOT COMPILE!
+  ip[4] = 5;               // Error: dereferencing a null pointer
+
+  int* const ip = new int[10]; // OK
+  ip[4] = 5;                   // OK
+  ip = new int[20];            // DOES NOT COMPILE!
+
+  int const* const ip = nullptr; // both the pointer and the values to which it points are const
+#+END_SRC
+
+**** =const= References
+=const= applied to references is usually simpler than =const= applied to pointers for two reasons. First,
+references are =const= by default, in that you can't change to what they refer. So, there is no need to mark
+them =const= explicitly. Second, you can't create a reference to a reference, so there is usually only one
+level of indirection with references. The only way to get multiple levels of indirection is to create a
+reference to a pointer.
+#+BEGIN_SRC c++
+  int z;
+  int const& zRef = z; // Same as: const int& zRef = z;
+  zRef = 4; // DOES NOT COMPILE!
+#+END_SRC
+
+By passing a const reference you ensure that no copy is made but the original variable cannot be changed.
+#+BEGIN_SRC c++
+  void printString(const std::string& someString) {
+    std::cout << someString << std::endl;
+  }
+#+END_SRC
+
+*** =const= Methods
+You can mark a class method =const=, which prevents the method from modifying any non-mutable data members of
+the class.
+
+*** The =constexpr= Keyword
+Constant expressions are evaluated at compile time.
+#+BEGIN_SRC c++
+  const int getArraySize() { return 32; }
+  int main() {
+    int myArray[getArraySize()]; // Invalid in C++
+    return 0;
+  }
+
+  constexpr int getArraySize() { return 32; }
+  int main() {
+    int myArray[getArraySize()]; // OK
+    int mySecondArray[getArraySize() + 5]; // OK
+    return 0;
+  }
+#+END_SRC
+
+Declaring a function as =constexpr= imposes quite a lot of restrictions on what the function can do because
+the compiler has to be able to evaluate the function at compile time, and the function is not allowed to have
+any side effects. Here are a couple of restrictions:
+- The function body shall be a single return statement that does not contain a =goto= statement or a try catch
+  block, and does not throw any exceptions. It is allowed to call other =constexpr= functions.
+- The return type of the function shall be a literal type. It cannot be =void=.
+- If the =constexpr= function is a member of a class, the function cannot be =virtual=.
+- All the function arguments shall be literal types.
+- A =constexpr= function cannot be called until it's defined in the translation unit because the compiler
+  needs to know the complete definition.
+- =dynamic_cast= is not allowed.
+- =new= and =delete= are not allowed.
+
+By defining a =constexpr= constructor you can create constant expression variables of user-defined types. A
+=constexpr= constructor should satisfy the following requirements:
+- All the constructor arguments should be literal types.
+- The constructor body cannot be a function-try-block.
+- The constructor body should satisfy the same requirements as the body of a =constexpr= function.
+- All data members should be initialized with constant expressions.
+#+BEGIN_SRC c++
+  class Rect {
+  public:
+    constexpr Rect(int width, int height) : mWidth(width), mHeight(height) {}
+    constexpr int getArea() const { return mWidth * mHeight; }
+  private:
+    int mWidth, mHeight;
+  };
+
+  int main() {
+    constexpr Rect r(8, 2);
+    int myArray[r.getArea()]; // OK
+    return 0;
+  }
+#+END_SRC
+
+** The Standard Library
+C++ comes with a standard library, which contains a lot of useful classes that can easily be used in your
+code. The benefit of using classes from the standard library is that you don't need to reinvent certain
+classes and you don't need to waste time on implementing things that have already been implemented for you.
+Another benefit is that the classes available in the standard library are heavily tested and verified for
+correctness by thousands of users. The standard library classes are also tuned for high performance, so using
+them will most likely result in better performance compared to making your own implementation.
