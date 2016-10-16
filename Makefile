@@ -23,3 +23,7 @@ ch01: clean
 	$(CC) $(CFLAGS) -o $(BIN)/12_AirlineTicket $(SRC)/ch01/12_AirlineTicket/*.cpp
 	$(CC) $(CFLAGS) -o $(BIN)/13_vectortest $(SRC)/ch01/13_vectortest/main.cpp
 	$(CC) $(CFLAGS) -o $(BIN)/14_EmployeeDB $(SRC)/ch01/14_EmployeeDB/*.cpp
+
+ch02: clean
+	$(CC) $(CFLAGS) -o $(BIN)/cstrings $(SRC)/ch02/01_CStrings/main.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/cppstrings $(SRC)/ch02/02_CppStrings/main.cpp

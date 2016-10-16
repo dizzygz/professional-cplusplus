@@ -50,10 +50,20 @@
   =new[]= should be paired with a call to =delete[]=. Pairing a =new[]= with a =delete= also causes a memory
   leak.
 
-
 ** Chapter 02 - Working with Strings
 *** Notes
+- C++ provides a much-improved implementation of the concept of a string as part of the Standard Library. In
+  C++, =std::string= is a class (actually an instantiation of the =basic_string= class template) that supports
+  many of the same functionalities as the =<cstring>= functions, but takes care of memory allocation for you.
+  The string class is defined in the =<string>= header in the =std= namespace.
+- Raw string literals are string literals that can span across multiple lines of code, that don't require
+  escaping of embedded double quotes, and where escape sequences like =\t= and =\n= are not processed as
+  escape sequences, but as normal text.
+
 *** Warnings
+- When starting a project in C++, it is very important to decide ahead of time how your group will represent
+  strings.
+
 ** Chapter 03 - Coding with Style
 *** Notes
 *** Warnings
