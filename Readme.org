@@ -390,8 +390,29 @@ takes twice as long to process twice as many elements. Thus, if it takes 2 secon
 will take 4 seconds to process 1000 elements. That is, you could graph the performance versus input size as a
 straight line. =Big-O= notation summarizes the algorithm performance like this: =O(n)=. The =O= just means
 that you're using =big-O= notation, while the =n= represents the input size. =O(n)= specifies that the
-algorithm speed is a direct linear function of the input size. =Big-O= notation is sometimes insufficient or
-even misleading. Consider the following issues whenever you think about =big-O= performance specifications:
+algorithm speed is a direct linear function of the input size.
+
+| Algorithm Complexity | Big-O Notation | Explanation                       | Example Algorithms                |
+|----------------------+----------------+-----------------------------------+-----------------------------------|
+| Constant             | O(1)           | Running time is independent of    | Accessing a single element in an  |
+|                      |                | input size.                       | array.                            |
+| Logarithmic          | O(log n)       | The running time is a function    | Finding an element in a sorted    |
+|                      |                | of the logarithm base 2 of the    | list using binary search.         |
+|                      |                | input size.                       |                                   |
+| Linear               | O(n)           | The running time is directly      | Finding an element in an unsorted |
+|                      |                | proportional to the input size.   | list.                             |
+| Linear Logarithmic   | O(n log n)     | The running time is a function of | Merge sort                        |
+|                      |                | the linear times the logarithmic  |                                   |
+|                      |                | function of the input size.       |                                   |
+| Quadratic            | O(n^2)         | The running time is a function of | A slower sorting algorithm like   |
+|                      |                | the square of the input size.     | selection sort.                   |
+| Exponential          | O(2^n)         | The running time is an            | Optimized traveling salesman      |
+|                      |                | exponential function of the input | problem.                          |
+|                      |                | size.                             |                                   |
+|----------------------+----------------+-----------------------------------+-----------------------------------|
+
+=Big-O= notation is sometimes insufficient or even misleading. Consider the following issues whenever you
+think about =big-O= performance specifications:
 - If an algorithm takes twice as long to work on twice as much data, it doesn't say anything about how long it
   took in the first place! If the algorithm is written badly but scales well, it's still not something you
   want to use. For example, suppose the algorithm makes unnecessary disk accesses. That probably wouldn't
@@ -403,30 +424,6 @@ even misleading. Consider the following issues whenever you think about =big-O= 
   to infinity. For small inputs, =big-O= time can be very misleading. An =O(n^2)= algorithm might actually
   perform better than an =O(log n)= algorithm on small input sizes. Consider your likely input sizes before
   making a decision.
-
-| Algorithm Complexity | Big-O Notation | Explanation                       | Example Algorithms                |
-|----------------------+----------------+-----------------------------------+-----------------------------------|
-| Constant             | O(1)           | Running time is independent of    | Accessing a single element in an  |
-|                      |                | input size.                       | array.                            |
-|----------------------+----------------+-----------------------------------+-----------------------------------|
-| Logarithmic          | O(log n)       | The running time is a function    | Finding an element in a sorted    |
-|                      |                | of the logarithm base 2 of the    | list using binary search.         |
-|                      |                | input size.                       |                                   |
-|----------------------+----------------+-----------------------------------+-----------------------------------|
-| Linear               | O(n)           | The running time is directly      | Finding an element in an unsorted |
-|                      |                | proportional to the input size.   | list.                             |
-|----------------------+----------------+-----------------------------------+-----------------------------------|
-| Linear Logarithmic   | O(n log n)     | The running time is a function of | Merge sort                        |
-|                      |                | the linear times the logarithmic  |                                   |
-|                      |                | function of the input size.       |                                   |
-|----------------------+----------------+-----------------------------------+-----------------------------------|
-| Quadratic            | O(n^2)         | The running time is a function of | A slower sorting algorithm like   |
-|                      |                | the square of the input size.     | selection sort.                   |
-|----------------------+----------------+-----------------------------------+-----------------------------------|
-| Exponential          | O(2^n)         | The running time is an            | Optimized traveling salesman      |
-|                      |                | exponential function of the input | problem.                          |
-|                      |                | size.                             |                                   |
-|----------------------+----------------+-----------------------------------+-----------------------------------|
 
 ** The Standard Library
 C++ comes with a standard library, which contains a lot of useful classes that can easily be used in your
