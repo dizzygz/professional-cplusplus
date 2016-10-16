@@ -2,8 +2,8 @@
 
 * Links
 [[http://www.nuonsoft.com/blog/][Marc Gregoire's Blog]] |
-[[http://www.cppreference.com][cppreference.com]] |
-[[http://www.cplusplus.com/reference/][cplusplus.com/reference]]
+[[http://www.cppreference.com][Cpp Reference (cppreference.com)]] |
+[[http://www.cplusplus.com/reference/][Cpp Reference (cplusplus.com/reference)]]
 
 * Part I - Introduction to Professional C++
 ** Chapter 01 - A Crash Course in C++ and the STL
@@ -75,7 +75,19 @@
 * Part II - Professional C++ Software Design
 ** Chapter 04 - Designing Professional C++ Programs
 *** Notes
+- The point of designing is to think about your program before you write it.
+- Keep in mind that good design is hard, and getting it right takes practice. Don't expect to become an expert
+  overnight, and don't be surprised if you find it more difficult to master C++ design than C++ coding.
+- A program uses a library but fits into a framework. Libraries provide specific functionality, while
+  frameworks are fundamental to your program design and structure.
+- Although people use the terms API and library interchangeably, they are not equivalent. The library refers
+  to the implementation, while the API refers to the published interface to the library.
+- Big-O notation applies only to algorithms whose speed depends on their inputs. It does not apply to
+  algorithms that take no input or whose runnign time is random. In practice, you will find that the running
+  times of most algorithms of interest depend on their input, so this limitation is not significant.
+
 *** Warnings
+
 ** Chapter 05 - Designing with Objects
 *** Notes
 *** Warnings
@@ -371,6 +383,51 @@ By defining a =constexpr= constructor you can create constant expression variabl
   }
 #+END_SRC
 
+** Big-O Notation
+=Big-O= notation specifies algorithm run time as a function of its input size, also known as the complexity of
+the algorithm. For example, an algorithm with a performance that is linear as a function of its input size
+takes twice as long to process twice as many elements. Thus, if it takes 2 seconds to process 500 elements, it
+will take 4 seconds to process 1000 elements. That is, you could graph the performance versus input size as a
+straight line. =Big-O= notation summarizes the algorithm performance like this: =O(n)=. The =O= just means
+that you're using =big-O= notation, while the =n= represents the input size. =O(n)= specifies that the
+algorithm speed is a direct linear function of the input size. =Big-O= notation is sometimes insufficient or
+even misleading. Consider the following issues whenever you think about =big-O= performance specifications:
+- If an algorithm takes twice as long to work on twice as much data, it doesn't say anything about how long it
+  took in the first place! If the algorithm is written badly but scales well, it's still not something you
+  want to use. For example, suppose the algorithm makes unnecessary disk accesses. That probably wouldn't
+  affect the =big-O= time but would be very bad for overall performance.
+- Along those lines, it's difficult to compare two algorithms with the same =big-O= running time. For example,
+  if two different sorting algorithms both claim to be =O(n log n)=, it's hard to tell which is really faster
+  without running your own tests.
+- The =big-O= notation describes the time complexity of an algorithm asymptotically, as the input size grows
+  to infinity. For small inputs, =big-O= time can be very misleading. An =O(n^2)= algorithm might actually
+  perform better than an =O(log n)= algorithm on small input sizes. Consider your likely input sizes before
+  making a decision.
+
+| Algorithm Complexity | Big-O Notation | Explanation                       | Example Algorithms                |
+|----------------------+----------------+-----------------------------------+-----------------------------------|
+| Constant             | O(1)           | Running time is independent of    | Accessing a single element in an  |
+|                      |                | input size.                       | array.                            |
+|----------------------+----------------+-----------------------------------+-----------------------------------|
+| Logarithmic          | O(log n)       | The running time is a function    | Finding an element in a sorted    |
+|                      |                | of the logarithm base 2 of the    | list using binary search.         |
+|                      |                | input size.                       |                                   |
+|----------------------+----------------+-----------------------------------+-----------------------------------|
+| Linear               | O(n)           | The running time is directly      | Finding an element in an unsorted |
+|                      |                | proportional to the input size.   | list.                             |
+|----------------------+----------------+-----------------------------------+-----------------------------------|
+| Linear Logarithmic   | O(n log n)     | The running time is a function of | Merge sort                        |
+|                      |                | the linear times the logarithmic  |                                   |
+|                      |                | function of the input size.       |                                   |
+|----------------------+----------------+-----------------------------------+-----------------------------------|
+| Quadratic            | O(n^2)         | The running time is a function of | A slower sorting algorithm like   |
+|                      |                | the square of the input size.     | selection sort.                   |
+|----------------------+----------------+-----------------------------------+-----------------------------------|
+| Exponential          | O(2^n)         | The running time is an            | Optimized traveling salesman      |
+|                      |                | exponential function of the input | problem.                          |
+|                      |                | size.                             |                                   |
+|----------------------+----------------+-----------------------------------+-----------------------------------|
+
 ** The Standard Library
 C++ comes with a standard library, which contains a lot of useful classes that can easily be used in your
 code. The benefit of using classes from the standard library is that you don't need to reinvent certain
@@ -378,3 +435,11 @@ classes and you don't need to waste time on implementing things that have alread
 Another benefit is that the classes available in the standard library are heavily tested and verified for
 correctness by thousands of users. The standard library classes are also tuned for high performance, so using
 them will most likely result in better performance compared to making your own implementation.
+
+When working with collections take great care of what you store in them. For example, if you return a
+reference to an object in a collection from some method, it is recommended to not directly store objects in
+the collection, but pointers or better yet smart pointers to objects, to avoid bizarre aliasing problems,
+which can be hard to track down. For example, suppose a client stores a reference received by a call to a
+method that return references from collections. If the collection directly stores objects, this returned
+reference can become invalid when the collection needs to reallocate memory. Storing pointers or smart
+pointers in the collection avoids this reference-invalidation problem
