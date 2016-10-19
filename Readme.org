@@ -3,7 +3,11 @@
 * Links
 [[http://www.nuonsoft.com/blog/][Marc Gregoire's Blog]] |
 [[http://www.cppreference.com][Cpp Reference (cppreference.com)]] |
-[[http://www.cplusplus.com/reference/][Cpp Reference (cplusplus.com/reference)]]
+[[http://www.cplusplus.com/reference/][Cpp Reference (cplusplus.com/reference)]] |
+[[http://www.gnu.org][GNU Project]] |
+[[http://www.opensource.org][Open Source Initiative]] |
+[[http://www.boost.org][Open Source Boost Libraries]] |
+[[http://www.sourceforge.net][Open Source Libraries]]
 
 * Part I - Introduction to Professional C++
 ** Chapter 01 - A Crash Course in C++ and the STL
@@ -87,10 +91,17 @@
   times of most algorithms of interest depend on their input, so this limitation is not significant.
 
 *** Warnings
+- Make sure that you understand the license restrictions of any third-party libraries you use if you plan to
+  distribute or sell the code you develop. When in doubt, consult a legal expert.
+- Due to time constraints, programmers sometimes find their prototypes morphing into the final product. If you
+  have hacked together a prototype that is insufficient as the basis for the final product, make sure that it
+  doesn't get used way.
 
 ** Chapter 05 - Designing with Objects
 *** Notes
+
 *** Warnings
+
 ** Chapter 06 - Designing for Reuse
 *** Notes
 *** Warnings
@@ -396,16 +407,21 @@ algorithm speed is a direct linear function of the input size.
 |----------------------+----------------+-----------------------------------+-----------------------------------|
 | Constant             | O(1)           | Running time is independent of    | Accessing a single element in an  |
 |                      |                | input size.                       | array.                            |
+|----------------------+----------------+-----------------------------------+-----------------------------------|
 | Logarithmic          | O(log n)       | The running time is a function    | Finding an element in a sorted    |
 |                      |                | of the logarithm base 2 of the    | list using binary search.         |
 |                      |                | input size.                       |                                   |
+|----------------------+----------------+-----------------------------------+-----------------------------------|
 | Linear               | O(n)           | The running time is directly      | Finding an element in an unsorted |
 |                      |                | proportional to the input size.   | list.                             |
+|----------------------+----------------+-----------------------------------+-----------------------------------|
 | Linear Logarithmic   | O(n log n)     | The running time is a function of | Merge sort                        |
 |                      |                | the linear times the logarithmic  |                                   |
 |                      |                | function of the input size.       |                                   |
+|----------------------+----------------+-----------------------------------+-----------------------------------|
 | Quadratic            | O(n^2)         | The running time is a function of | A slower sorting algorithm like   |
 |                      |                | the square of the input size.     | selection sort.                   |
+|----------------------+----------------+-----------------------------------+-----------------------------------|
 | Exponential          | O(2^n)         | The running time is an            | Optimized traveling salesman      |
 |                      |                | exponential function of the input | problem.                          |
 |                      |                | size.                             |                                   |
