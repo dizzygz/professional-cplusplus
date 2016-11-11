@@ -99,12 +99,32 @@
 
 ** Chapter 05 - Designing with Objects
 *** Notes
-
-*** Warnings
+- Unlike the procedural approach, which is based on the question What does this program do?, the
+  object-oriented approach asks another question: What real-world objects am I modeling? =OOP= is based on the
+  notion that you should divide your program not into tasks, but into models of physical objects. While this
+  seems abstract at first, it becomes clearer when you consider physical objects in terms of their =classes=,
+  =components=, =properties=, and =behaviors=.
+- The =Has-A Relationship=: Objects engaged in a =has-a=, or =aggregation=, relationship follow the pattern A
+  has a B, or A contains a B. In this type of relationship, you can envision one object as part of another.
+  Components generally represent a has-a relationship because they describe objects that are made up of other
+  objects.
+- The =Is-A Relationship= (Inheritance): The is-a relationship is such a fundamental concept of
+  object-oriented programming that it has many names, including deriving, subclassing, extending, and
+  inheriting. Classes model the fact that the real world contains objects with properties and behaviors.
+  Inheritance models the fact that these objects tend to be organized in hierarchies. These hierarchies
+  indicate is-a relationships. Fundamentally, inheritance follows the pattern A is a B or A is really quite a
+  bit like B.
+- A good object-oriented hierarchy accomplishes the following:
+  - Organizes classes into meaningful functional relationships.
+  - Supports code reuse by factoring common functionality to base classes.
+  - Avoid having derived classes that override much of the parent's functionality, unless the parent is an
+    abstract class.
 
 ** Chapter 06 - Designing for Reuse
 *** Notes
+
 *** Warnings
+
 * Part III - Coding The Professional Way
 ** Chapter 07 - Gaining Proficiency with Classes and Objects
 *** Notes
