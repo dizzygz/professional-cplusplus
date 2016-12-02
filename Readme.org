@@ -122,8 +122,85 @@
 
 ** Chapter 06 - Designing for Reuse
 *** Notes
+- Unfortunately, C++ is fundamentally unfriendly to the principle of good abstraction when writing classes.
+  The syntax requires you to combine your public interfaces and non-public (private or protected) data members
+  and methods together in one class definition, thereby exposing some of the internal implementation details
+  of the class to its clients. Chapter 8 describes some techniques for working around this in order to present
+  clean interfaces.
+- Always think about your interfaces from the perspective of someone using them. Do they make sense? Are they
+  what you would expect?
+
+**** Structuring your code
+- Avoid combining unrelated or logically separate concepts: When you design a library or framework, keep it
+  focused on a single task or group of tasks, i.e., strive for high cohesion.
+- Divide your programs into logical subsystems: Design your subsystems as discrete components that can be
+  reused independently, i.e., strive for low coupling.
+- Use class hierarchies to separate logical concepts: In addition to dividing your program into logical
+  subsystems, you should avoid combining unrelated concepts at the class level. You should also avoid
+  combining unrelated concepts at the level of methods, just as you should do at the class level. Both at the
+  class level and the method level you should strive for high cohesion.
+- Use aggregation to separate logical concepts: Aggregation models the has-a relationship: Objects contain
+  other objects to perform some aspects of their functionality. You can use aggregation to separate unrelated
+  or related but separate functionality when inheritance is not appropriate.
+- Eliminate user interface dependencies: If your library is a data manipulation library, you want to separate
+  data manipulation from the user interface. This means that for those kinds of libraries you should never
+  assume in which type of user interface the library will be used. As such, do not use =cout=, =cerr=, =cin=,
+  =stdout=, =stderr=, or =stdin=, because if the library is used in the context of a graphical user interface
+  these concepts may make no sense.
+- Use templates for generic data structures and algorithms: C++ has a concept called templates allowing you to
+  create structures that are generic with respect to a type or class. The notion of a template is that the
+  type becomes a parameter to the specification, and you can create a single body of code that can work on any
+  type. Templates allow you to write both data structures and algorithms that work on any types.
+- Provide appropriate checks and safeguards: There are two opposite styles for writing safe code. The optimal
+  programming style is probably using a healthy mix of both of them. The first is called design-by-contract
+  which means that the documentation for a function or a class represents a contract with a detailed
+  description of what the responsibility of the client code is and what the responsibility of your function or
+  class is. This is often used in the =STL=. The second style is that you design your functions and classes to
+  be as safe as possible. The most important aspect of this guideline is to perform error checking in your
+  code.
+
+**** Designing Interfaces
+- Develop Easy-To-Use Interfaces: The best strategy for developing easy-to-use interfaces is to follow
+  standard and familiar ways of doing things. When people encounter an interface similar to something they
+  have used in the past, they will understand it better, adopt it more readily, and be less likely to use it
+  improperly. Applied to C++, this strategy implies that you should develop interfaces that follow standards
+  to which C++ programmers are accustomed. For example, C++ programmers expect the =constructor= and
+  =destructor= of a class to initialize and clean up an object, respectively. When you design your classes,
+  you should follow this standard. If you require programmers to call =initialize()= and =cleanup()= methods
+  for initialization and cleanup instead of placing that functionality in the =constructor= and =destructor=,
+  you will confuse everyone who tries to use your class. Because your class behaves differently from other C++
+  classes, programmers will take longer to learn how to use it and will be more likely to use it incorrectly
+  by forgetting to call =initialize()= or =cleanup()=.
+- Don't omit required functionality: First, include interfaces for all behaviors that clients could need. This
+  strategy requires you to anticipate all the uses to which clients might put your code. If you are thinking
+  about the interface in one particular way, you might miss functionality that could be needed when clients
+  use it differently. The second part of this strategy is to include as much functionality in the
+  implementation as possible. Don't require client code to specify information that you already know in the
+  implementation, or could know if you designed it differently.
+- Present uncluttered interfaces: Don't provide unnecessary functionality in your interfaces; keep them clean
+  and simple. It might appear at first that this guideline directly contradicts the previous strategy of
+  avoiding omitting necessary functionality. Although one strategy to avoid omitting functionality would be to
+  include every imaginable interface, that is not a sound strategy. You should include necessary functionality
+  and omit useless or counterproductive interfaces.
+- Provide documentation and comments: Regardless of how easy to use you make your interfaces, you should
+  supply documentation for their use. There are two ways to provide documentation for your interfaces:
+  comments in the interfaces themselves and external documentation. You should strive to provide both. Whether
+  you provide comments, external documentation, or both, the documentation should describe the behavior of the
+  library, not the implementation. The behavior includes the inputs, outputs, error conditions and handling,
+  intended uses, and performance guarantees.
+- Provide multiple ways to perform the same functionality: In order to satisfy all your "customers," it is
+  sometimes helpful to provide multiple ways to perform the same functionality. Use this technique
+  judiciously, however, because over application can easily lead to cluttered interfaces.
+- Provide customizability: In order to increase the flexibility of your interfaces, provide customizability.
+  Customizability can be as simple as allowing a client to turn on or off error logging. The basic premise of
+  customizability is that it allows you to provide the same basic functionality to every client, but gives
+  clients the ability to tweak it slightly.
+- Make common functionality easy to use: When you provide a general-purpose interface, some functionality will
+  be used more often than other functionality. You should make the commonly used functionality easy to use,
+  while still providing the option for the more advanced functionality.
 
 *** Warnings
+- When designing your interface, do not expose implementation details to your clients.
 
 * Part III - Coding The Professional Way
 ** Chapter 07 - Gaining Proficiency with Classes and Objects
