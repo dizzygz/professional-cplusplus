@@ -205,10 +205,74 @@
 * Part III - Coding The Professional Way
 ** Chapter 07 - Gaining Proficiency with Classes and Objects
 *** Notes
+- A =class definition= is a statement in C++, so it must end with a semicolon. If you fail to terminate your
+  =class definition= with a semicolon, your compiler will probably give you several errors, most of which will
+  appear to be completely unrelated.
+- A =class= can have a number of members. A member is either a member function (which in turn is either a
+  method, constructor, or destructor), or a member variable also called data member.
+- In C++, a =struct= can have methods just like a =class=. In fact, the only difference is that the default
+  access specifier for a =struct= is =public= while the default for a =class= is =private=.
+- Every normal method call passes a pointer to the object for which it is called as a "hidden" parameter with
+  the name =this=. You can use this pointer to access data members or call methods, and can pass it to other
+  methods or functions. It is also sometimes useful for disambiguating names. if =this= is a pointer to the
+  object on which a method executes, then =*this= is the object itself!
+- If you don't use =smart pointers=, it is always a good idea to reset a pointer to the =null pointer= after
+  deleting the object to which it pointed. You are not required to do this, but it will make debugging easier
+  in case the pointer is accidentally used after deleting the object.
+- The object life cycle involves three activities: creation, destruction, and assignment. It is important to
+  understand how and when objects are created, destroyed, and assigned, and how you can customize these
+  behaviors.
+- C++ supports delegating constructors which allow you to call other constructors from the same class from
+  inside the =ctor-initializer=.
+- There is a special constructor in C++ called a copy constructor that allows you to create an object that is
+  an exact copy of another object. If you don't write a copy constructor yourself, C++ generates one for you
+  that initializes each data member in the new object from its equivalent data member in the source object.
+  For object data members, this initialization means that their copy constructors are called.
+- For performance reasons, it is best to pass objects by =const= reference instead of by value.
+- The assignment operator is sometimes called the copy assignment operator because both the left-hand side and
+  the right-hand side object stay alive after the assignment. This distinction is made because there is also a
+  move assignment operator in which the right-hand side object will be destroyed after the assignment for
+  performance reasons.
+- In the world of C++, "copying" only occurs when an object is being initialized. If an object already has a
+  value that is being overwritten, the more accurate term is "assigned" to. Note that the facility that C++
+  provides for copying is the copy constructor. Since it is a constructor, it can only be used for object
+  creation, not for later assignments to the object. Therefore, C++ provides another method in every class to
+  perform assignment. This method is called the assignment operator. Its name is operator= because it is
+  actually an overloading of the = operator for that class.
+- The implementation of the assignment operator is similar to that of a copy constructor, with several
+  important differences. First, a copy constructor is called only for initialization, so the destination
+  object does not yet have valid values. An assignment operator can overwrite the current values in an object.
+  This consideration doesn't really come into play until you have dynamically allocated memory in your
+  objects. Second, it's legal in C++ to assign an object to itself. Your assignment operator shouldn't
+  prohibit self-assignment, but also shouldn't perform a full assignment if it happens. Thus, assignment
+  operators should check for self-assignment at the beginning of the method and return immediately.
+
 *** Warnings
+- If you allocate an object with =new=, free it with =delete= when you are finished with it, or use =smart
+  pointers= to manage the memory automatically.
+- When creating an object on the stack, omit parentheses for the default constructor.
+- If you don't specify any constructors, the compiler will write one for you that doesn't take any arguments.
+  This =compiler-generated default constructor= calls the default constructor on all object members of the
+  class, but does not initialize the language primitives such as =int= and =double=. Nonetheless, it allows
+  you to create objects of that class. However, if you declare a default constructor, or any other
+  constructor, the compiler no longer generates a default constructor for you.
+- A =default constructor= is the same thing as a 0-argument constructor. The term =default constructor= does
+  not refer only to the constructor automatically generated if you fail to declare any constructors. It refers
+  to the constructor which is defaulted to if no arguments are required.
+- Ctor-initializers allow initialization of data members at the time of their creation. Ctor-initializers
+  initialize data members in the order that they appear in the class definition, not their order in the
+  ctor-initializer.
+- Make sure you always free dynamically allocated memory by calling =delete= or =delete[]= depending on
+  whether the memory was allocated using =new= or =new[]= or better yet, use smart pointers.
+- You could actually declare the assignment operator to return whatever type you wanted, including =void=.
+  However, you should always return a reference to the object on which it is called because that's what
+  clients expect.
+
 ** Chapter 08 - Mastering Classes and Objects
 *** Notes
+
 *** Warnings
+
 ** Chapter 09 - Discovering Inheritance Techniques
 *** Notes
 *** Warnings
@@ -270,113 +334,6 @@
 * Appendix C - Standard Library Header Files
 
 * Stuff
-** Type Inference
-Type inference allows the compiler to automatically deduce the type of an expression. There are two keywords
-for type inference: =auto= and =decltype= and C++14 add =decltype(auto)=.
-
-*** The =auto= keyword
-The =auto= keyword has four completely different meanings:
-  1. The first meaning is to tell the compiler to automatically deduce the type of a variable at compile time.
-  2. The second use of the =auto= keyword is for the =alternative function syntax=.
-  3. The third use of the =auto= keyword is for =function return type deduction=
-  4. The fourth use of =auto= is for generic lambda expressions.
-
-*** The =decltype= keyword
-The =decltype= keyword takes an expression as argument, and computes the type of that expression. For example:
-#+BEGIN_SRC C++
-  int x = 123;
-  decltype(x) y = 456; // The compiler deduces the type of y to be int because that's the type of x
-#+END_SRC
-
-*** =decltype(auto)=
-Using =auto= to deduce the type of an expression strips away reference qualifiers and const qualifiers.
-=decltype= does not strip those, but might cause code duplication. C++14 solves this by introducing
-=decltype(auto)=.
-#+BEGIN_SRC c++
-  const string message = "Test";
-  const string& foo() { return message; }
-
-  auto f1 = foo();            // f1 is of type string and thus a copy is made.
-  const auto& f1 = foo();     // explicitely make it a reference and mark it const.
-  decltype(foo()) f1 = foo(); // f1 is of type const string& but the syntax is ugly.
-  decltype(auto) f1 = foo();  // f1 is of type const string&.
-#+END_SRC
-
-** Smart Pointers
-To avoid common memory problems, you should use smart pointers instead of normal "naked" C-style pointers.
-Smart pointers automatically deallocate memory when the smart pointer object goes out of scope, for example
-when the function has finished executing.
-
-The difference between =shared_ptr= and =unique_ptr= is that =shared_ptr= is a reference-counted smart
-pointer, while =unique_ptr= is not reference counted. This means that you can have several =shared_ptr=
-instances pointing to the same dynamically allocated memory and the memory will only be deallocated when the
-last =shared_ptr= goes out of scope. =shared_ptr= is also thread-safe.
-
-=unique_ptr= on the other hand means ownership. When the single =unique_ptr= goes out of scope, the underlying
-memory is freed. Your default smart pointer should be =unique_ptr=. Use only =shared_ptr= when you need to
-share the resource.
-
-*** std::unique_ptr
-The =unique_ptr= is analogous to an ordinary pointer, except that it will automatically free the memory or
-resource when the =unique_ptr= goes out of scope or is deleted. A =unique_ptr= has sole ownership of the
-object pointed to.
-
-=unique_ptr= does not support the normal copy assignment operator and copy constructor, but it does support
-the move assignment operator and move constructor, which explains why you can return a =unique_ptr= from a
-function.
-
-#+BEGIN_SRC C++
-  Employee *emp = new Employee;               // normal "naked" pointer
-  auto emp = std::make_unique<Employee>();    // std::unique_ptr smart pointer (C++14)
-  std::unique_ptr<Employee> emp(new Employee) // std::unique_ptr smart pointer (C++11)
-
-  auto p1 = std::make_unique<int>(42);
-  std::unique_ptr<int> p2 = p1;              // Error: does not compile. No copy constructor.
-  std::unique_ptr<int> p3 = std::move(p1);   // OK. Ownership has been moved from p1 to p3.
-#+END_SRC
-
-*** std::shared_ptr
-=shared_ptr= allows for distributed "ownership" of data. Each time a =shared_ptr= is assigned, a reference
-count is incremented indicating there is one more "owner" of the data. When a =shared_ptr= goes out of scope,
-the reference count is decremented. When the reference count goes to zero it means there is no longer any
-owner of the data, and the object referenced by the pointer is freed. You can't store an array in a
-=shared_ptr=.
-
-=const_pointer_cast()=, =dynamic_pointer_cast()=, and =static_pointer_cast()= are functions available to cast
-=shared_ptrs=.
-
-#+BEGIN_SRC c++
-  auto emp = std::make_shared<Employee>();    // std::shared_ptr smart pointer (C++14)
-  std::shared_ptr<Employee> emp(new Employee) // std::shared_ptr smart pointer (C++11)
-
-  std::shared_ptr<Base> myBasePtr(new Derived);
-  std::shared_ptr<Derived> myDerivedPtr = std::dynamic_pointer_cast<Derived>(myBasePtr);
-#+END_SRC
-
-*** std::weak_ptr
-You can use a =weak_ptr= to observe a =shared_ptr= without incrementing or decrementing the reference count of
-the linked =shared_ptr=.
-
-A =weak_ptr= can contain a reference to memory managed by a =shared_ptr=. The =weak_ptr= does not own the
-memory, so the =shared_ptr= is not prevented from deallocating the memory. A =weak_ptr= does not destroy the
-pointed to memory when it goes out of scope; however, it can be used to determine if the memory has been
-deallocated by the associated =shared_ptr= or not. The constructor of a =weak_ptr= requires a =shared_ptr= or
-another =weak_ptr= as argument. To get access to the pointer stored in a =weak_ptr= you need to convert it to
-a =shared_ptr=. There are two ways to do this:
-  - Use the =lock()= method on a =weak_ptr= instance, which returns a =shared_ptr=.
-  - Create a new =shared_ptr= instance and give a =weak_ptr= as argument to the =shared_ptr= constructor.
-In both cases, this new =shared_ptr= will be =nullptr= if the =shared_ptr= associated with the =weak_ptr= has
-been deallocated in the meantime.
-
-** Exceptions
-An exception is an unexpected situation. Exceptions come with some new terminology. When a piece of code
-detects an exceptional situation, it =throws= an exception. Another piece of code =catches= the exception and
-takes appropriate action. Exceptions can get tricky in C++. To use exceptions properly, you need to understand
-what happens to the stack variables when an exception is thrown, and you have to be careful to properly catch
-and handle the necessary exceptions. Unlike the Java language, the C++ compiler doesn't force you to catch
-every exception that might occur. If your code never catches any exceptions but an exception is thrown, it
-will be caught by the program itself, which will be terminated.
-
 ** The =const= keyword
 The keyword =const= is short for "constant" and specifies that something remains unchanged. The compiler will
 enforce this requirement by marking any attempt to change it as an error. Furthermore, when optimizations are
@@ -490,6 +447,236 @@ By defining a =constexpr= constructor you can create constant expression variabl
     return 0;
   }
 #+END_SRC
+
+** Type Inference
+Type inference allows the compiler to automatically deduce the type of an expression. There are two keywords
+for type inference: =auto= and =decltype= and C++14 add =decltype(auto)=.
+
+*** The =auto= keyword
+The =auto= keyword has four completely different meanings:
+  1. The first meaning is to tell the compiler to automatically deduce the type of a variable at compile time.
+  2. The second use of the =auto= keyword is for the =alternative function syntax=.
+  3. The third use of the =auto= keyword is for =function return type deduction=
+  4. The fourth use of =auto= is for generic lambda expressions.
+
+*** The =decltype= keyword
+The =decltype= keyword takes an expression as argument, and computes the type of that expression. For example:
+#+BEGIN_SRC C++
+  int x = 123;
+  decltype(x) y = 456; // The compiler deduces the type of y to be int because that's the type of x
+#+END_SRC
+
+*** =decltype(auto)=
+Using =auto= to deduce the type of an expression strips away reference qualifiers and const qualifiers.
+=decltype= does not strip those, but might cause code duplication. C++14 solves this by introducing
+=decltype(auto)=.
+#+BEGIN_SRC c++
+  const string message = "Test";
+  const string& foo() { return message; }
+
+  auto f1 = foo();            // f1 is of type string and thus a copy is made.
+  const auto& f1 = foo();     // explicitely make it a reference and mark it const.
+  decltype(foo()) f1 = foo(); // f1 is of type const string& but the syntax is ugly.
+  decltype(auto) f1 = foo();  // f1 is of type const string&.
+#+END_SRC
+
+** Smart Pointers
+To avoid common memory problems, you should use smart pointers instead of normal "naked" C-style pointers.
+Smart pointers automatically deallocate memory when the smart pointer object goes out of scope, for example
+when the function has finished executing.
+
+The difference between =shared_ptr= and =unique_ptr= is that =shared_ptr= is a reference-counted smart
+pointer, while =unique_ptr= is not reference counted. This means that you can have several =shared_ptr=
+instances pointing to the same dynamically allocated memory and the memory will only be deallocated when the
+last =shared_ptr= goes out of scope. =shared_ptr= is also thread-safe.
+
+=unique_ptr= on the other hand means ownership. When the single =unique_ptr= goes out of scope, the underlying
+memory is freed. Your default smart pointer should be =unique_ptr=. Use only =shared_ptr= when you need to
+share the resource.
+
+*** std::unique_ptr
+The =unique_ptr= is analogous to an ordinary pointer, except that it will automatically free the memory or
+resource when the =unique_ptr= goes out of scope or is deleted. A =unique_ptr= has sole ownership of the
+object pointed to.
+
+=unique_ptr= does not support the normal copy assignment operator and copy constructor, but it does support
+the move assignment operator and move constructor, which explains why you can return a =unique_ptr= from a
+function.
+
+#+BEGIN_SRC C++
+  Employee *emp = new Employee;               // normal "naked" pointer
+  auto emp = std::make_unique<Employee>();    // std::unique_ptr smart pointer (C++14)
+  std::unique_ptr<Employee> emp(new Employee) // std::unique_ptr smart pointer (C++11)
+
+  auto p1 = std::make_unique<int>(42);
+  std::unique_ptr<int> p2 = p1;              // Error: does not compile. No copy constructor.
+  std::unique_ptr<int> p3 = std::move(p1);   // OK. Ownership has been moved from p1 to p3.
+#+END_SRC
+
+*** std::shared_ptr
+=shared_ptr= allows for distributed "ownership" of data. Each time a =shared_ptr= is assigned, a reference
+count is incremented indicating there is one more "owner" of the data. When a =shared_ptr= goes out of scope,
+the reference count is decremented. When the reference count goes to zero it means there is no longer any
+owner of the data, and the object referenced by the pointer is freed. You can't store an array in a
+=shared_ptr=.
+
+=const_pointer_cast()=, =dynamic_pointer_cast()=, and =static_pointer_cast()= are functions available to cast
+=shared_ptrs=.
+
+#+BEGIN_SRC c++
+  auto emp = std::make_shared<Employee>();    // std::shared_ptr smart pointer (C++14)
+  std::shared_ptr<Employee> emp(new Employee) // std::shared_ptr smart pointer (C++11)
+
+  std::shared_ptr<Base> myBasePtr(new Derived);
+  std::shared_ptr<Derived> myDerivedPtr = std::dynamic_pointer_cast<Derived>(myBasePtr);
+#+END_SRC
+
+*** std::weak_ptr
+You can use a =weak_ptr= to observe a =shared_ptr= without incrementing or decrementing the reference count of
+the linked =shared_ptr=.
+
+A =weak_ptr= can contain a reference to memory managed by a =shared_ptr=. The =weak_ptr= does not own the
+memory, so the =shared_ptr= is not prevented from deallocating the memory. A =weak_ptr= does not destroy the
+pointed to memory when it goes out of scope; however, it can be used to determine if the memory has been
+deallocated by the associated =shared_ptr= or not. The constructor of a =weak_ptr= requires a =shared_ptr= or
+another =weak_ptr= as argument. To get access to the pointer stored in a =weak_ptr= you need to convert it to
+a =shared_ptr=. There are two ways to do this:
+  - Use the =lock()= method on a =weak_ptr= instance, which returns a =shared_ptr=.
+  - Create a new =shared_ptr= instance and give a =weak_ptr= as argument to the =shared_ptr= constructor.
+In both cases, this new =shared_ptr= will be =nullptr= if the =shared_ptr= associated with the =weak_ptr= has
+been deallocated in the meantime.
+
+** Access Specifiers
+| Specifier | Meaning                                      | When to Use                                        |
+|-----------+----------------------------------------------+----------------------------------------------------|
+| public    | Any code can call public member function     | Behaviors (methods) that you want clients to use.  |
+|           | or access a public data member of an object. | Access methods for private and protected data      |
+|           |                                              | members.                                           |
+|-----------+----------------------------------------------+----------------------------------------------------|
+| protected | Any member function of the class can call    | "Helper" methods that you don not want clients     |
+|           | protected member functions and access        | to use.                                            |
+|           | protected data members. Member functions of  |                                                    |
+|           | derived class can access protected members   |                                                    |
+|           | of a base class.                             |                                                    |
+|-----------+----------------------------------------------+----------------------------------------------------|
+| private   | Only members functions of the class can call | Everything should be private by default,           |
+|           | private member functions and access private  | especially data members. You can provide protected |
+|           | data members. Member functions in derived    | getters and setters if you only want to allow      |
+|           | classes cannot access private members from   | derived classes access them, and provide public    |
+|           | a base class.                                | getters and setters if you want clients to access  |
+|           |                                              | them.                                              |
+|-----------+----------------------------------------------+----------------------------------------------------|
+
+** Constructors and Destructors
+*** Summary of Compiler-Generated Constructors
+The compiler automatically generates a 0-argument and copy constructor for every class. However, the
+constructors you define yourself replace these according to the following rules:
+
+| If you define...         | ...then the compiler generates... | ...and you can create an object...          |
+|--------------------------+-----------------------------------+---------------------------------------------|
+| [no constructors]        | A 0-argument constructor          | With no arguments:                          |
+|                          | A copy constructor                | =SpreadsheetCell cell;=                     |
+|                          |                                   | As a copy of another object:                |
+|                          |                                   | =SpreadsheetCell myCell(cell);=             |
+|--------------------------+-----------------------------------+---------------------------------------------|
+| A 0-argument             | A copy constructor                | With no arguments:                          |
+| constructor only         |                                   | =SpreadsheetCell cell;=                     |
+|                          |                                   | As a copy of another object:                |
+|                          |                                   | =SpreadsheetCell myCell(cell);=             |
+|--------------------------+-----------------------------------+---------------------------------------------|
+| A copy constructor       | No constructors                   | Theoretically, as a copy of another object. |
+| only                     |                                   | Practically, you can't create any objects.  |
+|--------------------------+-----------------------------------+---------------------------------------------|
+| A single-argument or     | A copy constructor                | With arguments:                             |
+| multi-argument non-      |                                   | =SpreadsheetCell cell(6);=                  |
+| copy constructor only    |                                   | As a copy of another object:                |
+|                          |                                   | =SpreadsheetCell myCell(cell);=             |
+|--------------------------+-----------------------------------+---------------------------------------------|
+| A 0-argument constructor | A copy constructor                | With no arguments:                          |
+| as well as a single-     |                                   | =SpreadsheetCell cell;=                     |
+| argument or multi-       |                                   | With arguments:                             |
+| argument non-copy        |                                   | =SpreadsheetCell myCell(5);=                |
+| constructor              |                                   | As a copy of another object:                |
+|                          |                                   | =SpreadsheetCell anotherCell(cell);=        |
+|--------------------------+-----------------------------------+---------------------------------------------|
+
+Note the lack of symmetry between the default constructor and the copy constructor. As long as you don't
+define a copy constructor explicitly, the compiler creates one for you. On the other hand, as soon as you
+define any constructor, the compiler stops generating a default constructor. As mentioned before in this
+chapter, the automatic generation of a default constructor and a default copy constructor can be influenced by
+defining them as explicitly defaulted or explicitly deleted.
+
+*** Constructor Order
+Objects don't spring to live all at once; they must be constructed along with their parents and any objects
+that are contained within them. C++ defines the creation order as follows:
+
+1. If the class has a base class, the default constructor of the base class is executed, unless there is a
+   call to a base class constructor in the ctor-initializer in which case that constructor is called instead
+   of the default constructor.
+2. Non-static data members of the class are constructed in the order in which they are declared.
+3. The body of the class's constructor is executed.
+
+These rules can apply recursively. If the class has a grandparent, the grandparent is initialized before the
+parent, and so on.
+
+*** Destructor Order
+Because destructors cannot take arguments, the language can always automatically call the destructor for
+parent classes. The order of destruction is conveniently the reverse of the order of construction:
+
+1. The body of the class's destructor is called.
+2. Any data members of the class are destroyed in the reverse order of their construction.
+3. The parent class, if any, is destructed.
+
+Again, these rules apply recursively. The lowest member of the chain is always destructed first.
+
+** Rule of Six
+- Default Constructor
+- Copy Constructor
+- Move Constructor (C++11 or higher)
+- Copy Assignment Operator
+- Move Assignment Operator (C++11 or higher)
+- Destructor (Should be virtual)
+
+#+BEGIN_SRC c++
+  Spreadsheet();                             // ctor
+  Spreadsheet(const Spreadsheet& src);       // copy ctor
+  Spreadsheet(Spreadsheet&& src) noexcept;   // move ctor
+  virtual ~Spreadsheet();                    // destructor
+
+  Spreadsheet& operator=(const Spreadsheet& rhs);      // assignment operator
+  Spreadsheet& operator=(Spreadsheet&& rhs) noexcept;  // move assignment operator
+#+END_SRC
+
+C++ has six methods (four in C++03) with a default behavior. The code for those can be generated by the
+compiler - saving us from boring routine work and thus preventing oversights. Regarding the six operations,
+implement as little as possible and declare as much as possible. Any operation not implemented shall be
+declared as =default= or =delete=.
+
+Move semantics for objects requires a move constructor and a move assignment operator. These will be used by
+the compiler on places where the source object is a temporary object that will be destroyed after the copy or
+assignment. Both the move constructor and the move assignment operator copy/move the member variables from the
+source object to the new object and then reset the variables of the source object to null values. By doing
+this, they are actually moving ownership of the memory from one object to another object. They basically do a
+shallow copy of the member variables and switch ownership of allocated memory to prevent dangling pointers or
+memory leaks.
+
+Move semantics is implemented by using rvalue references. To add move semantics to a class, a move constructor
+and a move assignment operator need to be implemented. Move constructors and move assignment operators should
+be marked with the =noexcept= qualifier to tell the compiler that they don't throw any exceptions. This is
+particularly important for compatibility with the standard library, as fully compliant implementations of the
+standard library will only move stored objects if, having move semantics implemented, they also guarantee not
+to throw.
+
+Obviously, move semantics is useful only when you know that the source object will be destroyed.
+
+** Exceptions
+An exception is an unexpected situation. Exceptions come with some new terminology. When a piece of code
+detects an exceptional situation, it =throws= an exception. Another piece of code =catches= the exception and
+takes appropriate action. Exceptions can get tricky in C++. To use exceptions properly, you need to understand
+what happens to the stack variables when an exception is thrown, and you have to be careful to properly catch
+and handle the necessary exceptions. Unlike the Java language, the C++ compiler doesn't force you to catch
+every exception that might occur. If your code never catches any exceptions but an exception is thrown, it
+will be caught by the program itself, which will be terminated.
 
 ** Big-O Notation
 =Big-O= notation specifies algorithm run time as a function of its input size, also known as the complexity of
