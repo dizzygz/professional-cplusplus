@@ -270,8 +270,76 @@
 
 ** Chapter 08 - Mastering Classes and Objects
 *** Notes
+- Whenever you are finished with dynamically allocated memory, you should free it. If you dynamically allocate
+  memory in an object, the place to free that memory is in the destructor. The compiler guarantees that the
+  destructor will be called when the object is destroyed. Normally the destructor frees the memory that was
+  allocated in the constructor. However, no rule requires you to free memory in the destructor. You can write
+  whatever code you want in the destructor, but it is a good idea to use it only for freeing memory or
+  disposing of other resources.
+- In assignment operators you must first free the memory referenced by the left-hand side, and then do a deep
+  copy. You can think of an assignment operator as a combination of a destructor and a copy constructor. You
+  are essentially "reincarnating" the object with new life (or data) when you assign to it.
+- Next to copying, C++ also supports move semantics, which requires a move constructor and move assignment
+  operator. These can be used to increase performance in certain situations.
+- Sometimes when you dynamically allocate memory in your class, it's easiest just to prevent anyone from
+  copying or assigning to your objects. You can do this by explicitly deleting your operator= and copy
+  constructor. That way, if anyone tries to pass the object by value, return it from a function or method, or
+  assign to it, the compiler will complain. If your compiler doesn't support explicitly deleting member
+  functions, then you can disallow copying and assigning by making your copy constructor and assignment
+  operator private without any implementation.
+- C++ gives you many choices for data members. In addition to declaring simple data members in your classes,
+  you can create =static= data members that all objects of the class share, =const= members, =reference=
+  members, =const reference= members, and more.
+- Data members in your class can be declared =const=, meaning they can't be changed after they are created and
+  initialized. You should use =static const= data members in place of global constants when the constants
+  apply only to the class.
+- Destructors will not be called when you thrown an exception from a constructor. Be carefull!
+- Non-static data members can also be declared =const=. Since you cannot assign to a =const= data member, you
+  need to initialize them in your =ctor-initializers=.
+- A reference cannot exist without referring to something, so a reference data member must be given a value in
+  the =ctor-initializer= of the constructor. Remember that after you have initialized a reference you cannot
+  change the object to which it refers. It's not possible to assign to references in the assignment operator.
+- There is an important difference between using a =const reference= versus a =non-const reference=. The
+  =const reference= data member can only be used to call =const= methods on the object. If you try to call a
+  =non-const= method through a =const reference=, you will get a compiler error.
+- A =const= object is an object whose value cannot be changed. If you have a =const=, reference to =const= or
+  pointer to =const= object, the compiler will not let you call any methods on that object unless those
+  methods guarantee that they won't change any data members. The way you guarantee that a method won't change
+  data members is to mark the method itself with the =const= keyword. A =non-const= object can call =const=
+  and =non-const= methods. However, a =const= object can only call =const= methods. You should get into the
+  habit of declaring =const= all methods that don't modify the object so that you can use references to
+  =const= objects in your program.
+- Sometimes you write a method that is "logically" =const= but happens to change a data member of the object.
+  This modification has no effect on any user-visible data, but is technically a change, so the compiler won't
+  let you declare the method =const=. The solution to this is to declare the data member variable =mutable=,
+  which tells the compiler that it's okay to change it in a =const= method.
+- Note also that you can overload a method based on =const=. That is, you can write two methods with the same
+  name and same parameters, one of which is declared =const= and one of which is not. The compiler will call
+  the =const= method if you have a =const= object and the =non-const= method if you have a =non-const= object.
+- Class definitions can contain more than just member functions and data members. You can also write nested
+  classes and =structs=, declare =typedefs=, or create enumerated types. Anything declared inside a class is
+  in the scope of that class. If it is =public=, you can access it outside the class by scoping it with the
+  =ClassName::= scope resolution syntax.
+- If you want to define a number of constants inside a class, you should use an enumerated type instead of a
+  collection of =#defines=.
+- C++ allows classes to declare that other classes, or member functions of other classes, or nonmember
+  functions are =friends=, and can access =protected= and =private= data members and methods. =friend= classes
+  and methods are easy to abuse; they allow you to violate the principle of encapsulation by exposing
+  internals of your class to other classes or functions. Thus, you should use them only in limited
+  circumstances such as operator overloading because in that case you need access to =protected= and =private=
+  members.
+- In C++, you cannot change the precedence of operators. For example, =*= and =/= are always evaluated before
+  =+= and =-=. The only thing user-defined operators can do is specify the implementation once the precedence
+  of operations has been determined. C++ also does not allow you to invent new operator symbols.
+- Most of the time, performing equality or inequality tests on floating point values is not a good idea. You
+  should use an epsilon test, but this falls outside the scope of this book.
+- Provide operator overloading as a service to clients of your class.
 
 *** Warnings
+- Whenever you have dynamically allocated memory in a class, you should write your own copy constructor and
+  assignment operator to provide a deep copy of the memory.
+- Whenever a class dynamically allocates memory, write a destructor, copy constructor, and assignment
+  operator.
 
 ** Chapter 09 - Discovering Inheritance Techniques
 *** Notes
@@ -677,6 +745,28 @@ what happens to the stack variables when an exception is thrown, and you have to
 and handle the necessary exceptions. Unlike the Java language, the C++ compiler doesn't force you to catch
 every exception that might occur. If your code never catches any exceptions but an exception is thrown, it
 will be caught by the program itself, which will be terminated.
+
+** Using Interface and Implementation Classes (PIMPL Idiom)
+Even with the preceding measures and the best design principles, the C++ language is fundamentally unfriendly
+to the principle of abstraction. The syntax requires you to combine your public interfaces and private (or
+protected) data members and methods together in one class definition, thereby exposing some of the internal
+implementation details of the class to its clients. The downside of this is that if you have to add new
+non-public methods or data members to your class, all the clients of the class have to be recompiled. This can
+become a burden in bigger projects.
+
+The good news is that you can make your interfaces a lot cleaner and hide all implementation details,
+resulting in stable interfaces. The bad news is that it takes a bit of hacking. The basic principle is to
+define two classes for every class you want to write: the interface class and the implementation class. The
+implementation class is identical to the class you would have written if you were not taking this approach.
+The interface class presents public methods identical to those of the implementation class, but it only has
+one data member: a pointer to an implementation class object. This is called the =pimpl idiom=, or private
+implementation idiom. The interface class method implementations simply call the equivalent methods on the
+implementation class object. The result of this is that no matter how the implementation changes, it has no
+impact on the public interface class. This reduces the need for recompilation. None of the clients that use
+the interface class need to be recompiled if the implementation (and only the implementation) changes. Note
+that this idiom only works if the single data member is a pointer to the implementation class. If it would be
+a by-value data member, the clients would have to be recompiled when the definition of the implementation
+class changes.
 
 ** Big-O Notation
 =Big-O= notation specifies algorithm run time as a function of its input size, also known as the complexity of

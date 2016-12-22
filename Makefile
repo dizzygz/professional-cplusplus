@@ -42,3 +42,18 @@ ch07: clean
 	$(CC) $(CFLAGS) -o $(BIN)/08_SpreadsheetCellDestructor $(SRC)/ch07/08_SpreadsheetCellDestructor/*.cpp
 	$(CC) $(CFLAGS) -o $(BIN)/09_SpreadsheetCellAssign $(SRC)/ch07/09_SpreadsheetCellAssign/*.cpp
 	$(CC) $(CFLAGS) -o $(BIN)/10_SpreadsheetCellFinal $(SRC)/ch07/10_SpreadsheetCellFinal/*.cpp
+
+ch08: clean
+	$(CC) $(CFLAGS) -o $(BIN)/01_Spreadsheet $(SRC)/ch08/01_Spreadsheet/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/02_SpreadsheetNoCopyAssign $(SRC)/ch08/02_SpreadsheetNoCopyAssign/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/03_SpreadsheetDataMembers $(SRC)/ch08/03_SpreadsheetDataMembers/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/04_SpreadsheetCellMethods $(SRC)/ch08/04_SpreadsheetCellMethods/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/05_SpreadsheetDefaultParams $(SRC)/ch08/05_SpreadsheetDefaultParams/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/06_NestedClasses $(SRC)/ch08/06_NestedClasses/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/07_SpreadsheetCellColors $(SRC)/ch08/07_SpreadsheetCellColors/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/08_FriendMethod $(SRC)/ch08/08_FriendMethod/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/09_Friends $(SRC)/ch08/09_Friends/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/10_OperatorOverloading1 $(SRC)/ch08/10_OperatorOverloading/AddFirstAttempt/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/10_OperatorOverloading2 $(SRC)/ch08/10_OperatorOverloading/AddSecondAttempt/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/10_OperatorOverloading3 $(SRC)/ch08/10_OperatorOverloading/GlobalOperators/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/11_SeparateImpl $(SRC)/ch08/11_SeparateImpl/*.cpp
