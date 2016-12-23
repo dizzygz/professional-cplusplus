@@ -1,6 +1,5 @@
-#+TITLE: Professional C++ Third Edition by Marc Gregoire
-
-* Links
+* Professional C++ Third Edition by Marc Gregoire
+** Links
 [[http://www.nuonsoft.com/blog/][Marc Gregoire's Blog]] |
 [[http://www.cppreference.com][Cpp Reference (cppreference.com)]] |
 [[http://www.cplusplus.com/reference/][Cpp Reference (cplusplus.com/reference)]] |
@@ -9,9 +8,9 @@
 [[http://www.boost.org][Open Source Boost Libraries]] |
 [[http://www.sourceforge.net][Open Source Libraries]]
 
-* Part I - Introduction to Professional C++
-** Chapter 01 - A Crash Course in C++ and the STL
-*** Notes
+** Part I - Introduction to Professional C++
+*** Chapter 01 - A Crash Course in C++ and the STL
+**** Notes
 - A function declaration tells the compiler how a function is called, declaring the number and types of
   parameters, and the function return type. A definition contains the actual code for the function. In C++,
   declarations usually go into files with extension =.h=, known as =header files=, while definitions usually
@@ -43,7 +42,7 @@
   change any data member of the object as being =const=. These member functions are also called "inspectors,"
   compared to "mutators" for non-const member functions.
 
-*** Warnings
+**** Warnings
 - Never put a =using= directive or =using= declaration in a header file, otherwise you force it on everyone
   that is including your header.
 - In C++, the first element of an array is always at position 0, not position 1! The last position of the
@@ -54,8 +53,8 @@
   =new[]= should be paired with a call to =delete[]=. Pairing a =new[]= with a =delete= also causes a memory
   leak.
 
-** Chapter 02 - Working with Strings
-*** Notes
+*** Chapter 02 - Working with Strings
+**** Notes
 - C++ provides a much-improved implementation of the concept of a string as part of the Standard Library. In
   C++, =std::string= is a class (actually an instantiation of the =basic_string= class template) that supports
   many of the same functionalities as the =<cstring>= functions, but takes care of memory allocation for you.
@@ -64,21 +63,21 @@
   escaping of embedded double quotes, and where escape sequences like =\t= and =\n= are not processed as
   escape sequences, but as normal text.
 
-*** Warnings
+**** Warnings
 - When starting a project in C++, it is very important to decide ahead of time how your group will represent
   strings.
 
-** Chapter 03 - Coding with Style
-*** Notes
+*** Chapter 03 - Coding with Style
+**** Notes
 - Commenting every line of code is usually untenable, but if the code is complicated enough to require it,
   don't just translate the code to English: explain what's really going on.
 - Good code is naturally readable and only requires comments to provide useful additional information.
 - Language features exist to help the programmer. Understand and make use of features that contribute to good
   programming style.
 
-* Part II - Professional C++ Software Design
-** Chapter 04 - Designing Professional C++ Programs
-*** Notes
+** Part II - Professional C++ Software Design
+*** Chapter 04 - Designing Professional C++ Programs
+**** Notes
 - The point of designing is to think about your program before you write it.
 - Keep in mind that good design is hard, and getting it right takes practice. Don't expect to become an expert
   overnight, and don't be surprised if you find it more difficult to master C++ design than C++ coding.
@@ -90,15 +89,15 @@
   algorithms that take no input or whose runnign time is random. In practice, you will find that the running
   times of most algorithms of interest depend on their input, so this limitation is not significant.
 
-*** Warnings
+**** Warnings
 - Make sure that you understand the license restrictions of any third-party libraries you use if you plan to
   distribute or sell the code you develop. When in doubt, consult a legal expert.
 - Due to time constraints, programmers sometimes find their prototypes morphing into the final product. If you
   have hacked together a prototype that is insufficient as the basis for the final product, make sure that it
   doesn't get used way.
 
-** Chapter 05 - Designing with Objects
-*** Notes
+*** Chapter 05 - Designing with Objects
+**** Notes
 - Unlike the procedural approach, which is based on the question What does this program do?, the
   object-oriented approach asks another question: What real-world objects am I modeling? =OOP= is based on the
   notion that you should divide your program not into tasks, but into models of physical objects. While this
@@ -120,8 +119,8 @@
   - Avoid having derived classes that override much of the parent's functionality, unless the parent is an
     abstract class.
 
-** Chapter 06 - Designing for Reuse
-*** Notes
+*** Chapter 06 - Designing for Reuse
+**** Notes
 - Unfortunately, C++ is fundamentally unfriendly to the principle of good abstraction when writing classes.
   The syntax requires you to combine your public interfaces and non-public (private or protected) data members
   and methods together in one class definition, thereby exposing some of the internal implementation details
@@ -130,7 +129,7 @@
 - Always think about your interfaces from the perspective of someone using them. Do they make sense? Are they
   what you would expect?
 
-**** Structuring your code
+***** Structuring your code
 - Avoid combining unrelated or logically separate concepts: When you design a library or framework, keep it
   focused on a single task or group of tasks, i.e., strive for high cohesion.
 - Divide your programs into logical subsystems: Design your subsystems as discrete components that can be
@@ -159,7 +158,7 @@
   be as safe as possible. The most important aspect of this guideline is to perform error checking in your
   code.
 
-**** Designing Interfaces
+***** Designing Interfaces
 - Develop Easy-To-Use Interfaces: The best strategy for developing easy-to-use interfaces is to follow
   standard and familiar ways of doing things. When people encounter an interface similar to something they
   have used in the past, they will understand it better, adopt it more readily, and be less likely to use it
@@ -199,12 +198,12 @@
   be used more often than other functionality. You should make the commonly used functionality easy to use,
   while still providing the option for the more advanced functionality.
 
-*** Warnings
+**** Warnings
 - When designing your interface, do not expose implementation details to your clients.
 
-* Part III - Coding The Professional Way
-** Chapter 07 - Gaining Proficiency with Classes and Objects
-*** Notes
+** Part III - Coding The Professional Way
+*** Chapter 07 - Gaining Proficiency with Classes and Objects
+**** Notes
 - A =class definition= is a statement in C++, so it must end with a semicolon. If you fail to terminate your
   =class definition= with a semicolon, your compiler will probably give you several errors, most of which will
   appear to be completely unrelated.
@@ -247,7 +246,7 @@
   prohibit self-assignment, but also shouldn't perform a full assignment if it happens. Thus, assignment
   operators should check for self-assignment at the beginning of the method and return immediately.
 
-*** Warnings
+**** Warnings
 - If you allocate an object with =new=, free it with =delete= when you are finished with it, or use =smart
   pointers= to manage the memory automatically.
 - When creating an object on the stack, omit parentheses for the default constructor.
@@ -268,8 +267,8 @@
   However, you should always return a reference to the object on which it is called because that's what
   clients expect.
 
-** Chapter 08 - Mastering Classes and Objects
-*** Notes
+*** Chapter 08 - Mastering Classes and Objects
+**** Notes
 - Whenever you are finished with dynamically allocated memory, you should free it. If you dynamically allocate
   memory in an object, the place to free that memory is in the destructor. The compiler guarantees that the
   destructor will be called when the object is destroyed. Normally the destructor frees the memory that was
@@ -335,80 +334,107 @@
   should use an epsilon test, but this falls outside the scope of this book.
 - Provide operator overloading as a service to clients of your class.
 
-*** Warnings
+**** Warnings
 - Whenever you have dynamically allocated memory in a class, you should write your own copy constructor and
   assignment operator to provide a deep copy of the memory.
 - Whenever a class dynamically allocates memory, write a destructor, copy constructor, and assignment
   operator.
 
-** Chapter 09 - Discovering Inheritance Techniques
-*** Notes
-*** Warnings
-** Chapter 10 - C++ Quirks, Oddities, and Incidentals
-*** Notes
-*** Warnings
-** Chapter 11 - Writing Generic Code with Templates
-*** Notes
-*** Warnings
-** Chapter 12 - Demystifying C++ I/O
-*** Notes
-*** Warnings
-** Chapter 13 - Handling Errors
-*** Notes
-*** Warnings
-** Chapter 14 - Overloading C++ Operators
-*** Notes
-*** Warnings
-** Chapter 15 - Overview of the C++ Standard Library
-*** Notes
-*** Warnings
-** Chapter 16 - Understanding Containers and Iterators
-*** Notes
-*** Warnings
-** Chapter 17 - Mastering STL Algorithms
-*** Notes
-*** Warnings
-** Chapter 18 - String Localization and Regular Expressions
-*** Notes
-*** Warnings
-** Chapter 19 - Additional Library Utilities
-*** Notes
-*** Warnings
-* Part IV - Mastering Advanced Features of C++
-** Chapter 20 - Customizing and Extending the STL
-*** Notes
-*** Warnings
-** Chapter 21 - Advanced Templates
-*** Notes
-*** Warnings
-** Chapter 22 - Memory Management
-*** Notes
-*** Warnings
-** Chapter 23 - Multithreaded Programming with C++
-*** Notes
-*** Warnings
-* Part V - C++ Software Engineering
-** Chapter 24 - Maximizing Software Engineering Methods
-*** Notes
-*** Warnings
-** Chapter 25 - Writing Efficient C++
-*** Notes
-*** Warnings
-** Chapter 26 - Conquering Debugging
-*** Notes
-*** Warnings
-* Appendix A - C++ Interviews
-* Appendix B - Annotated Bibliography
-* Appendix C - Standard Library Header Files
+*** Chapter 09 - Discovering Inheritance Techniques
+**** Notes
+- When you write a class definition in C++, you can tell the compiler that your class is inheriting from, or
+  extending, an existing class. By doing so, your class will automatically contain the data members and
+  methods of the original class, which is called the parent class or base class or superclass. Extending an
+  existing class gives your class (which is now called a derived class or a subclass) the ability to describe
+  only the ways in which it is different from the parent class.
+- From the perspective of other code, an object belongs to its defined class as well as to any base classes.
+- The private access specifier gives you control over how a potential derived class could interact with your
+  class. I recommend that you make all your data members private by default. You can provide public getters
+  and setters if you want to allow anyone to access those data members, and you can provide protected getters
+  and setters if you only want derived classes to access them. The reason to make data members private by
+  default is that this provides the highest level of encapsulation. This means that you can change how you
+  represent your data while keeping the public and protected interface unchanged. Without giving direct access
+  to data members, you can also easily add checks on the input data in your public and protected setters.
+  Methods should also be private by default. Only make those methods public that are designed to be public,
+  and make methods protected if you only want derived classes to have access to them.
+- C++ allows you to mark a class as =final=, which means trying to inherit from it will result in a compiler
+  error. Also, C++ allows you to mark a method as =final= which means that the method cannot be overridden in
+  a derived class.
+- There is one small twist to overriding methods in C++ and it has to do with the keyword =virtual=. Only
+  methods that are declared as =virtual= in the base class can be overridden properly by derived classes.
+- As a rule of thumb, make all your methods =virtual= (including the destructor, but not constructors) to
+  avoid problems associated with omission of the =virtual= keyword.
+- Derived classes retain their overridden methods when referred to by base class pointers or references. They
+  lose their uniqueness when cast to a base class object. The loss of overridden methods and derived class
+  data is called slicing.
 
-* Stuff
-** The =const= keyword
+**** Warnings
+
+*** Chapter 10 - C++ Quirks, Oddities, and Incidentals
+**** Notes
+**** Warnings
+*** Chapter 11 - Writing Generic Code with Templates
+**** Notes
+**** Warnings
+*** Chapter 12 - Demystifying C++ I/O
+**** Notes
+**** Warnings
+*** Chapter 13 - Handling Errors
+**** Notes
+**** Warnings
+*** Chapter 14 - Overloading C++ Operators
+**** Notes
+**** Warnings
+*** Chapter 15 - Overview of the C++ Standard Library
+**** Notes
+**** Warnings
+*** Chapter 16 - Understanding Containers and Iterators
+**** Notes
+**** Warnings
+*** Chapter 17 - Mastering STL Algorithms
+**** Notes
+**** Warnings
+*** Chapter 18 - String Localization and Regular Expressions
+**** Notes
+**** Warnings
+*** Chapter 19 - Additional Library Utilities
+**** Notes
+**** Warnings
+** Part IV - Mastering Advanced Features of C++
+*** Chapter 20 - Customizing and Extending the STL
+**** Notes
+**** Warnings
+*** Chapter 21 - Advanced Templates
+**** Notes
+**** Warnings
+*** Chapter 22 - Memory Management
+**** Notes
+**** Warnings
+*** Chapter 23 - Multithreaded Programming with C++
+**** Notes
+**** Warnings
+** Part V - C++ Software Engineering
+*** Chapter 24 - Maximizing Software Engineering Methods
+**** Notes
+**** Warnings
+*** Chapter 25 - Writing Efficient C++
+**** Notes
+**** Warnings
+*** Chapter 26 - Conquering Debugging
+**** Notes
+**** Warnings
+** Appendix A - C++ Interviews
+** Appendix B - Annotated Bibliography
+** Appendix C - Standard Library Header Files
+
+** Stuff
+*** The =const= keyword
 The keyword =const= is short for "constant" and specifies that something remains unchanged. The compiler will
 enforce this requirement by marking any attempt to change it as an error. Furthermore, when optimizations are
 enabled, the compiler can take advantage of this knowledge to produce better code. The keyword has two related
 roles. It can mark variables or parameters, and it can mark methods.
 
-*** =const= Variables and Parameters
+**** =const= Variables and Parameters
 You can use =const= to "protect" variables by specifying that they cannot be modified. You can mark any
 variable =const=, including global variables and class data members. Defining a constant with =const= is just
 like defining a variable, except that the compiler guarantees that code cannot change the value.
@@ -424,7 +450,7 @@ You can also use =const= to specify that parameters to functions or methods shou
   }
 #+END_SRC
 
-**** =const= Pointers
+***** =const= Pointers
 #+BEGIN_SRC c++
   int const* ip; // Same as const int* ip;
   ip = new int[10];
@@ -441,7 +467,7 @@ You can also use =const= to specify that parameters to functions or methods shou
   int const* const ip = nullptr; // both the pointer and the values to which it points are const
 #+END_SRC
 
-**** =const= References
+***** =const= References
 =const= applied to references is usually simpler than =const= applied to pointers for two reasons. First,
 references are =const= by default, in that you can't change to what they refer. So, there is no need to mark
 them =const= explicitly. Second, you can't create a reference to a reference, so there is usually only one
@@ -460,11 +486,11 @@ By passing a const reference you ensure that no copy is made but the original va
   }
 #+END_SRC
 
-*** =const= Methods
+**** =const= Methods
 You can mark a class method =const=, which prevents the method from modifying any non-mutable data members of
 the class.
 
-*** The =constexpr= Keyword
+**** The =constexpr= Keyword
 Constant expressions are evaluated at compile time.
 #+BEGIN_SRC c++
   const int getArraySize() { return 32; }
@@ -516,25 +542,25 @@ By defining a =constexpr= constructor you can create constant expression variabl
   }
 #+END_SRC
 
-** Type Inference
+*** Type Inference
 Type inference allows the compiler to automatically deduce the type of an expression. There are two keywords
 for type inference: =auto= and =decltype= and C++14 add =decltype(auto)=.
 
-*** The =auto= keyword
+**** The =auto= keyword
 The =auto= keyword has four completely different meanings:
-  1. The first meaning is to tell the compiler to automatically deduce the type of a variable at compile time.
-  2. The second use of the =auto= keyword is for the =alternative function syntax=.
-  3. The third use of the =auto= keyword is for =function return type deduction=
-  4. The fourth use of =auto= is for generic lambda expressions.
+1. The first meaning is to tell the compiler to automatically deduce the type of a variable at compile time.
+2. The second use of the =auto= keyword is for the =alternative function syntax=.
+3. The third use of the =auto= keyword is for =function return type deduction=
+4. The fourth use of =auto= is for generic lambda expressions.
 
-*** The =decltype= keyword
+**** The =decltype= keyword
 The =decltype= keyword takes an expression as argument, and computes the type of that expression. For example:
 #+BEGIN_SRC C++
   int x = 123;
   decltype(x) y = 456; // The compiler deduces the type of y to be int because that's the type of x
 #+END_SRC
 
-*** =decltype(auto)=
+**** =decltype(auto)=
 Using =auto= to deduce the type of an expression strips away reference qualifiers and const qualifiers.
 =decltype= does not strip those, but might cause code duplication. C++14 solves this by introducing
 =decltype(auto)=.
@@ -548,7 +574,7 @@ Using =auto= to deduce the type of an expression strips away reference qualifier
   decltype(auto) f1 = foo();  // f1 is of type const string&.
 #+END_SRC
 
-** Smart Pointers
+*** Smart Pointers
 To avoid common memory problems, you should use smart pointers instead of normal "naked" C-style pointers.
 Smart pointers automatically deallocate memory when the smart pointer object goes out of scope, for example
 when the function has finished executing.
@@ -562,7 +588,7 @@ last =shared_ptr= goes out of scope. =shared_ptr= is also thread-safe.
 memory is freed. Your default smart pointer should be =unique_ptr=. Use only =shared_ptr= when you need to
 share the resource.
 
-*** std::unique_ptr
+**** std::unique_ptr
 The =unique_ptr= is analogous to an ordinary pointer, except that it will automatically free the memory or
 resource when the =unique_ptr= goes out of scope or is deleted. A =unique_ptr= has sole ownership of the
 object pointed to.
@@ -581,7 +607,7 @@ function.
   std::unique_ptr<int> p3 = std::move(p1);   // OK. Ownership has been moved from p1 to p3.
 #+END_SRC
 
-*** std::shared_ptr
+**** std::shared_ptr
 =shared_ptr= allows for distributed "ownership" of data. Each time a =shared_ptr= is assigned, a reference
 count is incremented indicating there is one more "owner" of the data. When a =shared_ptr= goes out of scope,
 the reference count is decremented. When the reference count goes to zero it means there is no longer any
@@ -599,7 +625,7 @@ owner of the data, and the object referenced by the pointer is freed. You can't 
   std::shared_ptr<Derived> myDerivedPtr = std::dynamic_pointer_cast<Derived>(myBasePtr);
 #+END_SRC
 
-*** std::weak_ptr
+**** std::weak_ptr
 You can use a =weak_ptr= to observe a =shared_ptr= without incrementing or decrementing the reference count of
 the linked =shared_ptr=.
 
@@ -609,12 +635,12 @@ pointed to memory when it goes out of scope; however, it can be used to determin
 deallocated by the associated =shared_ptr= or not. The constructor of a =weak_ptr= requires a =shared_ptr= or
 another =weak_ptr= as argument. To get access to the pointer stored in a =weak_ptr= you need to convert it to
 a =shared_ptr=. There are two ways to do this:
-  - Use the =lock()= method on a =weak_ptr= instance, which returns a =shared_ptr=.
-  - Create a new =shared_ptr= instance and give a =weak_ptr= as argument to the =shared_ptr= constructor.
+- Use the =lock()= method on a =weak_ptr= instance, which returns a =shared_ptr=.
+- Create a new =shared_ptr= instance and give a =weak_ptr= as argument to the =shared_ptr= constructor.
 In both cases, this new =shared_ptr= will be =nullptr= if the =shared_ptr= associated with the =weak_ptr= has
 been deallocated in the meantime.
 
-** Access Specifiers
+*** Access Specifiers
 | Specifier | Meaning                                      | When to Use                                        |
 |-----------+----------------------------------------------+----------------------------------------------------|
 | public    | Any code can call public member function     | Behaviors (methods) that you want clients to use.  |
@@ -635,8 +661,8 @@ been deallocated in the meantime.
 |           |                                              | them.                                              |
 |-----------+----------------------------------------------+----------------------------------------------------|
 
-** Constructors and Destructors
-*** Summary of Compiler-Generated Constructors
+*** Constructors and Destructors
+**** Summary of Compiler-Generated Constructors
 The compiler automatically generates a 0-argument and copy constructor for every class. However, the
 constructors you define yourself replace these according to the following rules:
 
@@ -674,7 +700,7 @@ define any constructor, the compiler stops generating a default constructor. As 
 chapter, the automatic generation of a default constructor and a default copy constructor can be influenced by
 defining them as explicitly defaulted or explicitly deleted.
 
-*** Constructor Order
+**** Constructor Order
 Objects don't spring to live all at once; they must be constructed along with their parents and any objects
 that are contained within them. C++ defines the creation order as follows:
 
@@ -687,7 +713,7 @@ that are contained within them. C++ defines the creation order as follows:
 These rules can apply recursively. If the class has a grandparent, the grandparent is initialized before the
 parent, and so on.
 
-*** Destructor Order
+**** Destructor Order
 Because destructors cannot take arguments, the language can always automatically call the destructor for
 parent classes. The order of destruction is conveniently the reverse of the order of construction:
 
@@ -697,7 +723,7 @@ parent classes. The order of destruction is conveniently the reverse of the orde
 
 Again, these rules apply recursively. The lowest member of the chain is always destructed first.
 
-** Rule of Six
+*** Rule of Six
 - Default Constructor
 - Copy Constructor
 - Move Constructor (C++11 or higher)
@@ -737,7 +763,7 @@ to throw.
 
 Obviously, move semantics is useful only when you know that the source object will be destroyed.
 
-** Exceptions
+*** Exceptions
 An exception is an unexpected situation. Exceptions come with some new terminology. When a piece of code
 detects an exceptional situation, it =throws= an exception. Another piece of code =catches= the exception and
 takes appropriate action. Exceptions can get tricky in C++. To use exceptions properly, you need to understand
@@ -746,7 +772,7 @@ and handle the necessary exceptions. Unlike the Java language, the C++ compiler 
 every exception that might occur. If your code never catches any exceptions but an exception is thrown, it
 will be caught by the program itself, which will be terminated.
 
-** Using Interface and Implementation Classes (PIMPL Idiom)
+*** Using Interface and Implementation Classes (PIMPL Idiom)
 Even with the preceding measures and the best design principles, the C++ language is fundamentally unfriendly
 to the principle of abstraction. The syntax requires you to combine your public interfaces and private (or
 protected) data members and methods together in one class definition, thereby exposing some of the internal
@@ -768,7 +794,7 @@ that this idiom only works if the single data member is a pointer to the impleme
 a by-value data member, the clients would have to be recompiled when the definition of the implementation
 class changes.
 
-** Big-O Notation
+*** Big-O Notation
 =Big-O= notation specifies algorithm run time as a function of its input size, also known as the complexity of
 the algorithm. For example, an algorithm with a performance that is linear as a function of its input size
 takes twice as long to process twice as many elements. Thus, if it takes 2 seconds to process 500 elements, it
@@ -815,7 +841,7 @@ think about =big-O= performance specifications:
   perform better than an =O(log n)= algorithm on small input sizes. Consider your likely input sizes before
   making a decision.
 
-** The Standard Library
+*** The Standard Library
 C++ comes with a standard library, which contains a lot of useful classes that can easily be used in your
 code. The benefit of using classes from the standard library is that you don't need to reinvent certain
 classes and you don't need to waste time on implementing things that have already been implemented for you.
