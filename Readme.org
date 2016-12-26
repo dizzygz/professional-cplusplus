@@ -367,12 +367,74 @@
 - Derived classes retain their overridden methods when referred to by base class pointers or references. They
   lose their uniqueness when cast to a base class object. The loss of overridden methods and derived class
   data is called slicing.
+- An abstract class provides a way to prevent other code from instantiating an object directly, as opposed to
+  one of its derived classes.
+- When overriding from a parent class, a good rule of thumb is to override a method with the exact method
+  declaration, or method prototype, that the base class uses. The implementation can change, but the prototype
+  stays the same. That does not have to be the case, however. In C++, an overriding method can change the
+  return type as long as the original return type is a pointer or reference to a class, and the new return
+  type is a pointer or reference to a descendent class. Such types are called =covariant return types=. This
+  feature sometimes comes in handy when the base class and derived class work with objects in a parallel
+  hierarchy. That is, another group of classes that is tangential, but related, to the first class hierarchy.
+  A good way to figure out whether you can change the return type of an overridden method is to consider
+  whether existing code would still work, the Liskov substitution principle (LSP).
+- It is rare to find a method in a derived class with the same name as a method in the base class but using a
+  different parameter list.
+- =static= methods are scoped by the name of the class in which they are defined, but are not methods that
+  apply to a specific object. A method in a class that calls a =static= method calls the version determined by
+  normal name resolution. When called syntactically by using an object, the object is not actually involved in
+  the call, except to determine the type at compile time.
+- When overriding a method that has a default argument, you should provide a default argument as well, and it
+  should probably be the same value. It is recommended to use a symbolic constant for default values so that
+  the same symbolic constant can be used in derived classes.
+- There is no reasonable way (or good reason) to restrict access to a =public= parent method.
+- The only truly useful way to change a method's access level is by providing a less restrictive accessor to a
+  =protected= method.
+- Relative to other object-oriented languages, C++ is very compile-time oriented. Overriding methods works
+  because of a level of indirection between a method and its implementation, not because the object has
+  built-in knowledge of its own class.
+- If you are using =typeid= other than for logging and debugging purposes, consider re-implementing it using
+  =virtual= methods.
+- Non-public inheritance is rare and I recommend using it cautiously, if for no other reason than because most
+  programmers are not familiar with it.
+- Virtual base classes are a great way to avoid ambiguity in class hierarchies. The only drawback is that many
+  C++ programmers are unfamiliar with the concept.
 
 **** Warnings
+- Virtual methods behave differently in constructors. If your derived class has overridden a virtual method
+  from the base class, calling that method from a base class constructor will call the base class
+  implementation of that virtual method and not your overridden version in the derived class.
+- Always make your destructors =virtual=. The compiler generated default destructor is not =virtual=, so you
+  should define your own =virtual= destructor, at least for your parent classes.
+- Just as with constructors, virtual methods behave differently when called from a destructor. If your derived
+  class has overridden a virtual method from the base class, calling that method from the base class
+  destructor will call the base class implementation of that virtual method and not your overridden version in
+  the derived class.
+- When upcasting, use a pointer or reference to the base class to avoid slicing.
+- Use downcasting only when necessary and be sure to use =dynamic_cast=.
+- You can always cast up the hierarchy, and you can sometimes cast down the hierarchy. Casting across the
+  hierarchy is possible by changing the behavior of the cast operator, or by using =reinterpret_cast=, which
+  is not recommended.
+- To avoid obscure bugs, you should override all versions of an overloaded method, either explicitly or with
+  the =using= keyword, but keep the risks of the =using= clause in mind.
+- Overriding =private= and =protected= methods is a good way to change certain features of a class without a
+  major overhaul.
+- If your derived class does not specify its own copy constructor or ~operator=~, the parent functionality
+  continues to work. If the derived class does provide its own copy constructor or ~operator=~, it needs to
+  explicitly reference the parent versions.
+- Attempting to override a non-virtual method will hide the base class definition and will only be used in the
+  context of the derived class.
+- Unless you have a specific reason not to, or the class is marked as =final=, I recommend making all methods,
+  including destructors but not constructors, =virtual=. Constructors cannot and need not be =virtual= because
+  you always specify the exact class being constructed when creating an object.
+- The =typeid= operator only works correctly if the class has at least one =virtual= method. Using
+  =dynamic_cast= on a class without any =virtual= method will cause a compiler error.
 
 *** Chapter 10 - C++ Quirks, Oddities, and Incidentals
 **** Notes
+
 **** Warnings
+
 *** Chapter 11 - Writing Generic Code with Templates
 **** Notes
 **** Warnings
@@ -762,6 +824,57 @@ standard library will only move stored objects if, having move semantics impleme
 to throw.
 
 Obviously, move semantics is useful only when you know that the source object will be destroyed.
+
+*** Inheritance
+**** Copy Constructor and assignment operator on derived classes
+Providing a copy constructor and assignment operator is considered a good programming practice when you have
+dynamically allocated memory in the class. When defining a derived class, you need to be careful about copy
+constructors and ~operator=~. If your derived class does not have any special data (pointers, usually) that
+require a non-default copy constructor or ~operator=~, you don't need to have one, regardless of whether or
+not the base class has one. If your derived class omits the copy constructor or ~operator=~, a default copy
+constructor or ~operator=~ will be provided for the data members specified in the derived class and the base
+class copy constructor or ~operator=~ will be used for the data members specified in the base class. On the
+other hand, if you do specify a copy constructor in the derived class, you need to explicitly chain to the
+parent copy constructor. If you do not do this, the default constructor (not the copy constructor!) will be
+used for the parent portion of the object. Similarly, if the derived class overrides ~operator=~, it is almost
+always necessary to call the parent's version of ~operator=~ as well.
+#+BEGIN_SRC
+class Super {
+public:
+  Super();
+  Super(const Super& inSuper);
+  Super& operator=(const Super& inSuper);
+};
+
+class Sub : public Super {
+public:
+  Sub();
+  Sub(const Sub& inSub);
+  Sub& operator=(const Sub& inSub);
+};
+
+Sub::Sub(const Sub& inSub) : Super(inSub) {}
+Sub& Sub::operator=(const Sub& inSub) {
+  if (&inSub == this) { return *this; }
+  Super::operator=(inSub); // calls parent's operator=
+  // Do necessary assignment for derived class
+  return *this;
+}
+#+END_SRC
+
+**** Multiple Inheritance
+#+BEGIN_SRC c++
+  class Baz : public Foo, public Bar {};
+#+END_SRC
+
+By listing multiple parents, the =Baz= object will have the following characteristics:
+- A =Baz= object will support the =public= methods and contain the data members of both =Foo= and =Bar=.
+- The methods of the =Baz= class will have access to =protected= data and methods in both =Foo= and =Bar=.
+- A =Baz= object can be upcast to either a =Foo= or a =Bar=.
+- Creating a new =Baz= object will automatically call the =Foo= and =Bar= default constructors, in the order
+  that the classes are listed in the class definition.
+- Deleting a =Bas= object will automatically call the destructors for the =Foo= and =Bar= classes, in the
+  reverse order that the classes are listed in the class definition.
 
 *** Exceptions
 An exception is an unexpected situation. Exceptions come with some new terminology. When a piece of code

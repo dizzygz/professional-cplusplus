@@ -57,3 +57,13 @@ ch08: clean
 	$(CC) $(CFLAGS) -o $(BIN)/10_OperatorOverloading2 $(SRC)/ch08/10_OperatorOverloading/AddSecondAttempt/*.cpp
 	$(CC) $(CFLAGS) -o $(BIN)/10_OperatorOverloading3 $(SRC)/ch08/10_OperatorOverloading/GlobalOperators/*.cpp
 	$(CC) $(CFLAGS) -o $(BIN)/11_SeparateImpl $(SRC)/ch08/11_SeparateImpl/*.cpp
+
+ch09: clean
+	$(CC) $(CFLAGS) -o $(BIN)/01_WeatherPrediction $(SRC)/ch09/01_WeatherPrediction/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/02_ConstructorChain $(SRC)/ch09/02_ConstructorChain/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/03_Book $(SRC)/ch09/03_Book/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/04_PolymorphicSpreadsheet $(SRC)/ch09/04_PolymorphicSpreadsheet/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/05_DogBird $(SRC)/ch09/05_DogBird/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/06_Cherry $(SRC)/ch09/06_Cherry/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/07_MilesEstimator $(SRC)/ch09/07_MilesEstimator/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/08_VirtualInheritance $(SRC)/ch09/08_VirtualInheritance/*.cpp
