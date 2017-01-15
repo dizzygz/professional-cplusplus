@@ -432,12 +432,52 @@
 
 *** Chapter 10 - C++ Quirks, Oddities, and Incidentals
 **** Notes
+- Using =rvalue= references, it is possible to pass constants as arguments to functions that employ
+  =pass-by-rvalue-reference=.
+- You should use =pass-by-value= only for simple built-in types like ~int~ and ~double~ for which you don't
+  need to modify the arguments. Use =pass-by-reference= in all other cases.
+- Use references instead of pointers unless you need to change to where the reference refers to.
+- An easy-to-remember rule to figure out complicated variable declarations: read from right to left. Take for
+  example ~int* const ip~. Reading this from right to left gives us =ip is a const pointer to an int=. On the
+  other hand, ~const int* ip~ will read as =ip is a pointer to a const int=.
+- Avoid using stand-alone ~static~ variables. Maintain state within an object instead.
+- C++14 defines the following standard user-defined literals:
+  * "s" for creating ~std::string~; for example: ~auto myString = "Hello World"s;~
+  * "h", "min", "s", "ms", "us", "ns", for creating ~std::chrono::duration~ time intervals,
+    for example: ~auto myDuration = 42min~;
+  * "i", "il", "if", for creating complex numbers ~complex<double>, complex<long double>~, and
+    ~<complex<float>~ respectively; for example: ~auto myComplexNumber = 1.3i~;
+- It's recommended to use forward declarations as much as possible in your header files instead of including
+  other headers. This can reduce your compilation and recompilation times, because it breaks dependencies of
+  your header file on other headers. Of course, your implementation file needs to include the correct headers
+  for types that you've forward-declared, otherwise it won't compile.
 
 **** Warnings
+- You must always initialize a reference when it is created. Usually, references are created when they are
+  declared, but reference data members need to be initialized in the constructor initializer for the
+  containing class.
+- You cannot change the variable to which a reference refers after it is initialized; you can change only the
+  value of that variable.
+- From a function or method, never return a reference to a variable that is locally scoped to that function or
+  method, such as an automatically allocated variable on the stack that will be destroyed when the function
+  ends.
+- Your default choice for passing objects as parameters should be ~const reference~. You should only omit
+  ~const~ if you explicitly need to change the object.
+- Initialization order of non-local variables in different source files is undefined.
+- In theory, you could also use ~reinterpret_cast~ to cast pointers to ~ints~ and ~ints~ to pointers, but this
+  is considered erroneous programming, because on many platforms (especially 64-bit platforms) pointers and
+  ~ints~ are of different sizes. For example, on a 64-bit platform, pointers are 64 bit, but integers could be
+  32 bits. Casting a 64-bit pointer to a 32-bit integer will result in losing 32 critical bits!
+- Avoid using C-style variable-length argument lists. It is preferable to pass in an ~std::array~ or
+  ~std::vector~ of values, to use =initializer lists=, or to use =variadic templates= for type-safe
+  variable-length argument lists.
+- Avoid old C-style pre-processor macros entirely in favor of inline functions.
 
 *** Chapter 11 - Writing Generic Code with Templates
 **** Notes
+
 **** Warnings
+
 *** Chapter 12 - Demystifying C++ I/O
 **** Notes
 **** Warnings
@@ -490,31 +530,137 @@
 ** Appendix C - Standard Library Header Files
 
 ** Stuff
-*** The =const= keyword
-The keyword =const= is short for "constant" and specifies that something remains unchanged. The compiler will
+*** References
+A ~reference~ in C++ is an alias for another variable. All modifications to the reference change the value of
+the variable to which it refers. You can think of references as implicit pointers that save you the trouble of
+taking the address of variables and de-referencing the pointer. Alternatively, you can think of references as
+just another name for the original variable. You can create stand-alone reference variables, use reference
+data members in classes, accept references as parameters to functions and methods, and return references from
+functions and methods.
+
+**** Reference Variables
+Reference variables must be initialized as soon as they are created, like this:
+#+BEGIN_SRC c++
+  int x = 3;
+  int& xRef = x;
+  int& emptyRef; // Does Not Compile!
+#+END_SRC
+
+***** Modifying References
+A reference always refer to the same variable to which it is initialized; references cannot be changed once
+they are created.
+#+BEGIN_SRC c++
+  int x = 3, y = 4;
+  int& xRef = x;
+  xRef = y; // Changes value of x to 4. Doesn't make xRef refer to y.
+
+  int x = 3, z = 5;
+  int& xRef = x;
+  int& zRef = z;
+  zRef = xRef; // Assigns values, not references (set the value of z to 3, doesn't change zRef)
+#+END_SRC
+
+***** References to Pointers and Pointers to References
+You can create references to any type, including pointer types. You cannot declare a reference to a reference,
+or a pointer to a reference.
+#+BEGIN_SRC c++
+  int* intP;            // intP is a pointer to int
+  int*& ptrRef = intP;  // ptrRef is a reference to intP
+  ptrRef = new int;
+  *ptrRef = 5;
+#+END_SRC
+
+**** Reference Data Members
+Data members of classes can be references. A reference cannot exist without referring to some other variable.
+Thus, you must initialize reference data members in the constructor initializer, not in the body of the
+constructor.
+#+BEGIN_SRC c++
+  class MyClass {
+  public:
+    MyClass(int& ref) : mRef(ref) {}
+
+  private:
+    int& mRef;
+  };
+#+END_SRC
+
+**** Reference Parameters
+C++ programmers do not often use stand-alone reference variables or reference data members. The most common
+use of references is for parameters to functions and methods. Recall that the default parameter-passing
+semantics are pass-by-value: Functions receive copies of their arguments. When those parameters are modified,
+the original arguments remain unchanged. References allow you to specify pass-by-reference semantics for
+arguments passed to the function. When you use reference parameters, the function receives references to the
+function arguments. If those references are modified, the changes are reflected in the original argument
+variables.
+#+BEGIN_SRC c++
+  void swap(int& first, int& second) {
+    int temp = first;
+    first = second;
+    second = temp;
+  }
+
+  int x = 5, y = 6;
+  int *xp = &x, *yp = &y;
+
+  swap(x, y);    // x and y are actually changed through references in swap
+  swap(*xp, *yp) // x and y are actually changed through references in swap
+  swap(3, 4);    // Does not Compile!
+#+END_SRC
+
+**** Reference Return Values
+You can also return a reference from a function or method. The main reason to do so is efficiency. Instead of
+returning a whole object, return a reference to the object to avoid copying it unnecessarily. Of course, you
+can only use this technique if the object in question will continue to exist following the function
+termination.
+
+If the type you want to return from your function supports move semantics, discussed later in this chapter,
+then returning it by value is almost as efficient as returning a reference.
+
+A second reason to return a reference is if you want to be able to assign to the return value directly as an
+=lvalue= (the left-hand side of an assignment statement). Several overloaded operators commonly return
+references.
+
+**** Rvalue References
+In C++, an ~lvalue~ is something of which you can take an address; a named variable, for example. The name
+comes from the fact that they normally appear on the left-hand side of an assignment. An ~rvalue~ on the other
+hand is anything that is not an ~lvalue~ such as a constant value, or a temporary object or value. Typically
+an ~rvalue~ is on the right-hand side of an assignment operator.
+
+An ~rvalue reference~ is a reference to an ~rvalue~. In particular, it is a concept that is applied when the
+~rvalue~ is a temporary object. The purpose of an ~rvalue reference~ is to make it possible for a particular
+function to be chosen when a temporary object is involved. The consequence of this is that certain operations
+that normally involve copying large values can be implemented by copying pointers to those values, knowing the
+temporary object will be destroyed.
+
+A function can specify an ~rvalue reference~ parameter by using ~&&~ as part of the parameter specification;
+e.g., ~type&& name~. Normally, a temporary object will be seen as a ~const type&~, but when there is a
+function overload that uses an ~rvalue reference~, a temporary object can be resolved to that overload.
+
+*** The ~const~ keyword
+The keyword ~const~ is short for "constant" and specifies that something remains unchanged. The compiler will
 enforce this requirement by marking any attempt to change it as an error. Furthermore, when optimizations are
 enabled, the compiler can take advantage of this knowledge to produce better code. The keyword has two related
 roles. It can mark variables or parameters, and it can mark methods.
 
-**** =const= Variables and Parameters
-You can use =const= to "protect" variables by specifying that they cannot be modified. You can mark any
-variable =const=, including global variables and class data members. Defining a constant with =const= is just
+**** ~const~ Variables and Parameters
+You can use ~const~ to "protect" variables by specifying that they cannot be modified. You can mark any
+variable ~const~, including global variables and class data members. Defining a constant with ~const~ is just
 like defining a variable, except that the compiler guarantees that code cannot change the value.
 #+BEGIN_SRC c++
   const double PI = 3.141592653589793238462;
   const std::string productName = "Super Hyper Net Modulator";
 #+END_SRC
 
-You can also use =const= to specify that parameters to functions or methods should remain unchanged.
+You can also use ~const~ to specify that parameters to functions or methods should remain unchanged.
 #+BEGIN_SRC c++
   void mysteryFunction(const std::string* someString) {
     *someString = "Test"; // Will not compile
   }
 #+END_SRC
 
-***** =const= Pointers
+***** ~const~ Pointers
 #+BEGIN_SRC c++
-  int const* ip; // Same as const int* ip;
+  const int* ip; // Same as int const* ip;
   ip = new int[10];
   ip[4] = 5; // DOES NOT COMPILE! (Cannot change the value to wich ip points)
 
@@ -526,13 +672,13 @@ You can also use =const= to specify that parameters to functions or methods shou
   ip[4] = 5;                   // OK
   ip = new int[20];            // DOES NOT COMPILE!
 
-  int const* const ip = nullptr; // both the pointer and the values to which it points are const
+  const int* const ip = nullptr; // both the pointer and the values to which it points are const
 #+END_SRC
 
-***** =const= References
-=const= applied to references is usually simpler than =const= applied to pointers for two reasons. First,
-references are =const= by default, in that you can't change to what they refer. So, there is no need to mark
-them =const= explicitly. Second, you can't create a reference to a reference, so there is usually only one
+***** ~const~ References
+~const~ applied to references is usually simpler than ~const~ applied to pointers for two reasons. First,
+references are ~const~ by default, in that you can't change to what they refer. So, there is no need to mark
+them ~const~ explicitly. Second, you can't create a reference to a reference, so there is usually only one
 level of indirection with references. The only way to get multiple levels of indirection is to create a
 reference to a pointer.
 #+BEGIN_SRC c++
@@ -541,18 +687,18 @@ reference to a pointer.
   zRef = 4; // DOES NOT COMPILE!
 #+END_SRC
 
-By passing a const reference you ensure that no copy is made but the original variable cannot be changed.
+By passing a ~const~ reference you ensure that no copy is made but the original variable cannot be changed.
 #+BEGIN_SRC c++
   void printString(const std::string& someString) {
     std::cout << someString << std::endl;
   }
 #+END_SRC
 
-**** =const= Methods
-You can mark a class method =const=, which prevents the method from modifying any non-mutable data members of
+**** ~const~ Methods
+You can mark a class method ~const~, which prevents the method from modifying any non-mutable data members of
 the class.
 
-**** The =constexpr= Keyword
+**** The ~constexpr~ Keyword
 Constant expressions are evaluated at compile time.
 #+BEGIN_SRC c++
   const int getArraySize() { return 32; }
@@ -569,24 +715,24 @@ Constant expressions are evaluated at compile time.
   }
 #+END_SRC
 
-Declaring a function as =constexpr= imposes quite a lot of restrictions on what the function can do because
+Declaring a function as ~constexpr~ imposes quite a lot of restrictions on what the function can do because
 the compiler has to be able to evaluate the function at compile time, and the function is not allowed to have
 any side effects. Here are a couple of restrictions:
-- The function body shall be a single return statement that does not contain a =goto= statement or a try catch
-  block, and does not throw any exceptions. It is allowed to call other =constexpr= functions.
-- The return type of the function shall be a literal type. It cannot be =void=.
-- If the =constexpr= function is a member of a class, the function cannot be =virtual=.
+- The function body shall be a single return statement that does not contain a ~goto~ statement or a try catch
+  block, and does not throw any exceptions. It is allowed to call other ~constexpr~ functions.
+- The return type of the function shall be a literal type. It cannot be ~void~.
+- If the ~constexpr~ function is a member of a class, the function cannot be ~virtual~.
 - All the function arguments shall be literal types.
-- A =constexpr= function cannot be called until it's defined in the translation unit because the compiler
+- A ~constexpr~ function cannot be called until it's defined in the translation unit because the compiler
   needs to know the complete definition.
-- =dynamic_cast= is not allowed.
-- =new= and =delete= are not allowed.
+- ~dynamic_cast~ is not allowed.
+- ~new~ and ~delete~ are not allowed.
 
-By defining a =constexpr= constructor you can create constant expression variables of user-defined types. A
-=constexpr= constructor should satisfy the following requirements:
+By defining a ~constexpr~ constructor you can create constant expression variables of user-defined types. A
+~constexpr~ constructor should satisfy the following requirements:
 - All the constructor arguments should be literal types.
 - The constructor body cannot be a function-try-block.
-- The constructor body should satisfy the same requirements as the body of a =constexpr= function.
+- The constructor body should satisfy the same requirements as the body of a ~constexpr~ function.
 - All data members should be initialized with constant expressions.
 #+BEGIN_SRC c++
   class Rect {
@@ -603,6 +749,255 @@ By defining a =constexpr= constructor you can create constant expression variabl
     return 0;
   }
 #+END_SRC
+
+*** The ~static~ keyword
+There are several uses of the keyword ~static~ in C++, all seemingly unrelated. Part of the motivation for
+"overloading" the keyword was attempting to avoid having to introduce new keywords into the language.
+
+**** ~static~ Data Members and Methods
+You can declare ~static~ data members and methods of classes. ~static~ data members, unlike non-static data
+members, are not part of each object. Instead, there is only one copy of the data member, which exists outside
+any objects of that class.
+
+~static~ methods are similarly at the class level instead of the object level. A ~static~ method does not
+execute in the context of a specific object.
+
+**** ~static~ Linkage
+C++ source files are each compiled independently, and the resulting object files are linked together. Each
+name in a C++ source file, including functions and global variables, has a linkage that is either ~internal~
+or ~external~. External linkage means that the name is available from other source files. Internal linkage
+(also called ~static linkage~) means that it is not. By default, functions and global variables have external
+linkage. However, you can specify internal (or static) linkage by prefixing the declaration with the keyword
+~static~.
+
+An alternative to using ~static~ for internal linkage is to employ ~anonymous namespaces~. Instead of marking
+a variable or function ~static~, wrap it in an unnamed ~namespace~. Entities in an ~anonymous namespace~ can
+be accessed anywhere following their declaration in the same source file, but cannot be accessed from other
+source files. These semantics are the same as those obtained with the ~static~ keyword.
+
+**** The ~extern~ Keyword
+A related keyword, ~extern~, seems like it should be the opposite of ~static~, specifying external linkage for
+the names it precedes. It can be used that way in certain cases. For example, ~consts~ and ~typedefs~ have
+internal linkage by default. You can use ~extern~ to give them external linkage. However, ~extern~ has some
+complications. When you specify a name as ~extern~, the compiler treats it as a declaration, not a definition.
+For variables, this means the compiler doesn't allocate space for the variable. You must provide a separate
+definition line for the variable without the ~extern~ keyword.
+
+**** ~static~ Variables in Functions
+The final use of the ~static~ keyword in C++ is to create local variables that retain their values between
+exits and entrances to their scope. A ~static~ variable inside a function is like a global variable that is
+only accessible from that function. One common use of ~static~ variables is to "remember" whether a particular
+initialization has been performed for a certain function.
+
+*** Types
+**** ~typedef~
+A ~typedef~ provides a new name for an existing type declaration. You can think of a ~typedef~ as syntax for
+introducing a synonym for an existing type declaration without creating a new type.
+#+BEGIN_SRC c++
+  typedef int* IntPtr;
+  int* p1;   // p1 is a pointer to int
+  IntPtr p2; // p2 is also a pointer to int
+  p1 = p2;   // they are the same type (compatible)
+  p2 = p1;   // they are the same type (compatible)
+
+  typedef std::vector<std::string> StringVector;
+  void processVector(const StringVector& vec) { /* omitted */ }
+  int main() {
+    StringVector myVector;
+    processVector(myVector);
+    return 0;
+  }
+#+END_SRC
+
+The STL uses ~typedefs~ extensively to provide shorter names for types. For example, ~string~ is actually a
+~typedef~ that looks like this: ~typedef basic_string<char, char_traits<char>, allocator<char>> string;~
+
+**** Type Aliases
+Type aliases are easier to understand than ~typedefs~ in certain situations.
+#+BEGIN_SRC c++
+  typedef int MyInt;
+  using MyInt = int; // same as above
+
+  typedef int (*FuncType)(char, double);
+  using FuncType = int (*)(char, double); // same as above
+#+END_SRC
+
+*** Casts
+**** ~const_cast~
+You can use ~const_cast~ to cast away const-ness of a variable.
+#+BEGIN_SRC c++
+  extern void ThirdPartyLibraryMethod(char* str);
+  void f(const char* str) {
+    ThirdPartyLibraryMethod(const_cast<char*>(str));
+  }
+#+END_SRC
+
+**** ~static_cast~
+You can use the ~static_cast~ to perform explicit conversions that are supported directly by the language.
+#+BEGIN_SRC c++
+  int i = 3, j = 4;
+  double result = static_cast<double>(i) / j;
+#+END_SRC
+
+You can also use ~static_cast~ to perform explicit conversions that are allowed because of user-defined
+constructors or conversions routines. For example, if class A has a constructor that takes an object of
+class B, you can convert a B object to an A object with a ~static_cast~. In most situations where you want
+this behavior, however, the compiler will perform the conversion automatically.
+
+Another use for ~static_cast~ is to perform downcasts in an inheritance hierarchy. This casts work with both
+pointers and references, they do not work with objects themselves. Note that these casts with ~static_cast~ do
+not perform run-time type checking. They allow you to convert any Base pointer to a Derived pointer or Base
+reference to a Derived reference, even if the Base really isn't a Derived at run time.
+#+BEGIN_SRC c++
+  class Base {
+  public:
+    Base() {}
+    virtual ~Base() {}
+  };
+
+  class Derived : public Base {
+  public:
+    Derived() {}
+    virtual ~Derived() {}
+  };
+
+  Base* b;
+  Derived* d = new Derived();
+  b = d;                        // Don't need a cast to go up the inheritance hierarchy
+  d = static_cast<Derived*>(b); // Need a cast to go down the hierarchy
+
+  Base base;
+  Derived derived;
+  Base& br = derived;
+  Derived& dr = static_cast<Derived&>(br);
+#+END_SRC
+
+~static_casts~ are not all-powerful. You can't ~static_cast~ pointers of one type to pointers of another
+unrelated type. You can't ~static_cast~ directly objects of one type to objects of another type. You can't
+~static_cast~ a ~const~ type to a ~non-const~ type. You can't ~static_cast~ pointers to ~ints~. Basically, you
+can't do anything that doesn't make sense according to the type rules of C++.
+
+**** ~reinterpret_cast~
+The ~reinterpret_cast~ is a bit more powerful and less safe than the ~static_cast~. You can use it to perform
+some casts that are not technically allowed by C++ type rules, but which might make sense to the programmer in
+some circumstances. For example, you can cast a reference to one type to a reference to another type, even if
+the types are unrelated. Similarly, you can cast a pointer type to any other pointer type, even if they are
+unrelated by an inheritance hierarchy. This is commonly used to cast a pointer to a ~void*~ and back. A
+~void*~ pointer is just a pointer to some location in memory. No type information is associated with a ~void*~
+pointer. You should be very careful with ~reinterpret_cast~ because it allows you to do conversions without
+performing any type checking.
+#+BEGIN_SRC c++
+  class X {};
+  class Y {};
+
+  X x;
+  Y y;
+  X* xp = &x;
+  Y* yp = &y;
+  // Need reinterpret cast for pointer conversion from unrelated classes
+  // static_cast doesn't work
+  xp = reinterpret_cast<X*>(yp);
+  // No cast required for conversion from pointer to void*
+  void* p = xp;
+  // Need reinterpret cast for pointer conversion from void*
+  xp = reinterpret_cast<X*>(p);
+  // Need reinterpret cast for reference conversion from unrelated classes
+  // static_cast doesn't work
+  X& xr = x;
+  Y& yr = reinterpret_cast<Y&>(x);
+#+END_SRC
+
+**** ~dynamic_cast~
+The ~dynamic_cast~ provides a run-time check on casts within an inheritance hierarchy. You can use it to cast
+pointers or references. ~dynamic_cast~ checks the run-time type information of the underlying object at run
+time. If the cast doesn't make sense, ~dynamic_cast~ returns a null pointer (for the pointer version) or
+throws an ~std::bad_cast~ exception (for the reference version). Note that the run-time type information is
+stored in the vtable of the object. Therefore, in order to use ~dynamic_cast~, your classes must have at least
+one virtual method. If your classes don't have a vtable, trying to use ~dynamic_cast~ will result in a
+compiler error.
+#+BEGIN_SRC c++
+  class Base {
+  public:
+    Base() {}
+    virtual ~Base() {}
+  };
+
+  class Derived : public Base {
+  public:
+    Derived() {}
+    virtual ~Derived() {}
+  };
+
+  // correct use of dynamic_cast
+  Base* b;
+  Derived* d = new Derived();
+  b = d;
+  d = dynamic_cast<Derived*>(b);
+
+  // dynamic cast on references casue an exception to be thrown
+  Base base;
+  Derived derived;
+  Base& br = base;
+  try {
+    Derived& dr = dynamic_cast<Derived&>(br);
+  } catch (const std::bad_cast&) {
+    cout << "Bad cast!\n";
+  }
+#+END_SRC
+
+Note that you can perform the same casts down the inheritance hierarchy with a ~static_cast~ or
+~reinterpret_cast~. The difference with ~dynamic_cast~ is that it performs run-time (dynamic) type checking,
+while ~static_cast~ and ~reinterpret_cast~ will perform the casting even if they are erroneous.
+
+**** Casting Up and Down
+An object can be cast or assigned to its parent class. If the cast or assignment is performed on a plain old
+object, this results in slicing. However, slicing does not occur if a derived class is assigned to a pointer
+or reference to its base class.
+#+BEGIN_SRC c++
+  Super mySuper = mySub;  // Slice!
+  Super& mySuper = mySub; // No Slice!
+#+END_SRC
+
+Casting from a base class to one of its derived classes, also called downcasting, is often frowned upon by
+professional C++ programmers because there is no guarantee that the object really belongs to that derived
+class, and because downcasting is a sign of bad design.
+#+BEGIN_SRC c++
+  void presumptuous(Super* inSuper) {
+    Sub* mySub = static_cast<Sub*>(inSuper); // BAD!!!
+    // Proceed to access Sub methods on mySub.
+  }
+
+  void lessPresumptuous(Super* inSuper) {
+    Sub* mySub = dynamic_cast<Sub*>(inSuper);
+    if (mySub != nullptr) {
+      // Proceed to access Sub methods on mySub.
+    }
+  }
+#+END_SRC
+
+**** Summary of Casts
+| Situation                                                              | Cast                         |
+|------------------------------------------------------------------------+------------------------------|
+| Remove const-ness                                                      | const_cast                   |
+|------------------------------------------------------------------------+------------------------------|
+| Explicit cast supported by language (e.g., int to double, int to bool) | static_cast                  |
+|------------------------------------------------------------------------+------------------------------|
+| Explicit cast supported by user-defined constructors or conversions    | static_cast                  |
+|------------------------------------------------------------------------+------------------------------|
+| Object of one class to object of another (unrelated) class             | Can't be done                |
+|------------------------------------------------------------------------+------------------------------|
+| Pointer-to-object of one class to pointer-to-object of another class   | dynamic_cast recommended, or |
+| in the same inheritance hierarchy                                      | static_cast                  |
+|------------------------------------------------------------------------+------------------------------|
+| Reference-to-object of one class to reference-to-object of another     | dynamic_cast recommended, or |
+| class in the same inheritance hierarchy                                | static_cast                  |
+|------------------------------------------------------------------------+------------------------------|
+| Pointer-to-type to unrelated pointer-to-type                           | reinterpret_cast             |
+|------------------------------------------------------------------------+------------------------------|
+| Reference-to-type to unrelated reference-to-type                       | reinterpret_cast             |
+|------------------------------------------------------------------------+------------------------------|
+| Pointer-to-function to pointer-to-function                             | reinterpret_cast             |
+|------------------------------------------------------------------------+------------------------------|
 
 *** Type Inference
 Type inference allows the compiler to automatically deduce the type of an expression. There are two keywords
@@ -816,12 +1211,12 @@ this, they are actually moving ownership of the memory from one object to anothe
 shallow copy of the member variables and switch ownership of allocated memory to prevent dangling pointers or
 memory leaks.
 
-Move semantics is implemented by using rvalue references. To add move semantics to a class, a move constructor
-and a move assignment operator need to be implemented. Move constructors and move assignment operators should
-be marked with the =noexcept= qualifier to tell the compiler that they don't throw any exceptions. This is
-particularly important for compatibility with the standard library, as fully compliant implementations of the
-standard library will only move stored objects if, having move semantics implemented, they also guarantee not
-to throw.
+Move semantics is implemented by using =rvalue= references. To add move semantics to a class, a move
+constructor and a move assignment operator need to be implemented. Move constructors and move assignment
+operators should be marked with the ~noexcept~ qualifier to tell the compiler that they don't throw any
+exceptions. This is particularly important for compatibility with the standard library, as fully compliant
+implementations of the standard library will only move stored objects if, having move semantics implemented,
+they also guarantee not to throw.
 
 Obviously, move semantics is useful only when you know that the source object will be destroyed.
 
@@ -876,14 +1271,19 @@ By listing multiple parents, the =Baz= object will have the following characteri
 - Deleting a =Bas= object will automatically call the destructors for the =Foo= and =Bar= classes, in the
   reverse order that the classes are listed in the class definition.
 
-*** Exceptions
-An exception is an unexpected situation. Exceptions come with some new terminology. When a piece of code
-detects an exceptional situation, it =throws= an exception. Another piece of code =catches= the exception and
-takes appropriate action. Exceptions can get tricky in C++. To use exceptions properly, you need to understand
-what happens to the stack variables when an exception is thrown, and you have to be careful to properly catch
-and handle the necessary exceptions. Unlike the Java language, the C++ compiler doesn't force you to catch
-every exception that might occur. If your code never catches any exceptions but an exception is thrown, it
-will be caught by the program itself, which will be terminated.
+**** Inheritance versus Specialization
+|               | Inheritance                           | Specialization                                     |
+|---------------+---------------------------------------+----------------------------------------------------|
+| Recuse Code?  | Yes: Derived classes contain all      | No: You must rewrite all required code in the      |
+|               | base class data members and methods.  | specialization.                                    |
+|---------------+---------------------------------------+----------------------------------------------------|
+| Reuse name?   | No: The derived class name must be    | Yes: The specialization must have the same name as |
+|               | different from the base class name.   | the original.                                      |
+|---------------+---------------------------------------+----------------------------------------------------|
+| Supports      | Yes: Objects of the derived class can | No: Each instantiation of a template for a type is |
+| polymorphism? | stand in for objects of the base      | a different type.                                  |
+|               | class.                                |                                                    |
+|---------------+---------------------------------------+----------------------------------------------------|
 
 *** Using Interface and Implementation Classes (PIMPL Idiom)
 Even with the preceding measures and the best design principles, the C++ language is fundamentally unfriendly
@@ -906,6 +1306,15 @@ the interface class need to be recompiled if the implementation (and only the im
 that this idiom only works if the single data member is a pointer to the implementation class. If it would be
 a by-value data member, the clients would have to be recompiled when the definition of the implementation
 class changes.
+
+*** Exceptions
+An exception is an unexpected situation. Exceptions come with some new terminology. When a piece of code
+detects an exceptional situation, it =throws= an exception. Another piece of code =catches= the exception and
+takes appropriate action. Exceptions can get tricky in C++. To use exceptions properly, you need to understand
+what happens to the stack variables when an exception is thrown, and you have to be careful to properly catch
+and handle the necessary exceptions. Unlike the Java language, the C++ compiler doesn't force you to catch
+every exception that might occur. If your code never catches any exceptions but an exception is thrown, it
+will be caught by the program itself, which will be terminated.
 
 *** Big-O Notation
 =Big-O= notation specifies algorithm run time as a function of its input size, also known as the complexity of

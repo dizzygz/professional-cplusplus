@@ -67,3 +67,26 @@ ch09: clean
 	$(CC) $(CFLAGS) -o $(BIN)/06_Cherry $(SRC)/ch09/06_Cherry/*.cpp
 	$(CC) $(CFLAGS) -o $(BIN)/07_MilesEstimator $(SRC)/ch09/07_MilesEstimator/*.cpp
 	$(CC) $(CFLAGS) -o $(BIN)/08_VirtualInheritance $(SRC)/ch09/08_VirtualInheritance/*.cpp
+
+ch10: clean
+	$(CC) $(CFLAGS) -o $(BIN)/01_ReferenceVariables $(SRC)/ch10/01_References/ReferenceVariables.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/01_ReferenceDataMembers $(SRC)/ch10/01_References/ReferenceDataMembers.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/01_ReferenceParameters $(SRC)/ch10/01_References/ReferenceParameters.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/01_OddsEvensPtrs $(SRC)/ch10/01_References/OddsEvensPtrs.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/01_OddsEvensRefs $(SRC)/ch10/01_References/OddsEvensRefs.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/01_OddsEvensVector $(SRC)/ch10/01_References/OddsEvensVector.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/01_RvalueReferences $(SRC)/ch10/01_References/RvalueReferences.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/02_SpreadsheetMoveSemantics $(SRC)/ch10/02_SpreadsheetMoveSemantics/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/03_Const $(SRC)/ch10/03_Const/Const.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/04_Constexpr1 $(SRC)/ch10/04_Constexpr/constexpr.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/04_Constexpr2 $(SRC)/ch10/04_Constexpr/constexprClasses.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/05_Static1 $(SRC)/ch10/05_Static/FirstFile.cpp $(SRC)/ch10/05_Static/AnotherFile.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/05_Static2 $(SRC)/ch10/05_Static/StaticsInFunctions.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/07_Extern $(SRC)/ch10/07_Extern/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/11_Scope $(SRC)/ch10/11_Scope/Scope.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/13_InitializerLists $(SRC)/ch10/13_InitializerLists/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/14_ExplicitConversionOperators $(SRC)/ch10/14_ExplicitConversionOperators/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/15_UserDefinedLiterals $(SRC)/ch10/15_UserDefinedLiterals/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/17_VarArgs1 $(SRC)/ch10/17_VarArgs/PrintfDemo.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/17_VarArgs2 $(SRC)/ch10/17_VarArgs/VarArgs.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/18_Macros $(SRC)/ch10/18_Macros/Square.cpp
