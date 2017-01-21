@@ -90,3 +90,22 @@ ch10: clean
 	$(CC) $(CFLAGS) -o $(BIN)/17_VarArgs1 $(SRC)/ch10/17_VarArgs/PrintfDemo.cpp
 	$(CC) $(CFLAGS) -o $(BIN)/17_VarArgs2 $(SRC)/ch10/17_VarArgs/VarArgs.cpp
 	$(CC) $(CFLAGS) -o $(BIN)/18_Macros $(SRC)/ch10/18_Macros/Square.cpp
+
+ch11: clean
+	$(CC) $(CFLAGS) -o $(BIN)/01_GameBoard $(SRC)/ch11/01_GameBoard/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/02_Grid1 $(SRC)/ch11/02_Grid/01_MethodsInHeader/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/02_Grid2 $(SRC)/ch11/02_Grid/02_MethodsInSeparateHeader/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/02_Grid3 $(SRC)/ch11/02_Grid/03_MethodsInSource/SpreadsheetCell.cpp $(SRC)/ch11/02_Grid/03_MethodsInSource/main.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/02_Grid4 $(SRC)/ch11/02_Grid/04_ExplicitInstantiations/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/03_GridNonType $(SRC)/ch11/03_GridNonType/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/04_GridNonTypeDefault $(SRC)/ch11/04_GridNonTypeDefault/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/05_GridMethodTemplates $(SRC)/ch11/05_MethodTemplates/main.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/06_GridMethodTemplatesNonType $(SRC)/ch11/06_MethodTemplatesNonType/main.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/07_GridSpecialization $(SRC)/ch11/07_GridSpecialization/main.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/08_GridInheritance $(SRC)/ch11/08_GridInheritance/main.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/09_AlternativeFunctionSyntax $(SRC)/ch11/09_AlternativeFunctionSyntax/main.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/10_FunctionTemplate1 $(SRC)/ch11/10_FunctionTemplate/01_FindTemplate.cpp $(SRC)/ch11/10_FunctionTemplate/SpreadsheetCell.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/10_FunctionTemplate2 $(SRC)/ch11/10_FunctionTemplate/02_FindTemplateSpecialization.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/10_FunctionTemplate3 $(SRC)/ch11/10_FunctionTemplate/03_FindTemplateOverload.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/10_FunctionTemplate4 $(SRC)/ch11/10_FunctionTemplate/04_FindTemplateSpecialOverload.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/11_FriendFunctionTemplates $(SRC)/ch11/11_FriendFunctionTemplates/main.cpp

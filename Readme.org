@@ -475,12 +475,82 @@
 
 *** Chapter 11 - Writing Generic Code with Templates
 **** Notes
-
-**** Warnings
+- Functions parameterize values. Templates take the concept of parameterization a step further to allow you to
+  parameterize on types as well as values. Just as you use parameter names in functions to represent the
+  arguments that the caller will pass, you use template parameter names (such as ~T~) in templates to
+  represent the types that the caller will specify.
+- Class templates define a class where the types of some of the variables, return types of methods, and/or
+  parameters to the methods are specified as parameters. Class templates are useful primarily for containers,
+  or data structures, that store objects.
+- In C++, you can write class templates, which allows you to write a class without specifying one or more
+  types. Clients then instantiate the template by specifying the types they want to use. This is called
+  generic programming. The biggest advantage of generic programming is type safety. The types used in the
+  class and its methods are concrete types, and not abstract base classes types as is the case with
+  polymorphic solutions.
+- For historical reasons, you can use the keyword ~class~ instead of ~typename~ to specify template type
+  parameters. Thus, many books and existing programs use syntax like this: ~template <class T>~. However, the
+  use of the word "class" in this context is confusing because it implies that the type must be a class, which
+  is not true. The type can be a ~class~, a ~struct~, a ~union~, a primitive type of the language like ~int~
+  or ~double~, and so on.
+- The ~template <typename T>~ specifier must precede each method definition for a class template.
+- Templates require you to put the implementation of the methods in the header file itself, because the
+  compiler needs to know the complete definition, including the definition of methods, before it can create an
+  instance of the template.
+- Normally you put class definitions in a header file and method definitions in a source file. Code that
+  creates or uses objects of the class ~#includes~ the header file and obtains access to the method code via
+  the linker. Templates don't work that way. Because they are "templates" for the compiler to generate the
+  actual methods for the instantiated types, both class template definitions and method definitions must be
+  available to the compiler in any source file that uses them. There are several mechanisms to obtain this
+  inclusion.
+  * Template Definitions in Header Files. You can place the method definitions directly in the same header
+    file where you define the class itself. When you ~#include~ this file in a source file where you use the
+    template, the compiler will have access to all the code it needs.
+  * Template Definitions in a Separate Header File. Alternatively, you can place the template method
+    definitions in a separate header file that you ~#include~ in the header file with the class definitions.
+    Make sure the ~#include~ for the method definitions follows the class definition; otherwise the code won't
+    compile.
+  * Template Definitions in Source Files. Method implementations look strange in header files. If that syntax
+    annoys you, there is a way that you can place the method definitions in a source file. However, you still
+    need to make the definitions available to the code that uses the templates, which you can do by
+    ~#includeing~ the method implementation source file in the class template definition header file. That
+    sounds odd if you've never seen it before, but it's legal in C++. When using this technique, make sure you
+    don't add the source file to your project, because it is not supposed to be, and cannot be compiled
+    separately; it should be ~#included~ only in a header file.
+  * Limit Class Template Instantiations. If you want your class templates to be used only with certain known
+    types, you can use the this technique also called "Explicit Instantiation". With this technique, you
+    disallow client code from using your class template with other types that you don't explicitly
+    instantiate.
+- Non-type template parameters become part of the type specification of instantiated objects.
+- C++ allows you to templatize individual methods of a class. These methods can be inside a class template or
+  in a non-templatized class. When you write a templatized class method, you are actually writing many
+  different versions of that method for many different types. Method templates come in useful for assignment
+  operators and copy constructors in class templates. Virtual methods and destructors cannot be method
+  templates.
+- Alternate implementations of templates are called template specializations. You might find the syntax to be
+  a little weird. When you write a class template specialization, you must specify that it's a template, and
+  that you are writing the version of the template for that particular type.
+- Class template specialization allows you to write a special implementation for a template with the template
+  types replaced by specific types. Keep in mind that there is also a more advanced feature of specialization
+  called partial specialization.
+- When you specialize a template, you don't "inherit" any code: Specializations are not like derivations. You
+  must rewrite the entire implementation of the class. There is no requirement that you provide methods with
+  the same names or behavior. As a matter of fact, you could write a completely different class with no
+  relation to the original. Of course, that would abuse the template specialization ability, and you shouldn't
+  do it without good reason.
+- You can inherit from class templates. If the derived class inherits from the template itself, it must be a
+  template as well. Alternatively, you can derive from a specific instantiation of the class template, in
+  which case your derived class does not need to be a template.
+- Use inheritance for extending implementations and for polymorphism. Use specialization for customizing
+  implementations for particular types.
+- You can also write templates for stand-alone functions. Like class template method definitions, function
+  template definitions (not just the prototypes) must be available to all source files that use them. Thus,
+  you should put the definitions in header files if more than one source file uses them.
 
 *** Chapter 12 - Demystifying C++ I/O
 **** Notes
+
 **** Warnings
+
 *** Chapter 13 - Handling Errors
 **** Notes
 **** Warnings
@@ -820,6 +890,23 @@ Type aliases are easier to understand than ~typedefs~ in certain situations.
 
   typedef int (*FuncType)(char, double);
   using FuncType = int (*)(char, double); // same as above
+#+END_SRC
+
+**** Alias Templates
+You can use a ~typedef~ to give another name to a templatized class. However, C++ requires you to specify
+concrete arguments for each template parameter. Use alias template to be able to specify some of the types
+only.
+#+BEGIN_SRC
+  template<typename T1, typename T2>
+  class MyTemplateClass {/* ... */};
+
+  typedef MyTemplateClass<int, double> OtherName; // Wors as expected
+
+  template<typenamt T1>
+  typedef MyTemplateClass<T1, double> OtherName; // Error
+
+  template<typename T1>
+  using OtherName = MyTemplateClass<T1, double>; // Using alias template works!
 #+END_SRC
 
 *** Casts
@@ -1271,20 +1358,6 @@ By listing multiple parents, the =Baz= object will have the following characteri
 - Deleting a =Bas= object will automatically call the destructors for the =Foo= and =Bar= classes, in the
   reverse order that the classes are listed in the class definition.
 
-**** Inheritance versus Specialization
-|               | Inheritance                           | Specialization                                     |
-|---------------+---------------------------------------+----------------------------------------------------|
-| Recuse Code?  | Yes: Derived classes contain all      | No: You must rewrite all required code in the      |
-|               | base class data members and methods.  | specialization.                                    |
-|---------------+---------------------------------------+----------------------------------------------------|
-| Reuse name?   | No: The derived class name must be    | Yes: The specialization must have the same name as |
-|               | different from the base class name.   | the original.                                      |
-|---------------+---------------------------------------+----------------------------------------------------|
-| Supports      | Yes: Objects of the derived class can | No: Each instantiation of a template for a type is |
-| polymorphism? | stand in for objects of the base      | a different type.                                  |
-|               | class.                                |                                                    |
-|---------------+---------------------------------------+----------------------------------------------------|
-
 *** Using Interface and Implementation Classes (PIMPL Idiom)
 Even with the preceding measures and the best design principles, the C++ language is fundamentally unfriendly
 to the principle of abstraction. The syntax requires you to combine your public interfaces and private (or
@@ -1306,6 +1379,23 @@ the interface class need to be recompiled if the implementation (and only the im
 that this idiom only works if the single data member is a pointer to the implementation class. If it would be
 a by-value data member, the clients would have to be recompiled when the definition of the implementation
 class changes.
+
+*** Generic Code with Templates
+**** Inheritance versus Specialization
+Some programmers find the distinction between template inheritance and template specialization confusing. The
+following table summarizes the differences:
+|               | Inheritance                           | Specialization                                     |
+|---------------+---------------------------------------+----------------------------------------------------|
+| Recuse Code?  | Yes: Derived classes contain all      | No: You must rewrite all required code in the      |
+|               | base class data members and methods.  | specialization.                                    |
+|---------------+---------------------------------------+----------------------------------------------------|
+| Reuse name?   | No: The derived class name must be    | Yes: The specialization must have the same name as |
+|               | different from the base class name.   | the original.                                      |
+|---------------+---------------------------------------+----------------------------------------------------|
+| Supports      | Yes: Objects of the derived class can | No: Each instantiation of a template for a type is |
+| polymorphism? | stand in for objects of the base      | a different type.                                  |
+|               | class.                                |                                                    |
+|---------------+---------------------------------------+----------------------------------------------------|
 
 *** Exceptions
 An exception is an unexpected situation. Exceptions come with some new terminology. When a piece of code
