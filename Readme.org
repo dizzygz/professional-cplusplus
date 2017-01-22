@@ -548,8 +548,54 @@
 
 *** Chapter 12 - Demystifying C++ I/O
 **** Notes
+- Every input stream has an associated source. Every output stream has an associated destination.
+- If you get confused between ~<< and >>~, just think of the angles as pointing toward their destination. In
+  an output stream, ~<<~ points toward the stream itself because data is being sent tho the stream. In an
+  input stream, ~>>~ points toward the variables because data is being stored.
+- You can use the ~<<~ operator to output a C++ string even though it is not a basic type. In C++, objects are
+  able to prescribe how they are output and input. This is accomplished by overloading the ~<< and >>~
+  operator to understand a new type or class.
+- The ~ostringstream~ class is used to write data to a string, while the ~istringstream~ class is used to read
+  data from a string. They are both defined in the ~<sstream>~ header file. Because ~ostringstream~ and
+  ~istringstream~ inherit the same behavior as ~ostream~ and ~istream~, working with them is pleasantly
+  similar.
+- Tuning an object into a "flattened" type, like a string, is often called marshalling. Marshalling is useful
+  for saving objects to disk or sending them accross a network.
+- The main advantage of a string stream over a standard C++ string is that, in addition to data, the object
+  knows where the next read or write operation will take place, also called current position. There may also
+  be performance benefits depending on the particular implementation of string streams. For example, if you
+  need to append a lot of strings together, it might be more efficient to use a string stream, instead of
+  repeatedly calling the ~+=~ operator on a string object.
+- Files lend themselves very well to the stream abstraction because reading and writing files always involves
+  a position in addition to the data. In C++, the ~ofstream~ and ~ifstream~ classes provide output and input
+  functionality for files. They are defined in the ~<fstream>~ header file.
+- The ~seek()~ and ~tell()~ methods are present on all input and output streams, but they rarely make sense
+  outside of the context of file streams. The ~seek()~ methods let you move to an arbitrary position within an
+  input or output stream. There are several forms of ~seek()~. The methods of ~seek()~ within an input stream
+  are actually called ~seekg()~ (the g is for get), and the versions of ~seek()~ in an output stream are
+  called ~seekp()~ (the p is for put). You might wonder why there is both a ~seekg()~ and a ~seekp()~ method,
+  instead of one ~seek()~ method. The reason is that you can have streams that are both input and output, for
+  example, file streams. In that case, the stream needs to remember both a read position and a separate write
+  position. This is also called bidirectional I/O.
+- A link can be established between any input and output streams to give them flush-on-access behavior. In
+  other words, when data is requested from an input stream, its linked output stream will automatically flush.
+  This behavior is available to all streams, but is particularly useful for file streams that may be dependent
+  upon each other. Stream linking is accomplished with the ~tie()~ method. To tie an output stream to an input
+  stream, call ~tie()~ on the input stream, and pass the address of the output stream. To break the link, pass
+  ~nullptr~. One example of this stream linking is the link between ~cout~ and ~cin~. Whenever you try to
+  input data from ~cin~, ~cout~ is automatically flushed.
+- A bidirectional stream operates as both an input stream and an output stream. Bidirectional streams are
+  deriving from ~iostream~, which in turn derives from both ~istream~ and ~ostream~, thus serving as an
+  example of useful multiple inheritance. As you would expect, bidirectional streams support both the ~>>~
+  operator and the ~<<~ operator, as well as the methods of both input streams and output streams.
+- Bidirectional streams have separate pointers for the read position and the write position. When switching
+  between reading and writing, you will need to ~seek~ to the appropriate position.
 
 **** Warnings
+- Note that graphical user interface applications normally do not have a console; i.e., if you write something
+  to ~cout~, the user will not see it. If you are writing a library, you should never assume the existence of
+  ~cout~, ~cin~, ~cerr~ or, ~clog~ because you never know if your library will be used in a console or in a
+  GUI application.
 
 *** Chapter 13 - Handling Errors
 **** Notes
@@ -1396,6 +1442,58 @@ following table summarizes the differences:
 | polymorphism? | stand in for objects of the base      | a different type.                                  |
 |               | class.                                |                                                    |
 |---------------+---------------------------------------+----------------------------------------------------|
+
+*** IO Streams
+All streams can be viewed as data chutes. Streams vary in their =direction= and their =associated source or
+destination=. For example, the ~cout~ stream is an output stream, so its direction is "out." It writes data to
+the console so its associated destination is "console." There is another standard stream called ~cin~ that
+accepts input from the user. Its direction is "in," and its associated source is "console." Both ~cout~ and
+~cin~ are predefined instances of streams that are defined within the ~std namespace~ in C++. The following
+table gives a brief description of all predefined streams.
+| Stream | Description                                                                          |
+|--------+--------------------------------------------------------------------------------------|
+| cin    | An input stream, reads data from the "input console."                                |
+| cout   | A buffered output stream, writes data to the "output console."                       |
+| cerr   | An un-buffered output stream, writes data to the "error console," which is often the |
+|        | same as the "output console."                                                        |
+| clog   | A buffered version of cerr.                                                          |
+|--------+--------------------------------------------------------------------------------------|
+
+**** Output Manipulators
+One of the unusual features of streams is that you can throw more than just data down the chute. C++ streams
+also recognize manipulators, objects that make a change to the behavior of the stream instead of, or in
+addition to, providing data for the stream to work with. All the manipulators stay in effect for subsequent
+output to the stream until they are reset, except ~setw~ which is only active for the next single output.
+- ~boolalpha~ and ~noboolalpha~ :: Tells the stream to output ~bool~ values as =true= and =false=
+     (~boolalpha~) or =1= and =0= (~noboolalpha~). The default is ~noboolalpha~.
+- ~hex~, ~oct~ and ~dec~ :: Outputs numbers in hexadecimal, octal and base 10, respectively.
+- ~setprecision~ :: Sets the number of decimal places that are output for fractional numbers. This is a
+     parameterized manipulator (meaning that it takes an argument).
+- ~setw~ :: Sets the field width for outputting numerical data. This is a parameterized manipulator.
+- ~setfill~ :: Specifies the character that is used to pad numbers that are smaller than the specified width.
+     This is a parameterized manipulator.
+- ~showpoint~ and ~noshowpoint~ :: Forces the stream to always or never show the decimal point for floating
+     point numbers with no fractional part.
+- ~put_money~ :: Writes a formatted money amount to a stream.
+- ~put_time~ :: Writes a formatted time to a stream.
+- ~quoted~ :: A parameterized manipulator that encloses a given string with quotes and escapes embedded
+     quotes.
+
+**** Input Manipulators
+The built-in input manipulators, described in the list that follows, can be sent to an input stream to
+customize the way that data is read.
+- ~boolalpha~ and ~noboolalpha~ :: If ~boolalpha~ is used, the string =false= will be interpreted as a Boolean
+     value =false=; anything else will be treated as the Boolean value =true=. If ~noboolalpha~ is set, =0=
+     will be interpreted as =false=, anything else as =true=. The default is ~noboolalpha~.
+- ~hex~, ~oct~, and ~dec~ :: Reads numbers in hexadecimal, octal, and base 10, respectively.
+- ~skipws~ and ~noskipws~ :: Tells the stream to either skip white space when tokenizing or to read in white
+     space as its own token.
+- ~ws~ :: A handy manipulator that simply skips over the current series of white space at the current position
+     in the stream.
+- ~get_money~ :: Reads a money amount from a stream.
+- ~get_time~ :: Reads a formatted time from a stream.
+- ~quoted~ :: A parameterized manipulator that reads a string enclosed with quotes and in which embedded
+     quotes are escaped.
 
 *** Exceptions
 An exception is an unexpected situation. Exceptions come with some new terminology. When a piece of code

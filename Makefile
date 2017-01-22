@@ -3,6 +3,7 @@ CFLAGS=-std=c++14 -Wall -Wextra -Wpedantic -g -O0
 SRC=src
 BIN=bin
 RM=rm -rf
+CP=cp -rf
 
 # The Cleaner
 clean:
@@ -109,3 +110,23 @@ ch11: clean
 	$(CC) $(CFLAGS) -o $(BIN)/10_FunctionTemplate3 $(SRC)/ch11/10_FunctionTemplate/03_FindTemplateOverload.cpp
 	$(CC) $(CFLAGS) -o $(BIN)/10_FunctionTemplate4 $(SRC)/ch11/10_FunctionTemplate/04_FindTemplateSpecialOverload.cpp
 	$(CC) $(CFLAGS) -o $(BIN)/11_FriendFunctionTemplates $(SRC)/ch11/11_FriendFunctionTemplates/main.cpp
+
+ch12: clean
+	$(CC) $(CFLAGS) -o $(BIN)/01_OutputBasics $(SRC)/ch12/01_OutputBasics/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/02_Write $(SRC)/ch12/02_Write/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/03_Put $(SRC)/ch12/03_Put/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/04_Flush $(SRC)/ch12/04_Flush/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/05_Exceptions $(SRC)/ch12/05_Exceptions/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/06_OutputManipulators $(SRC)/ch12/06_Manipulator/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/07_Input $(SRC)/ch12/07_Input/main.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/08_Get $(SRC)/ch12/08_Get/Get.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/09_Unget $(SRC)/ch12/09_Unget/Unget.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/10_Peek $(SRC)/ch12/10_Peek/Peek.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/11_Getline $(SRC)/ch12/11_Getline/Getline.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/12_ErrorCheck $(SRC)/ch12/12_ErrorCheck/ErrorCheck.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/13_Muffin $(SRC)/ch12/13_Muffin/Muffin.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/14_StringStream $(SRC)/ch12/14_StringStream/StringStream.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/15_FileStream1 $(SRC)/ch12/15_FileStream/FileStream1.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/15_FileStream2 $(SRC)/ch12/15_FileStream/FileStream2.cpp
+	@$(CP) $(SRC)/ch12/16_tie/input.txt $(BIN)/input.txt && $(CC) $(CFLAGS) -o $(BIN)/16_tie $(SRC)/ch12/16_tie/tie.cpp
+	@$(CP) $(SRC)/ch12/17_Bidirectional/data.txt $(BIN)/data.txt && $(CC) $(CFLAGS) -o $(BIN)/17_Bidirectional $(SRC)/ch12/17_Bidirectional/Bidirectional.cpp
