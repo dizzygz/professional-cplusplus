@@ -599,10 +599,64 @@
 
 *** Chapter 13 - Handling Errors
 **** Notes
+- Inevitably, your C++ programs will encounter errors. The program might be unable to open a file, the network
+  connection might go down, or the user might enter an incorrect value, to name a few possibilities. The C++
+  language provides a feature called exceptions to handle these exceptional but not unexpected situations.
+- I recommend exceptions as a useful mechanism for error handling. I feel that the structure and
+  error-handling formalization that exceptions provide outweigh the less desirable aspects. Also, many popular
+  libraries, such as the =STL= and =Boost= use exceptions, so you need to be prepared to handle them.
+- Although by default, streams do not throw exceptions, you can tell the streams to throw exceptions for error
+  conditions by calling their ~exceptions()~ method. However, not all compilers give useful information in the
+  stream exceptions they throw. For those compilers it might be better to deal with the stream state directly
+  instead of using exceptions. This book does not use stream exceptions.
+- It is recommended to catch exceptions by ~const reference~. This avoids object slicing which could happend
+  when you catch exceptions by value.
+- It is also possible to change the behavior of your program if there is an uncaught exception. When the
+  program encounters an uncaught exception, it calls the built-in ~terminate()~ function, which calls
+  ~abort()~ from ~<cstdlib>~ to kill the program. You can set your own ~terminate_handler~ by calling
+  ~set_terminate()~ with a pointer to a callback function that takes no arguments and returns no value.
+  ~terminate()~, ~set_terminate()~, and ~terminate_handler~ are all declared in the ~<exception>~ header.
+- A function without a throw list can throw exceptions of any type. A function with ~noexcept~ shouldn't throw
+  any exception.
+- Since C++11, any exception specification is deprecated, except for ~noexcept~.
+- Throw lists don't prevent functions from throwing unlisted exception types, but they prevent the exception
+  from leaving the function, resulting a run-time error.
+- When a function marked as ~noexcept~ throws an exception, C++ calls ~terminate()~ to terminate the
+  application. When a function throws an exception that is not listed in its throw list, C++ calls a special
+  function ~unexpected()~. The built-in implementation of ~unexpected()~ calls ~terminate()~.
+- Never use throw lists because they are now deprecated, except for ~noexcept~. Instead, document the possible
+  exceptions a function can throw in its code documentation.
+- If you write a class whose objects will be thrown as exceptions, you must make those objects copyable. This
+  means that if you have dynamically allocated memory, you must write a destructor, copy constructor, and
+  assignment operator.
+- Catch exception objects by reference to avoid unnecessary copying.
+- It could happen that during handling of a first exception, a second exceptional situation is triggered which
+  requires a second exception to be thrown. Unfortunately, when you throw the second exception, all
+  information about the first exception that you are currently trying to handle will be lost. The solution
+  provided by C++ for this problem is called nested exceptions, which allow you to nest a caught exception in
+  the context of a new exception. You use ~std::throw_with_nested()~ to throw an exception with another
+  exception nested inside it. A catch handler for the second exception can use a ~dynamic_cast~ to get access
+  to the ~nested_exception~ representing the first exception.
+- With smart pointers, you never have to remember to free the underlying resource: the smart pointer
+  destructor does it for you, whether you leave the function via an exception or leave the function normally.
+- C++ guarantees that it will run the destructor for any fully constructed "sub-objects". Therefore, any
+  constructor that completes without an exception will cause the corresponding destructor to be run.
+
 **** Warnings
+- Catch and handle all possible exceptions thrown in your program.
+- When you catch exceptions polymorphically, make sure to catch them by reference. If you catch exceptions by
+  value, you can encounter slicing, in which case you lose information from the object.
+- Objects thrown as exceptions are always copied by value at least once.
+- Careless exception handling can lead to memory and resource leaks (because of stack unwinding).
+- Remember, if and exception leaves a constructor, the destructor for that object will never be called!
+- Be careful to catch in a destructor any exceptions that can be thrown by calls you make from the destructor.
+  Never allow an exception to leave a destructor.
+
 *** Chapter 14 - Overloading C++ Operators
 **** Notes
+
 **** Warnings
+
 *** Chapter 15 - Overview of the C++ Standard Library
 **** Notes
 **** Warnings
@@ -1503,6 +1557,47 @@ what happens to the stack variables when an exception is thrown, and you have to
 and handle the necessary exceptions. Unlike the Java language, the C++ compiler doesn't force you to catch
 every exception that might occur. If your code never catches any exceptions but an exception is thrown, it
 will be caught by the program itself, which will be terminated.
+
+**** Memory Allocation Errors
+The default behaviors of ~new~ and ~new[]~ are to throw an exception of type ~bad_alloc~, defined in the
+~<new>~ header file, if they cannot allocate memory. Your code could catch these exceptions and handle them
+appropriately. It's not realistic to wrap all your calls to ~new~ and ~new[]~ with a =try/catch=, but at least
+you should do so when you are trying to allocate a big block of memory.
+
+One consideration is that logging an error might try to allocate memory. If ~new~ fails, there might
+not be enough memory left even to log the error message.
+
+If you don't like exceptions, you can revert to the old C model in which memory allocation routines return a
+~null~ pointer if they cannot allocate memory. C++ provides ~nothrow~ versions of ~new~ and ~new[]~, which
+return ~nullptr~ instead of throwing an exception if they fail to allocate memory. This is done by using the
+syntax ~new(nothrow)~ instead of ~new~.
+
+**** Errors in Constructors
+You can throw an exception from a constructor, even though you can't return a value. With exceptions you can
+easily tell clients whether or not construction of the object succeeded. However, there is one major problem:
+if an exception leaves a constructor, the destructor for that object will never be called. Thus, you must be
+careful to clean up any resources and free any allocated memory in constructors before allowing exceptions to
+leave the constructor. This problem is the same as in any other function, but it is subtler in constructors
+because you're accustomed to letting the destructors take care of the memory deallocation and resource
+freeing.
+
+**** Errors in Destructors
+You should handle all error conditions that arise in destructors in the destructors themselves. You should not
+let any exceptions be thrown from destructors, for three reasons:
+  1. Destructors can run while there is another pending exception, in the process of stack unwinding. If you
+     throw an exception from the destructor in the middle of stack unwinding, the C++ runtime will call
+     ~std::terminate()~ to terminate the application. For the brave and curious, C++ does provide the ability
+     to determine, in a destructor, whether you are executing as a result of a normal function exit or delete
+     call, or because of stack unwinding. The function ~uncaught_exception()~, declared in the ~<exception>~
+     header file, returns true if there is an uncaught exception and you are in the middle of stack unwinding.
+     Otherwise, it returns false. However, this approach is messy and should be avoided.
+  2. What action would clients take? Clients don't call destructors explicitly: they call ~delete~, which
+     calls the destructor. If you throw an exception from the destructor, what is a client supposed to do? It
+     can't call delete on the object again, and it shouldn't call the destructor explicitly. There is no
+     reasonable action the client can take, so there is no reason to burden that code with exception handling.
+  3. The destructor is your one chance to free memory and resources used in the object. If you waste your
+     chance by exiting the function early due to an exception, you will never be able to go back and free the
+     memory or resources.
 
 *** Big-O Notation
 =Big-O= notation specifies algorithm run time as a function of its input size, also known as the complexity of
