@@ -132,36 +132,31 @@ ch12: clean
 	@$(CP) $(SRC)/ch12/17_Bidirectional/data.txt $(BIN)/data.txt && $(CC) $(CFLAGS) -o $(BIN)/17_Bidirectional $(SRC)/ch12/17_Bidirectional/Bidirectional.cpp
 
 ch13: clean
-	# @$(CP) $(SRC)/ch13/01_ReadIntegerFile/IntegerFile.txt $(BIN)/IntegerFile.txt
-	# $(CC) $(CFLAGS) -o $(BIN)/01_RIF_NoExceptionHandling $(SRC)/ch13/01_ReadIntegerFile/01_NoExceptionHandling.cpp
-	# $(CC) $(CFLAGS) -o $(BIN)/01_RIF_BasicExceptions $(SRC)/ch13/01_ReadIntegerFile/02_BasicExceptions.cpp
-	# $(CC) $(CFLAGS) -o $(BIN)/01_RIF_ThrowInt $(SRC)/ch13/01_ReadIntegerFile/03_ThrowInt.cpp
-	# $(CC) $(CFLAGS) -o $(BIN)/01_RIF_ThrowCharStar $(SRC)/ch13/01_ReadIntegerFile/04_ThrowCharStar.cpp
-	# $(CC) $(CFLAGS) -o $(BIN)/01_RIF_CatchByValue $(SRC)/ch13/01_ReadIntegerFile/05_CatchByValue.cpp
-	# $(CC) $(CFLAGS) -o $(BIN)/01_RIF_CatchByNonConstReference $(SRC)/ch13/01_ReadIntegerFile/06_CatchByNonConstReference.cpp
-	# $(CC) $(CFLAGS) -o $(BIN)/01_RIF_ThrowingMultipleBasic $(SRC)/ch13/01_ReadIntegerFile/07_ThrowingMultipleBasic.cpp
-	# $(CC) $(CFLAGS) -o $(BIN)/01_RIF_ThrowingTwoTypes $(SRC)/ch13/01_ReadIntegerFile/08_ThrowingTwoTypes.cpp
-	# $(CC) $(CFLAGS) -o $(BIN)/01_RIF_MatchingAnyException $(SRC)/ch13/01_ReadIntegerFile/09_MatchingAnyException.cpp
-	# $(CC) $(CFLAGS) -o $(BIN)/01_RIF_TerminateHandler $(SRC)/ch13/01_ReadIntegerFile/10_TerminateHandler.cpp
-	# $(CC) $(CFLAGS) -o $(BIN)/01_RIF_ThrowList $(SRC)/ch13/01_ReadIntegerFile/11_ThrowList.cpp
-	# $(CC) $(CFLAGS) -o $(BIN)/01_RIF_noexcept $(SRC)/ch13/01_ReadIntegerFile/12_noexcept.cpp
-	# $(CC) $(CFLAGS) -o $(BIN)/01_RIF_UnexpectedExceptions $(SRC)/ch13/01_ReadIntegerFile/13_UnexpectedExceptions.cpp
-
-	# $(CC) $(CFLAGS) -o $(BIN)/02_SafeDivide $(SRC)/ch13/02_SafeDivide/*.cpp
-	# $(CC) $(CFLAGS) -o $(BIN)/03_Rethrow $(SRC)/ch13/03_Rethrow/*.cpp
-
-	# $(CC) $(CFLAGS) -o $(BIN)/05_EAP_UsingWhat $(SRC)/ch13/05_ExceptionsAndPolymorphism/01_UsingWhat.cpp
-	# $(CC) $(CFLAGS) -o $(BIN)/05_EAP_CatchingPolymorphicallyCorrectOne $(SRC)/ch13/05_ExceptionsAndPolymorphism/02_CatchingPolymorphicallyCorrectOne.cpp
-	# $(CC) $(CFLAGS) -o $(BIN)/05_EAP_CatchingPolymorphicallyCorrectTwo $(SRC)/ch13/05_ExceptionsAndPolymorphism/03_CatchingPolymorphicallyCorrectTwo.cpp
-	# $(CC) $(CFLAGS) -o $(BIN)/05_EAP_WritingExceptions $(SRC)/ch13/05_ExceptionsAndPolymorphism/05_WritingExceptions.cpp
-
-	# $(CC) $(CFLAGS) -o $(BIN)/06_NestedException $(SRC)/ch13/06_NestedException/NestedException.cpp
-
-	# $(CC) $(CFLAGS) -o $(BIN)/07_SU_BadCode $(SRC)/ch13/07_StackUnwinding/01_BadCode.cpp
-	# $(CC) $(CFLAGS) -o $(BIN)/07_SU_SmartPointer $(SRC)/ch13/07_StackUnwinding/02_SmartPointer.cpp
-	# $(CC) $(CFLAGS) -o $(BIN)/07_SU_CatchAndRethrow $(SRC)/ch13/07_StackUnwinding/03_CatchAndRethrow.cpp
-	# $(CC) $(CFLAGS) -o $(BIN)/09_ConstructorError $(SRC)/ch13/09_ConstructorError/*.cpp
-	# $(CC) $(CFLAGS) -o $(BIN)/10_FunctionTryBlock $(SRC)/ch13/10_FunctionTryBlock/*.cpp
-
+	@$(CP) $(SRC)/ch13/01_ReadIntegerFile/IntegerFile.txt $(BIN)/IntegerFile.txt
+	$(CC) $(CFLAGS) -o $(BIN)/01_RIF_NoExceptionHandling $(SRC)/ch13/01_ReadIntegerFile/01_NoExceptionHandling.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/01_RIF_BasicExceptions $(SRC)/ch13/01_ReadIntegerFile/02_BasicExceptions.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/01_RIF_ThrowInt $(SRC)/ch13/01_ReadIntegerFile/03_ThrowInt.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/01_RIF_ThrowCharStar $(SRC)/ch13/01_ReadIntegerFile/04_ThrowCharStar.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/01_RIF_CatchByValue $(SRC)/ch13/01_ReadIntegerFile/05_CatchByValue.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/01_RIF_CatchByNonConstReference $(SRC)/ch13/01_ReadIntegerFile/06_CatchByNonConstReference.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/01_RIF_ThrowingMultipleBasic $(SRC)/ch13/01_ReadIntegerFile/07_ThrowingMultipleBasic.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/01_RIF_ThrowingTwoTypes $(SRC)/ch13/01_ReadIntegerFile/08_ThrowingTwoTypes.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/01_RIF_MatchingAnyException $(SRC)/ch13/01_ReadIntegerFile/09_MatchingAnyException.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/01_RIF_TerminateHandler $(SRC)/ch13/01_ReadIntegerFile/10_TerminateHandler.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/01_RIF_ThrowList $(SRC)/ch13/01_ReadIntegerFile/11_ThrowList.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/01_RIF_noexcept $(SRC)/ch13/01_ReadIntegerFile/12_noexcept.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/01_RIF_UnexpectedExceptions $(SRC)/ch13/01_ReadIntegerFile/13_UnexpectedExceptions.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/02_SafeDivide $(SRC)/ch13/02_SafeDivide/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/03_Rethrow $(SRC)/ch13/03_Rethrow/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/05_EAP_UsingWhat $(SRC)/ch13/05_ExceptionsAndPolymorphism/01_UsingWhat.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/05_EAP_CatchingPolymorphicallyCorrectOne $(SRC)/ch13/05_ExceptionsAndPolymorphism/02_CatchingPolymorphicallyCorrectOne.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/05_EAP_CatchingPolymorphicallyCorrectTwo $(SRC)/ch13/05_ExceptionsAndPolymorphism/03_CatchingPolymorphicallyCorrectTwo.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/05_EAP_WritingExceptions $(SRC)/ch13/05_ExceptionsAndPolymorphism/05_WritingExceptions.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/06_NestedException $(SRC)/ch13/06_NestedException/NestedException.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/07_SU_BadCode $(SRC)/ch13/07_StackUnwinding/01_BadCode.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/07_SU_SmartPointer $(SRC)/ch13/07_StackUnwinding/02_SmartPointer.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/07_SU_CatchAndRethrow $(SRC)/ch13/07_StackUnwinding/03_CatchAndRethrow.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/09_ConstructorError $(SRC)/ch13/09_ConstructorError/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/10_FunctionTryBlock $(SRC)/ch13/10_FunctionTryBlock/*.cpp
 	$(CC) $(CFLAGS) -o $(BIN)/11_GameBoardNoExceptions $(SRC)/ch13/11_GameBoard/NoExceptions/*.cpp
 	$(CC) $(CFLAGS) -o $(BIN)/11_GameBoardWithExceptions $(SRC)/ch13/11_GameBoard/WithExceptions/*.cpp
