@@ -1,0 +1,21 @@
+#include <cstddef>
+#include <new>
+
+class MyClass {
+public:
+  void* operator new(std::size_t size) = delete;
+  void* operator new[](std::size_t size) = delete;
+};
+
+int main() {
+  // It is possible to create instances of MyClass on the stack.
+  MyClass classOnStack;
+  (void)classOnStack;
+
+  // It is not possible to create them on the heap.
+  // The following two lines will not compile.
+  // MyClass* p1 = new MyClass;
+  // MyClass* pArray = new MyClass[2];
+
+  return 0;
+}

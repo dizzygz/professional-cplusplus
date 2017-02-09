@@ -654,12 +654,55 @@
 
 *** Chapter 14 - Overloading C++ Operators
 **** Notes
+- The ~operator[]~ can be used to both set and get elements because it returns a reference to the element.
+  This reference can be used to assign to that element. When ~operator[]~ is used on the left-hand side of an
+  assignment statement, the assignment actually changes the value at the given location.
+- Although it's sometimes convenient for ~operator[]~ to return an element that can serve as an ~lvalue~, you
+  don't always want that behavior. It would be nice to be able to provide read-only access to the elements of
+  the array as well, by returning a ~const~ value or ~const~ reference. C++ provides a way to do this: if you
+  mark the second ~operator[]~ with the attribute ~const~, then the compiler can distinguish between the two.
+  If you call ~operator[]~ on a ~const~ object, it will use the const ~operator[]~, and, if you call it on a
+  non-const object, it will use the non-const ~operator[]~.
+- You cannot overload the subscripting operator to take more than one parameter. If you want to provide
+  subscripting on more than one index, you can use the function call operator.
+- You can overload the dereferencing operators for your classes in order to make objects of the classes behave
+  like pointers. The main use of this capability is for implementing smart pointers. It is also useful for
+  iterators, which the STL uses.
+- Many programmers prefer ~operator void*()~ instead of ~operator bool()~.
+- C++ gives you the ability to redefine the way memory allocation and deallocation work in your programs. You
+  can provide this customization both on the global level and the class level. This capability is most useful
+  when you are worried about memory fragmentation, which can occur if you allocate and deallocate a lot of
+  small objects. For example, instead of going to the default C++ memory allocation each time you need memory,
+  you could write a memory pool allocator that reuses fixed-size chunks of memory.
+- You can overload ~operator new~ and ~operator delete~ to control memory allocation and deallocation, but you
+  cannot overload the =new-expression= or the =delete-expression=. Thus, you can customize the actual memory
+  allocation and deallocation, but not the calls to the constructor and destructor.
 
 **** Warnings
+- You should rarely, if ever, write an implementation of just one of ~operator*~ and ~operator->~. You should
+  almost always write both operators together. It would confuse the users of your class if you failed to
+  provide both.
+- Unless you know a lot about memory allocation strategies, attempts to overload the memory allocation
+  routines are rarely worth the trouble. Don't overload them just because it sounds like a neat idea. Only do
+  so if you have a genuine requirement and the necessary knowledge.
+- If you fail to heed my advice and decide to replace the global ~operator new~, keep in mind that you cannot
+  put any code in the operator that makes a call to ~new~ because this will cause an infinite loop. For
+  example, you cannot write a message to the console with ~cout~. A more useful technique is to overload
+  ~operator new~ and ~operator delete~ for specific classes. These overloaded operators will be called only
+  when you allocate and deallocate objects of that particular class.
+- Whenever you overload ~operator new~, overload the corresponding form of ~operator delete~. Otherwise,
+  memory will be allocated as you specify but freed according to the built-in semantics, which may not be
+  compatible.
+- Overload all forms of ~operator new~, or explicitly delete forms that you don't want to get used.
+- If your class declares two identical versions of ~operator delete~ except that one takes the size parameter
+  and the other doesn't, the version without the size parameter will always get called. If you want the
+  version with the size parameter to be used, write only that version.
 
 *** Chapter 15 - Overview of the C++ Standard Library
 **** Notes
+
 **** Warnings
+
 *** Chapter 16 - Understanding Containers and Iterators
 **** Notes
 **** Warnings
@@ -1598,6 +1641,151 @@ let any exceptions be thrown from destructors, for three reasons:
   3. The destructor is your one chance to free memory and resources used in the object. If you waste your
      chance by exiting the function early due to an exception, you will never be able to go back and free the
      memory or resources.
+
+*** Operator Overloading
+**** Limitations to Operator Overloading
+- You cannot add new operator symbols. You can only redefine the meanings of operators already in the
+  language.
+- There are a few operators that you cannot overload, such as ~.~ (member access in an object), ~::~ (scope
+  resolution operator, ~sizeof~, ~?:~ (the conditional operator), and a few others. The table below lists all
+  the operators that you can overload. The operators that you can't overload are usually not those you would
+  care to overload anyway, so you shouldn't find this restriction limiting.
+- The =arity= describes the number of arguments, or operands, associated with the operator. You can only
+  change the =arity= for the function call, ~new~ and ~delete~ operators. For all other operators you cannot
+  change the =arity=. Unary operators, such as ~++~, work on only one operand. Binary operators, such as ~/~,
+  work on two operands. There is only one ternary operator: ~?:~. The main place where this limitation might
+  bother you is when overloading ~[]~ (array brackets).
+- You cannot change the precedence or associativity of the operator. These rules determine in which order
+  operators are evaluated in a statement. Again, this constraint shouldn't be cause for concern in most
+  programs because there are rarely benefits to changing the order of evaluation.
+- You cannot redefine operators for built-in types. The operator must be a method in a class, or at least one
+  of the arguments to a global overloaded operator function must be a user-defined type (e.g., a class). This
+  means that you can't do something ridiculous, such as redefine ~+~ for ~ints~ to mean subtraction (though
+  you could do so for your classes). The one exception to this rule is the memory allocation and deallocation
+  routines; you can replace the global routines for all memory allocations in your program.
+
+**** Summary of Overloadable Operators
+The following table lists the operators that you can overload, specifies whether they should be methods of the
+class or global friend functions, summarizes when you should (or should not) overload them, and provides
+sample prototypes showing the proper return values.
+
+In this table, ~T~ is the name of the class for which the overloaded operator is written, and ~E~ is a
+different type. Note that the sample prototypes given are not exhaustive; often there are other combinations
+of ~T~ and ~E~ possible for a given operator.
+
+| Operator    | Name or Category   | Friend Function | When to Overload      | Sample Prototype                 |
+|-------------+--------------------+-----------------+-----------------------+----------------------------------|
+| operator+   | Binary             | Global friend   | Whenever you want     | friend T operator+(const T&,     |
+| operator-   | arithmetic         | function        | to provide these      | const T&);                       |
+| operator*   |                    | recommended     | operations for        | friend T operator+(const T&,     |
+| operator/   |                    |                 | your class            | const E&);                       |
+| operator%   |                    |                 |                       |                                  |
+|-------------+--------------------+-----------------+-----------------------+----------------------------------|
+| operator-   | Unary arithmetic   | Method          | Whenever you want     | T operator-() const;             |
+| operator+   | and bitwise        | recommended     | to provide these      |                                  |
+| operator~   | operators          |                 | operations for        |                                  |
+|             |                    |                 | your class            |                                  |
+|-------------+--------------------+-----------------+-----------------------+----------------------------------|
+| operator++  | Pre-increment and  | Method          | Whenever you          | T& operator++();                 |
+| operator--  | pre-decrement      | recommended     | overload operator+=   |                                  |
+|             |                    |                 | and operator-=        |                                  |
+|-------------+--------------------+-----------------+-----------------------+----------------------------------|
+| operator++  | Post-increment and | Method          | Whenever you          | T operator++(int);               |
+| operator--  | post-decrement     | recommended     | overload operator+=   |                                  |
+|             |                    |                 | and operator-=        |                                  |
+|-------------+--------------------+-----------------+-----------------------+----------------------------------|
+| operator=   | Assignment         | Method          | Whenever your class   | T& operator=(const T&);          |
+|             | operator           | required        | has dynamically       |                                  |
+|             |                    |                 | allocated memory or   |                                  |
+|             |                    |                 | resources, or members |                                  |
+|             |                    |                 | that are references   |                                  |
+|-------------+--------------------+-----------------+-----------------------+----------------------------------|
+| operator+=  | Shorthand          | Method          | Whenever you overload | T& operator+=(const T&);         |
+| operator-=  | arithmetic         | recommended     | the binary arithmetic | T& operator+=(const E&);         |
+| operator*=  | operator           |                 | operators and your    |                                  |
+| operator/=  | assignments        |                 | class is not designed |                                  |
+| operator%=  |                    |                 | to be immutable       |                                  |
+|-------------+--------------------+-----------------+-----------------------+----------------------------------|
+| operator<<  | Binary bitwise     | Global friend   | Whenever you want to  | friend T operator<<(const T&,    |
+| operator>>  | operators          | function        | provide these         | const T&);                       |
+| operator&   |                    | recommended     | operations            | friend T operator<<(const T&,    |
+| operator|   |                    |                 |                       | const E&);                       |
+| operator^   |                    |                 |                       |                                  |
+|-------------+--------------------+-----------------+-----------------------+----------------------------------|
+| operator<<= | Shorthand bitwise  | Method          | Whenever you overload | T& operator<<=(const T&);        |
+| operator>>= | operator           | recommended     | the binary bitwise    | T& operator<<=(const E&);        |
+| operator&=  | assignments        |                 | operators and your    |                                  |
+| operator|=  |                    |                 | class is not designed |                                  |
+| operator^=  |                    |                 | to be immutable       |                                  |
+|-------------+--------------------+-----------------+-----------------------+----------------------------------|
+| operator<   | Binary comparison  | Global friend   | Whenever you want to  | friend bool operator<(const T&,  |
+| operator>   | operators          | function        | provide these         | const T&);                       |
+| operator<=  |                    | recommended     | operations            | friend bool operator<(const T&,  |
+| operator>=  |                    |                 |                       | const E&);                       |
+| operator==  |                    |                 |                       |                                  |
+| operator!=  |                    |                 |                       |                                  |
+|-------------+--------------------+-----------------+-----------------------+----------------------------------|
+| operator<<  | I/O stream         | Global friend   | Whenever you want to  | friend ostream& operator<<(      |
+| operator>>  | operators          | function        | provide these         | ostream&, const T&);             |
+|             | (insertion and     | required        | operations            | friend istream& operator>>(      |
+|             | extraction)        |                 |                       | istream&, T&);                   |
+|-------------+--------------------+-----------------+-----------------------+----------------------------------|
+| operator!   | Boolean negation   | Member function | Rarely; use bool or   | bool operator!() const;          |
+|             | operator           | recommended     | void* conversion      |                                  |
+|             |                    |                 | instead               |                                  |
+|-------------+--------------------+-----------------+-----------------------+----------------------------------|
+| operator&&  | Binary Boolean     | Global friend   | Rarely                | friend bool operator&&(          |
+| operator||  | operators          | function        |                       | const T& lhs, const T& rhs);     |
+|             |                    | recommended     |                       |                                  |
+|-------------+--------------------+-----------------+-----------------------+----------------------------------|
+| operator[]  | Subscripting       | Method          | When you want to      | E& operator[](int);              |
+|             | (array index)      | required        | support               | const E& operator[](int) const;  |
+|             | operator           |                 | subscripting          |                                  |
+|-------------+--------------------+-----------------+-----------------------+----------------------------------|
+| operator()  | Function call      | Method          | When you want objects | Return type and arguments        |
+|             | operator           | required        | to behave like        | can vary;                        |
+|             |                    |                 | function pointers     |                                  |
+|-------------+--------------------+-----------------+-----------------------+----------------------------------|
+| operator    | Conversion, or     | Method          | When you want to      | operator type() const;           |
+| type()      | cast, operators    | required        | provide conversions   |                                  |
+|             | (separate operator |                 | from your class       |                                  |
+|             | for each type)     |                 | to other types        |                                  |
+|-------------+--------------------+-----------------+-----------------------+----------------------------------|
+| operator    | Memory allocation  | Method          | When you want to      | void* operator new(size_t size); |
+| new         | routines           | recommended     | control memory        | void* operator new[](            |
+| operator    |                    |                 | allocation for your   | size_t size);                    |
+| new[]       |                    |                 | classes (rarely)      |                                  |
+|-------------+--------------------+-----------------+-----------------------+----------------------------------|
+| operator    | Memory             | Method          | Whenever you overload | void operator delete(void* ptr)  |
+| delete      | deallocation       | recommended     | the memory allocation | noexcept;                        |
+| operator    | routines           |                 | routines              | void operator delete[](          |
+| delete[]    |                    |                 |                       | void * ptr) noexcept;            |
+|-------------+--------------------+-----------------+-----------------------+----------------------------------|
+| operator*   | Dereferencing      | Method          | Useful for smart      | E& operator*() const;            |
+| operator->  | operators          | recommended for | pointers              | E* operator->() const;           |
+|             |                    | operator*       |                       |                                  |
+|             |                    | Method required |                       |                                  |
+|             |                    | for operator->  |                       |                                  |
+|-------------+--------------------+-----------------+-----------------------+----------------------------------|
+| operator&   | Address-of         | N/A             | Never                 | N/A                              |
+|             | operator           |                 |                       |                                  |
+|-------------+--------------------+-----------------+-----------------------+----------------------------------|
+| operator->* | Dereference        | N/A             | Never                 | N/A                              |
+|             | pointer-to-member  |                 |                       |                                  |
+|-------------+--------------------+-----------------+-----------------------+----------------------------------|
+| operator,   | Comma operator     | N/A             | Never                 | N/A                              |
+|-------------+--------------------+-----------------+-----------------------+----------------------------------|
+
+The preceding table does not include sample prototypes with =rvalue= reference semantics. However, for most
+operators it can make sense to write both a version using normal =lvalue= references and a version using
+=rvalue= references. Whether it makes sense depends on implementation details of your class. The ~operator=~
+is one example. Another example is ~operator+~ to prevent unnecessary memory allocations.
+
+The logical operators are trickier. It's not recommended to overload ~&&~ and ~||~. These operators don't
+really apply to individual types: they aggregate results of Boolean expressions. Additionally, you lose the
+short-circuit evaluation, because both the left-hand side and the right-hand side have to be evaluated before
+they can be bound to the parameters of your overloaded operator ~&&~ and ~||~. Thus, it rarely makes sense to
+overload them for specific types.
 
 *** Big-O Notation
 =Big-O= notation specifies algorithm run time as a function of its input size, also known as the complexity of

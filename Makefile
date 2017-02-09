@@ -160,3 +160,16 @@ ch13: clean
 	$(CC) $(CFLAGS) -o $(BIN)/10_FunctionTryBlock $(SRC)/ch13/10_FunctionTryBlock/*.cpp
 	$(CC) $(CFLAGS) -o $(BIN)/11_GameBoardNoExceptions $(SRC)/ch13/11_GameBoard/NoExceptions/*.cpp
 	$(CC) $(CFLAGS) -o $(BIN)/11_GameBoardWithExceptions $(SRC)/ch13/11_GameBoard/WithExceptions/*.cpp
+
+ch14: clean
+	$(CC) $(CFLAGS) -o $(BIN)/01_ArithmeticOperators $(SRC)/ch14/01_ArithmeticOperators/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/02_StreamOperators $(SRC)/ch14/02_StreamOperators/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/03_SubscriptOperator $(SRC)/ch14/03_SubscriptOperator/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/04_AssociativeArray $(SRC)/ch14/04_AssociativeArray/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/05_Functors $(SRC)/ch14/05_Functors/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/06_DereferenceOps $(SRC)/ch14/06_DereferenceOps/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/07_ConversionsSpreadsheetCell $(SRC)/ch14/07_ConversionsSpreadsheetCell/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/08_ConversionsPointer1 $(SRC)/ch14/08_ConversionsPointer/SpreadsheetCell.cpp $(SRC)/ch14/08_ConversionsPointer/PointerTest.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/08_ConversionsPointer2 $(SRC)/ch14/08_ConversionsPointer/SpreadsheetCell.cpp $(SRC)/ch14/08_ConversionsPointer/PointerBoolTest.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/09_Memory $(SRC)/ch14/09_Memory/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/10_ExplicitDelete $(SRC)/ch14/10_ExplicitDelete/*.cpp
