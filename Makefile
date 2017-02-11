@@ -173,3 +173,6 @@ ch14: clean
 	$(CC) $(CFLAGS) -o $(BIN)/08_ConversionsPointer2 $(SRC)/ch14/08_ConversionsPointer/SpreadsheetCell.cpp $(SRC)/ch14/08_ConversionsPointer/PointerBoolTest.cpp
 	$(CC) $(CFLAGS) -o $(BIN)/09_Memory $(SRC)/ch14/09_Memory/*.cpp
 	$(CC) $(CFLAGS) -o $(BIN)/10_ExplicitDelete $(SRC)/ch14/10_ExplicitDelete/*.cpp
+
+ch15: clean
+	$(CC) $(CFLAGS) -o $(BIN)/01_NumericLimits $(SRC)/ch15/01_numeric_limits/numeric_limits.cpp

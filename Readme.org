@@ -700,12 +700,47 @@
 
 *** Chapter 15 - Overview of the C++ Standard Library
 **** Notes
-
-**** Warnings
+- Technically, the C++ ~string~ is a ~typedef~ name for a ~char~ instantiation of the ~basic_string~ template.
+  However, you need not worry about these details; you can use ~string~ as if it were a bona fide non-template
+  class.
+- The C++ STL containers are homogenous: they allow elements of only one type in each container.
+- A ~vector~ in C++ is a synonym for a dynamic array: an array that grows and shrinks automatically in
+  response to the number of elements it stores.
+- Use a ~vector~ instead of a C-style array whenever possible.
+- The ~vector~, ~list~, ~forward_list~, ~deque~, and ~array~ containers are called sequential containers
+  because they store a sequence of elements.
+- Technically, the ~queue~, ~priority_queue~, and ~stack~ containers are container adapters. They are simple
+  interfaces built on top of one of the standard sequential containers ~vector~, ~list~, or ~deque~.
+- Use a ~set~ instead of a ~vector~ or ~list~ if you need order and want equal performance for insertion,
+  deletion, and lookup.
+- The ~set~ and ~map~ containers are called associative containers becuase they associate keys and values.
+  This term is confusing when applied to ~sets~, because in ~sets~ the keys are themselves the valuse. Both
+  containers sort their elements, so they are called sorted or ordered associative containers.
+- Note that ~string~ is technically a container as well.
+- Note that ~strings~ are technically containers as well. They can be thought of as ~vectors~ of characters.
+  Thus, some of the standard algorithms also work on ~strings~.
+- ~vector~ should be your default container. In practice, insertion and deletion in a ~vector~ is often faster
+  than in a ~list~ or ~forward_list~. This is because of how memory and caches work on modern CPUs, and
+  because of the fact that for a ~list~ or ~forward_list~ you first need to iterate to the position where you
+  want to insert or delete an element. Memory for a ~list~ or ~forward_list~ might be fragmented, so iteration
+  is slower than for a ~vector~.
+- Although the algorithms and containers are theoretically independent, some containers provide certain
+  algorithms in the form of class methods because the generic algorithms do not perform well on those
+  particular containers. For example, ~sets~ provide their own ~find()~ algorithm that is faster than the
+  generic ~find()~ algorithm. You should use the container-specific method form of the algorithm, if provided,
+  because it is generally more efficient or appropriate for the container at hand.
+- Iterators mediate between algorithms and containers. They provide a standard interface to traverse the
+  elements of a container in sequence, so that any algorithm can work on any container.
+- When examining the list of algorithms, remember that the STL is designed with generality in mind, so it adds
+  generality that might never be used, but which, if required, would be essential. You may not need every
+  algorithm, or need to worry about the more obscure parameters that are there for anticipated generality. It
+  is important only to be aware of what's available in case you ever find it useful.
 
 *** Chapter 16 - Understanding Containers and Iterators
 **** Notes
+
 **** Warnings
+
 *** Chapter 17 - Mastering STL Algorithms
 **** Notes
 **** Warnings
@@ -742,8 +777,8 @@
 ** Appendix B - Annotated Bibliography
 ** Appendix C - Standard Library Header Files
 
-** Stuff
-*** References
+
+** References
 A ~reference~ in C++ is an alias for another variable. All modifications to the reference change the value of
 the variable to which it refers. You can think of references as implicit pointers that save you the trouble of
 taking the address of variables and de-referencing the pointer. Alternatively, you can think of references as
@@ -751,7 +786,7 @@ just another name for the original variable. You can create stand-alone referenc
 data members in classes, accept references as parameters to functions and methods, and return references from
 functions and methods.
 
-**** Reference Variables
+*** Reference Variables
 Reference variables must be initialized as soon as they are created, like this:
 #+BEGIN_SRC c++
   int x = 3;
@@ -759,7 +794,7 @@ Reference variables must be initialized as soon as they are created, like this:
   int& emptyRef; // Does Not Compile!
 #+END_SRC
 
-***** Modifying References
+**** Modifying References
 A reference always refer to the same variable to which it is initialized; references cannot be changed once
 they are created.
 #+BEGIN_SRC c++
@@ -773,7 +808,7 @@ they are created.
   zRef = xRef; // Assigns values, not references (set the value of z to 3, doesn't change zRef)
 #+END_SRC
 
-***** References to Pointers and Pointers to References
+**** References to Pointers and Pointers to References
 You can create references to any type, including pointer types. You cannot declare a reference to a reference,
 or a pointer to a reference.
 #+BEGIN_SRC c++
@@ -783,7 +818,7 @@ or a pointer to a reference.
   *ptrRef = 5;
 #+END_SRC
 
-**** Reference Data Members
+*** Reference Data Members
 Data members of classes can be references. A reference cannot exist without referring to some other variable.
 Thus, you must initialize reference data members in the constructor initializer, not in the body of the
 constructor.
@@ -797,7 +832,7 @@ constructor.
   };
 #+END_SRC
 
-**** Reference Parameters
+*** Reference Parameters
 C++ programmers do not often use stand-alone reference variables or reference data members. The most common
 use of references is for parameters to functions and methods. Recall that the default parameter-passing
 semantics are pass-by-value: Functions receive copies of their arguments. When those parameters are modified,
@@ -820,7 +855,7 @@ variables.
   swap(3, 4);    // Does not Compile!
 #+END_SRC
 
-**** Reference Return Values
+*** Reference Return Values
 You can also return a reference from a function or method. The main reason to do so is efficiency. Instead of
 returning a whole object, return a reference to the object to avoid copying it unnecessarily. Of course, you
 can only use this technique if the object in question will continue to exist following the function
@@ -833,7 +868,7 @@ A second reason to return a reference is if you want to be able to assign to the
 =lvalue= (the left-hand side of an assignment statement). Several overloaded operators commonly return
 references.
 
-**** Rvalue References
+*** Rvalue References
 In C++, an ~lvalue~ is something of which you can take an address; a named variable, for example. The name
 comes from the fact that they normally appear on the left-hand side of an assignment. An ~rvalue~ on the other
 hand is anything that is not an ~lvalue~ such as a constant value, or a temporary object or value. Typically
@@ -849,13 +884,13 @@ A function can specify an ~rvalue reference~ parameter by using ~&&~ as part of 
 e.g., ~type&& name~. Normally, a temporary object will be seen as a ~const type&~, but when there is a
 function overload that uses an ~rvalue reference~, a temporary object can be resolved to that overload.
 
-*** The ~const~ keyword
+** The ~const~ keyword
 The keyword ~const~ is short for "constant" and specifies that something remains unchanged. The compiler will
 enforce this requirement by marking any attempt to change it as an error. Furthermore, when optimizations are
 enabled, the compiler can take advantage of this knowledge to produce better code. The keyword has two related
 roles. It can mark variables or parameters, and it can mark methods.
 
-**** ~const~ Variables and Parameters
+*** ~const~ Variables and Parameters
 You can use ~const~ to "protect" variables by specifying that they cannot be modified. You can mark any
 variable ~const~, including global variables and class data members. Defining a constant with ~const~ is just
 like defining a variable, except that the compiler guarantees that code cannot change the value.
@@ -871,7 +906,7 @@ You can also use ~const~ to specify that parameters to functions or methods shou
   }
 #+END_SRC
 
-***** ~const~ Pointers
+**** ~const~ Pointers
 #+BEGIN_SRC c++
   const int* ip; // Same as int const* ip;
   ip = new int[10];
@@ -888,7 +923,7 @@ You can also use ~const~ to specify that parameters to functions or methods shou
   const int* const ip = nullptr; // both the pointer and the values to which it points are const
 #+END_SRC
 
-***** ~const~ References
+**** ~const~ References
 ~const~ applied to references is usually simpler than ~const~ applied to pointers for two reasons. First,
 references are ~const~ by default, in that you can't change to what they refer. So, there is no need to mark
 them ~const~ explicitly. Second, you can't create a reference to a reference, so there is usually only one
@@ -907,11 +942,11 @@ By passing a ~const~ reference you ensure that no copy is made but the original 
   }
 #+END_SRC
 
-**** ~const~ Methods
+*** ~const~ Methods
 You can mark a class method ~const~, which prevents the method from modifying any non-mutable data members of
 the class.
 
-**** The ~constexpr~ Keyword
+*** The ~constexpr~ Keyword
 Constant expressions are evaluated at compile time.
 #+BEGIN_SRC c++
   const int getArraySize() { return 32; }
@@ -963,11 +998,11 @@ By defining a ~constexpr~ constructor you can create constant expression variabl
   }
 #+END_SRC
 
-*** The ~static~ keyword
+** The ~static~ keyword
 There are several uses of the keyword ~static~ in C++, all seemingly unrelated. Part of the motivation for
 "overloading" the keyword was attempting to avoid having to introduce new keywords into the language.
 
-**** ~static~ Data Members and Methods
+*** ~static~ Data Members and Methods
 You can declare ~static~ data members and methods of classes. ~static~ data members, unlike non-static data
 members, are not part of each object. Instead, there is only one copy of the data member, which exists outside
 any objects of that class.
@@ -975,7 +1010,7 @@ any objects of that class.
 ~static~ methods are similarly at the class level instead of the object level. A ~static~ method does not
 execute in the context of a specific object.
 
-**** ~static~ Linkage
+*** ~static~ Linkage
 C++ source files are each compiled independently, and the resulting object files are linked together. Each
 name in a C++ source file, including functions and global variables, has a linkage that is either ~internal~
 or ~external~. External linkage means that the name is available from other source files. Internal linkage
@@ -988,7 +1023,7 @@ a variable or function ~static~, wrap it in an unnamed ~namespace~. Entities in 
 be accessed anywhere following their declaration in the same source file, but cannot be accessed from other
 source files. These semantics are the same as those obtained with the ~static~ keyword.
 
-**** The ~extern~ Keyword
+*** The ~extern~ Keyword
 A related keyword, ~extern~, seems like it should be the opposite of ~static~, specifying external linkage for
 the names it precedes. It can be used that way in certain cases. For example, ~consts~ and ~typedefs~ have
 internal linkage by default. You can use ~extern~ to give them external linkage. However, ~extern~ has some
@@ -996,14 +1031,14 @@ complications. When you specify a name as ~extern~, the compiler treats it as a 
 For variables, this means the compiler doesn't allocate space for the variable. You must provide a separate
 definition line for the variable without the ~extern~ keyword.
 
-**** ~static~ Variables in Functions
+*** ~static~ Variables in Functions
 The final use of the ~static~ keyword in C++ is to create local variables that retain their values between
 exits and entrances to their scope. A ~static~ variable inside a function is like a global variable that is
 only accessible from that function. One common use of ~static~ variables is to "remember" whether a particular
 initialization has been performed for a certain function.
 
-*** Types
-**** ~typedef~
+** Types
+*** ~typedef~
 A ~typedef~ provides a new name for an existing type declaration. You can think of a ~typedef~ as syntax for
 introducing a synonym for an existing type declaration without creating a new type.
 #+BEGIN_SRC c++
@@ -1025,7 +1060,7 @@ introducing a synonym for an existing type declaration without creating a new ty
 The STL uses ~typedefs~ extensively to provide shorter names for types. For example, ~string~ is actually a
 ~typedef~ that looks like this: ~typedef basic_string<char, char_traits<char>, allocator<char>> string;~
 
-**** Type Aliases
+*** Type Aliases
 Type aliases are easier to understand than ~typedefs~ in certain situations.
 #+BEGIN_SRC c++
   typedef int MyInt;
@@ -1035,7 +1070,7 @@ Type aliases are easier to understand than ~typedefs~ in certain situations.
   using FuncType = int (*)(char, double); // same as above
 #+END_SRC
 
-**** Alias Templates
+*** Alias Templates
 You can use a ~typedef~ to give another name to a templatized class. However, C++ requires you to specify
 concrete arguments for each template parameter. Use alias template to be able to specify some of the types
 only.
@@ -1052,8 +1087,8 @@ only.
   using OtherName = MyTemplateClass<T1, double>; // Using alias template works!
 #+END_SRC
 
-*** Casts
-**** ~const_cast~
+** Casts
+*** ~const_cast~
 You can use ~const_cast~ to cast away const-ness of a variable.
 #+BEGIN_SRC c++
   extern void ThirdPartyLibraryMethod(char* str);
@@ -1062,7 +1097,7 @@ You can use ~const_cast~ to cast away const-ness of a variable.
   }
 #+END_SRC
 
-**** ~static_cast~
+*** ~static_cast~
 You can use the ~static_cast~ to perform explicit conversions that are supported directly by the language.
 #+BEGIN_SRC c++
   int i = 3, j = 4;
@@ -1107,7 +1142,7 @@ unrelated type. You can't ~static_cast~ directly objects of one type to objects 
 ~static_cast~ a ~const~ type to a ~non-const~ type. You can't ~static_cast~ pointers to ~ints~. Basically, you
 can't do anything that doesn't make sense according to the type rules of C++.
 
-**** ~reinterpret_cast~
+*** ~reinterpret_cast~
 The ~reinterpret_cast~ is a bit more powerful and less safe than the ~static_cast~. You can use it to perform
 some casts that are not technically allowed by C++ type rules, but which might make sense to the programmer in
 some circumstances. For example, you can cast a reference to one type to a reference to another type, even if
@@ -1137,7 +1172,7 @@ performing any type checking.
   Y& yr = reinterpret_cast<Y&>(x);
 #+END_SRC
 
-**** ~dynamic_cast~
+*** ~dynamic_cast~
 The ~dynamic_cast~ provides a run-time check on casts within an inheritance hierarchy. You can use it to cast
 pointers or references. ~dynamic_cast~ checks the run-time type information of the underlying object at run
 time. If the cast doesn't make sense, ~dynamic_cast~ returns a null pointer (for the pointer version) or
@@ -1179,7 +1214,7 @@ Note that you can perform the same casts down the inheritance hierarchy with a ~
 ~reinterpret_cast~. The difference with ~dynamic_cast~ is that it performs run-time (dynamic) type checking,
 while ~static_cast~ and ~reinterpret_cast~ will perform the casting even if they are erroneous.
 
-**** Casting Up and Down
+*** Casting Up and Down
 An object can be cast or assigned to its parent class. If the cast or assignment is performed on a plain old
 object, this results in slicing. However, slicing does not occur if a derived class is assigned to a pointer
 or reference to its base class.
@@ -1205,7 +1240,7 @@ class, and because downcasting is a sign of bad design.
   }
 #+END_SRC
 
-**** Summary of Casts
+*** Summary of Casts
 | Situation                                                              | Cast                         |
 |------------------------------------------------------------------------+------------------------------|
 | Remove const-ness                                                      | const_cast                   |
@@ -1229,25 +1264,25 @@ class, and because downcasting is a sign of bad design.
 | Pointer-to-function to pointer-to-function                             | reinterpret_cast             |
 |------------------------------------------------------------------------+------------------------------|
 
-*** Type Inference
+** Type Inference
 Type inference allows the compiler to automatically deduce the type of an expression. There are two keywords
 for type inference: =auto= and =decltype= and C++14 add =decltype(auto)=.
 
-**** The =auto= keyword
+*** The =auto= keyword
 The =auto= keyword has four completely different meanings:
 1. The first meaning is to tell the compiler to automatically deduce the type of a variable at compile time.
 2. The second use of the =auto= keyword is for the =alternative function syntax=.
 3. The third use of the =auto= keyword is for =function return type deduction=
 4. The fourth use of =auto= is for generic lambda expressions.
 
-**** The =decltype= keyword
+*** The =decltype= keyword
 The =decltype= keyword takes an expression as argument, and computes the type of that expression. For example:
 #+BEGIN_SRC C++
   int x = 123;
   decltype(x) y = 456; // The compiler deduces the type of y to be int because that's the type of x
 #+END_SRC
 
-**** =decltype(auto)=
+*** =decltype(auto)=
 Using =auto= to deduce the type of an expression strips away reference qualifiers and const qualifiers.
 =decltype= does not strip those, but might cause code duplication. C++14 solves this by introducing
 =decltype(auto)=.
@@ -1261,7 +1296,7 @@ Using =auto= to deduce the type of an expression strips away reference qualifier
   decltype(auto) f1 = foo();  // f1 is of type const string&.
 #+END_SRC
 
-*** Smart Pointers
+** Smart Pointers
 To avoid common memory problems, you should use smart pointers instead of normal "naked" C-style pointers.
 Smart pointers automatically deallocate memory when the smart pointer object goes out of scope, for example
 when the function has finished executing.
@@ -1275,7 +1310,7 @@ last =shared_ptr= goes out of scope. =shared_ptr= is also thread-safe.
 memory is freed. Your default smart pointer should be =unique_ptr=. Use only =shared_ptr= when you need to
 share the resource.
 
-**** std::unique_ptr
+*** std::unique_ptr
 The =unique_ptr= is analogous to an ordinary pointer, except that it will automatically free the memory or
 resource when the =unique_ptr= goes out of scope or is deleted. A =unique_ptr= has sole ownership of the
 object pointed to.
@@ -1294,7 +1329,7 @@ function.
   std::unique_ptr<int> p3 = std::move(p1);   // OK. Ownership has been moved from p1 to p3.
 #+END_SRC
 
-**** std::shared_ptr
+*** std::shared_ptr
 =shared_ptr= allows for distributed "ownership" of data. Each time a =shared_ptr= is assigned, a reference
 count is incremented indicating there is one more "owner" of the data. When a =shared_ptr= goes out of scope,
 the reference count is decremented. When the reference count goes to zero it means there is no longer any
@@ -1312,7 +1347,7 @@ owner of the data, and the object referenced by the pointer is freed. You can't 
   std::shared_ptr<Derived> myDerivedPtr = std::dynamic_pointer_cast<Derived>(myBasePtr);
 #+END_SRC
 
-**** std::weak_ptr
+*** std::weak_ptr
 You can use a =weak_ptr= to observe a =shared_ptr= without incrementing or decrementing the reference count of
 the linked =shared_ptr=.
 
@@ -1327,7 +1362,7 @@ a =shared_ptr=. There are two ways to do this:
 In both cases, this new =shared_ptr= will be =nullptr= if the =shared_ptr= associated with the =weak_ptr= has
 been deallocated in the meantime.
 
-*** Access Specifiers
+** Access Specifiers
 | Specifier | Meaning                                      | When to Use                                        |
 |-----------+----------------------------------------------+----------------------------------------------------|
 | public    | Any code can call public member function     | Behaviors (methods) that you want clients to use.  |
@@ -1348,8 +1383,8 @@ been deallocated in the meantime.
 |           |                                              | them.                                              |
 |-----------+----------------------------------------------+----------------------------------------------------|
 
-*** Constructors and Destructors
-**** Summary of Compiler-Generated Constructors
+** Constructors and Destructors
+*** Summary of Compiler-Generated Constructors
 The compiler automatically generates a 0-argument and copy constructor for every class. However, the
 constructors you define yourself replace these according to the following rules:
 
@@ -1387,7 +1422,7 @@ define any constructor, the compiler stops generating a default constructor. As 
 chapter, the automatic generation of a default constructor and a default copy constructor can be influenced by
 defining them as explicitly defaulted or explicitly deleted.
 
-**** Constructor Order
+*** Constructor Order
 Objects don't spring to live all at once; they must be constructed along with their parents and any objects
 that are contained within them. C++ defines the creation order as follows:
 
@@ -1400,7 +1435,7 @@ that are contained within them. C++ defines the creation order as follows:
 These rules can apply recursively. If the class has a grandparent, the grandparent is initialized before the
 parent, and so on.
 
-**** Destructor Order
+*** Destructor Order
 Because destructors cannot take arguments, the language can always automatically call the destructor for
 parent classes. The order of destruction is conveniently the reverse of the order of construction:
 
@@ -1410,7 +1445,7 @@ parent classes. The order of destruction is conveniently the reverse of the orde
 
 Again, these rules apply recursively. The lowest member of the chain is always destructed first.
 
-*** Rule of Six
+** Rule of Six
 - Default Constructor
 - Copy Constructor
 - Move Constructor (C++11 or higher)
@@ -1450,8 +1485,8 @@ they also guarantee not to throw.
 
 Obviously, move semantics is useful only when you know that the source object will be destroyed.
 
-*** Inheritance
-**** Copy Constructor and assignment operator on derived classes
+** Inheritance
+*** Copy Constructor and assignment operator on derived classes
 Providing a copy constructor and assignment operator is considered a good programming practice when you have
 dynamically allocated memory in the class. When defining a derived class, you need to be careful about copy
 constructors and ~operator=~. If your derived class does not have any special data (pointers, usually) that
@@ -1487,7 +1522,7 @@ Sub& Sub::operator=(const Sub& inSub) {
 }
 #+END_SRC
 
-**** Multiple Inheritance
+*** Multiple Inheritance
 #+BEGIN_SRC c++
   class Baz : public Foo, public Bar {};
 #+END_SRC
@@ -1501,7 +1536,7 @@ By listing multiple parents, the =Baz= object will have the following characteri
 - Deleting a =Bas= object will automatically call the destructors for the =Foo= and =Bar= classes, in the
   reverse order that the classes are listed in the class definition.
 
-*** Using Interface and Implementation Classes (PIMPL Idiom)
+** Using Interface and Implementation Classes (PIMPL Idiom)
 Even with the preceding measures and the best design principles, the C++ language is fundamentally unfriendly
 to the principle of abstraction. The syntax requires you to combine your public interfaces and private (or
 protected) data members and methods together in one class definition, thereby exposing some of the internal
@@ -1523,8 +1558,8 @@ that this idiom only works if the single data member is a pointer to the impleme
 a by-value data member, the clients would have to be recompiled when the definition of the implementation
 class changes.
 
-*** Generic Code with Templates
-**** Inheritance versus Specialization
+** Generic Code with Templates
+*** Inheritance versus Specialization
 Some programmers find the distinction between template inheritance and template specialization confusing. The
 following table summarizes the differences:
 |               | Inheritance                           | Specialization                                     |
@@ -1540,7 +1575,7 @@ following table summarizes the differences:
 |               | class.                                |                                                    |
 |---------------+---------------------------------------+----------------------------------------------------|
 
-*** IO Streams
+** IO Streams
 All streams can be viewed as data chutes. Streams vary in their =direction= and their =associated source or
 destination=. For example, the ~cout~ stream is an output stream, so its direction is "out." It writes data to
 the console so its associated destination is "console." There is another standard stream called ~cin~ that
@@ -1556,7 +1591,7 @@ table gives a brief description of all predefined streams.
 | clog   | A buffered version of cerr.                                                          |
 |--------+--------------------------------------------------------------------------------------|
 
-**** Output Manipulators
+*** Output Manipulators
 One of the unusual features of streams is that you can throw more than just data down the chute. C++ streams
 also recognize manipulators, objects that make a change to the behavior of the stream instead of, or in
 addition to, providing data for the stream to work with. All the manipulators stay in effect for subsequent
@@ -1576,7 +1611,7 @@ output to the stream until they are reset, except ~setw~ which is only active fo
 - ~quoted~ :: A parameterized manipulator that encloses a given string with quotes and escapes embedded
      quotes.
 
-**** Input Manipulators
+*** Input Manipulators
 The built-in input manipulators, described in the list that follows, can be sent to an input stream to
 customize the way that data is read.
 - ~boolalpha~ and ~noboolalpha~ :: If ~boolalpha~ is used, the string =false= will be interpreted as a Boolean
@@ -1592,7 +1627,7 @@ customize the way that data is read.
 - ~quoted~ :: A parameterized manipulator that reads a string enclosed with quotes and in which embedded
      quotes are escaped.
 
-*** Exceptions
+** Exceptions
 An exception is an unexpected situation. Exceptions come with some new terminology. When a piece of code
 detects an exceptional situation, it =throws= an exception. Another piece of code =catches= the exception and
 takes appropriate action. Exceptions can get tricky in C++. To use exceptions properly, you need to understand
@@ -1601,7 +1636,7 @@ and handle the necessary exceptions. Unlike the Java language, the C++ compiler 
 every exception that might occur. If your code never catches any exceptions but an exception is thrown, it
 will be caught by the program itself, which will be terminated.
 
-**** Memory Allocation Errors
+*** Memory Allocation Errors
 The default behaviors of ~new~ and ~new[]~ are to throw an exception of type ~bad_alloc~, defined in the
 ~<new>~ header file, if they cannot allocate memory. Your code could catch these exceptions and handle them
 appropriately. It's not realistic to wrap all your calls to ~new~ and ~new[]~ with a =try/catch=, but at least
@@ -1615,7 +1650,7 @@ If you don't like exceptions, you can revert to the old C model in which memory 
 return ~nullptr~ instead of throwing an exception if they fail to allocate memory. This is done by using the
 syntax ~new(nothrow)~ instead of ~new~.
 
-**** Errors in Constructors
+*** Errors in Constructors
 You can throw an exception from a constructor, even though you can't return a value. With exceptions you can
 easily tell clients whether or not construction of the object succeeded. However, there is one major problem:
 if an exception leaves a constructor, the destructor for that object will never be called. Thus, you must be
@@ -1624,7 +1659,7 @@ leave the constructor. This problem is the same as in any other function, but it
 because you're accustomed to letting the destructors take care of the memory deallocation and resource
 freeing.
 
-**** Errors in Destructors
+*** Errors in Destructors
 You should handle all error conditions that arise in destructors in the destructors themselves. You should not
 let any exceptions be thrown from destructors, for three reasons:
   1. Destructors can run while there is another pending exception, in the process of stack unwinding. If you
@@ -1642,8 +1677,8 @@ let any exceptions be thrown from destructors, for three reasons:
      chance by exiting the function early due to an exception, you will never be able to go back and free the
      memory or resources.
 
-*** Operator Overloading
-**** Limitations to Operator Overloading
+** Operator Overloading
+*** Limitations to Operator Overloading
 - You cannot add new operator symbols. You can only redefine the meanings of operators already in the
   language.
 - There are a few operators that you cannot overload, such as ~.~ (member access in an object), ~::~ (scope
@@ -1664,7 +1699,7 @@ let any exceptions be thrown from destructors, for three reasons:
   you could do so for your classes). The one exception to this rule is the memory allocation and deallocation
   routines; you can replace the global routines for all memory allocations in your program.
 
-**** Summary of Overloadable Operators
+*** Summary of Overloadable Operators
 The following table lists the operators that you can overload, specifies whether they should be methods of the
 class or global friend functions, summarizes when you should (or should not) overload them, and provides
 sample prototypes showing the proper return values.
@@ -1787,7 +1822,7 @@ short-circuit evaluation, because both the left-hand side and the right-hand sid
 they can be bound to the parameters of your overloaded operator ~&&~ and ~||~. Thus, it rarely makes sense to
 overload them for specific types.
 
-*** Big-O Notation
+** Big-O Notation
 =Big-O= notation specifies algorithm run time as a function of its input size, also known as the complexity of
 the algorithm. For example, an algorithm with a performance that is linear as a function of its input size
 takes twice as long to process twice as many elements. Thus, if it takes 2 seconds to process 500 elements, it
@@ -1834,7 +1869,8 @@ think about =big-O= performance specifications:
   perform better than an =O(log n)= algorithm on small input sizes. Consider your likely input sizes before
   making a decision.
 
-*** The Standard Library
+** The Standard Library
+*** Introduction
 C++ comes with a standard library, which contains a lot of useful classes that can easily be used in your
 code. The benefit of using classes from the standard library is that you don't need to reinvent certain
 classes and you don't need to waste time on implementing things that have already been implemented for you.
@@ -1849,3 +1885,1351 @@ which can be hard to track down. For example, suppose a client stores a referenc
 method that return references from collections. If the collection directly stores objects, this returned
 reference can become invalid when the collection needs to reallocate memory. Storing pointers or smart
 pointers in the collection avoids this reference-invalidation problem
+
+STL containers use value semantics on elements. That is, they store a copy of elements that they are given,
+assign to elements with the assignment operator, and destroy elements with the destructor. Thus, when you
+write classes that you intend to use with the STL, make sure they are copyable. When requesting an element
+from the container, a reference to the stored copy is returned.
+If you prefer reference semantics, you must implement them yourself by storing pointers to elements instead of
+the elements themselves. When the containers copy a pointer, the result still refers to the same element.
+For move semantics to work properly with STL containers, the move contructor and the move assignment operator
+must be marked as ~noexcept~.
+
+Templates are used to allow generic programming. They make it possible to write code that can
+work with all kinds of objects, even objects unknown to the programmer when writing the code.
+The obligation of the programmer writing the template code is to specify the requirements of the
+classes that define these objects; for example, that they have an operator for comparison, or a copy
+constructor, or whatever is deemed appropriate, and then making sure the code that is written uses
+only those required capabilities. The obligation of the programmer creating the objects is to supply
+those operators and methods that the template writer requires.
+
+All the containers in the STL are templates, so you can use them to store any type, from built-in types such
+as ~int~ and ~double~ to your own classes. Each container instance stores objects of only one type; that is,
+they are homogeneous collections. If you need non fixed-sized heterogeneous collections, you could create a
+class that has multiple derived classes, and each derived class could wrap an object of your required type.
+
+*** Overview
+| Functionality       | Header Files         | Description                                                       |
+|---------------------+----------------------+-------------------------------------------------------------------|
+| Strings             | <string>             | Build-int string class. Technically a ~typedef~ for a char        |
+|                     | <locale>             | instantiation of the ~basic_string~ template.                     |
+|---------------------+----------------------+-------------------------------------------------------------------|
+| Regular expressions | <regex>              | Regex make it easy to perform so-called pattern-matching          |
+|                     |                      | often used in text processing.                                    |
+|---------------------+----------------------+-------------------------------------------------------------------|
+| I/O Streams         | <fstream>            | C++ introduces a new model for input and output using streams.    |
+|                     | <iomanip>            | The C++ library provides routines for reading and writing         |
+|                     | <ios>                | built-in types from and to files, console/keyboard, and strings.  |
+|                     | <iosfwd>             | C++ also provides the facilities for coding your own routines     |
+|                     | <iostream>           | for reading and writing your own objects.                         |
+|                     | <istream>            |                                                                   |
+|                     | <ostream>            |                                                                   |
+|                     | <sstream>            |                                                                   |
+|                     | <streambuf>          |                                                                   |
+|                     | <strstream>          |                                                                   |
+|---------------------+----------------------+-------------------------------------------------------------------|
+| Smart Pointers      | <memory>             | Smart pointers implementation: ~unique_ptr~, ~shared_ptr~, and    |
+|                     |                      | ~weak_ptr~. ~shared_ptr~ and ~weak_ptr~ are thread-safe.          |
+|---------------------+----------------------+-------------------------------------------------------------------|
+| Exceptions          | <exception>          | The C++ language supports exceptions, which allow functions or    |
+|                     | <stdexcept>          | methods to pass errors of various types up the calling            |
+|                     | <system_error>       | functions or methods. The C++ standard library provides a class   |
+|                     |                      | hierarchy of exceptions that you can use in your program as is,   |
+|                     |                      | or that you can derive from to create your own exceptions types.  |
+|---------------------+----------------------+-------------------------------------------------------------------|
+| Mathematical        | <complex>            | ~complex~ number class which provides an abstraction for working  |
+| Utilities           | <ratio>              | with numbers that contain both real and imaginary components.     |
+|                     | <valarray>           | ~ratio~ class template that can exactly represent any finite      |
+|                     | <limits>             | rational number defined by a numerator and denominator.           |
+|                     |                      | ~valarray~ class which is similar to vector but more optimized    |
+|                     |                      | for high performance numerical applications.                      |
+|                     |                      | ~numeric_limits~ class template which provides a standard way to  |
+|                     |                      | obtain information about numeric limits.                          |
+|---------------------+----------------------+-------------------------------------------------------------------|
+| Time Utilities      | <chrono>             | The Chrono library makes it easy to work with time; for example,  |
+|                     |                      | to time certain durations or to perform actions based on timing.  |
+|---------------------+----------------------+-------------------------------------------------------------------|
+| Random Numbers      | <random>             | Since C++11, a random number library has been added to the        |
+|                     |                      | standard. The new library comes with "random number engines",     |
+|                     |                      | "random number engine adaptors", and "random number               |
+|                     |                      | distributions".                                                   |
+|---------------------+----------------------+-------------------------------------------------------------------|
+| Initializer Lists   | <initializer_list>   | Initializer lists make it easy to write functions that can        |
+|                     |                      | accept a variable number of arguments.                            |
+|---------------------+----------------------+-------------------------------------------------------------------|
+| Pair and Tuple      | <utility>            | The ~pair~ template can store two elements with two different     |
+|                     | <tuple>              | types. ~typle~ is a generalization of ~pair~.                     |
+|---------------------+----------------------+-------------------------------------------------------------------|
+| Function Objects    | <functional>         | A class that implements a function call operator is called a      |
+|                     |                      | "function object". Function objects can, for example, be uses as  |
+|                     |                      | predicates for certain STL algorithms.                            |
+|---------------------+----------------------+-------------------------------------------------------------------|
+| Multithreading      | <thread>             | The standard library provides a couple of basic building blocks   |
+|                     | <atomic>             | for writing multithreaded code. Individual threads can be         |
+|                     | <condition_variable> | created using the ~thread~ class from the ~<thread>~ header.      |
+|                     | <mutex>              | In multithreaded code you need to take care that several threads  |
+|                     | <future>             | are not reading and writing to the same piece of data at the      |
+|                     |                      | same time. To prevent this, you can use ~atomics~ defined in      |
+|                     |                      | ~<atomic>~, which give you thread-safe atomic access to a piece   |
+|                     |                      | of data. Other thread synchronization mechanisms are provided by  |
+|                     |                      | ~<condition_variable>~ and ~<mutex>~. If you just need to         |
+|                     |                      | calculate something and get the result back with proper exception |
+|                     |                      | handling, it's easier to use ~async~ and ~future~ defined in the  |
+|                     |                      | ~<future>~ header that it is to directly use the ~thread~ class.  |
+|---------------------+----------------------+-------------------------------------------------------------------|
+| Type Traits         | <type_traits>        | Type traits provide information about types at compile time. They |
+|                     |                      | are useful when writing advanced templates.                       |
+|---------------------+----------------------+-------------------------------------------------------------------|
+
+*** STL requirements on elements
+| Method      | Description                                          | Notes                                      |
+|-------------+------------------------------------------------------+--------------------------------------------|
+| Copy        | Creates a new element that is "equal to the old one, | Uses every time you insert an element,     |
+| Constructor | but that can safely be destructed without affecting  | except when using an emplace method.       |
+|             | the old one.                                         |                                            |
+|-------------+------------------------------------------------------+--------------------------------------------|
+| Move        | Creates a new element by moving all content from a   | Used when the source element is an rvalue, |
+| Constructor | source element to the new element.                   | and will be destroyed after the            |
+|             |                                                      | construction of the new element; also used |
+|             |                                                      | when a vector grows in size, for example.  |
+|-------------+------------------------------------------------------+--------------------------------------------|
+| Assignment  | Replaces the contents of an element with a copy of   | Used every time you modify an element.     |
+| Operator    | the source element.                                  |                                            |
+|-------------+------------------------------------------------------+--------------------------------------------|
+| Move        | Replaces the contents of an element by moving all    | Used when the source element is an rvalue, |
+| Assignment  | content from a source element.                       | and will be destroyed after the assignment |
+| Operator    |                                                      | operation.                                 |
+|-------------+------------------------------------------------------+--------------------------------------------|
+| Destructor  | Cleans up an element.                                | Used every time you remove an element, or, |
+|             |                                                      | for example, when a vector grows in size   |
+|             |                                                      | and the elements are not movable.          |
+|-------------+------------------------------------------------------+--------------------------------------------|
+| Default     | Constructs an element without any arguments.         | Required only for certain operations, such |
+| Constructor |                                                      | as the vector::resize() method with one    |
+|             |                                                      | argument, and the map::operator[] access.  |
+|-------------+------------------------------------------------------+--------------------------------------------|
+| operator==  | Compares two elements for equality.                  | Required for keys in unordered containers, |
+|             |                                                      | and for certain operations, such as        |
+|             |                                                      | operator== on two containers.              |
+|-------------+------------------------------------------------------+--------------------------------------------|
+| operator<   | Determines if one element is less than another.      | Required for keys in associative           |
+|             |                                                      | containers and for certain operations,     |
+|             |                                                      | such as ~operator<~ on two containers.     |
+|-------------+------------------------------------------------------+--------------------------------------------|
+
+*** Iterators
+The STL uses the iterator pattern to provide a generic abstraction for accessing the elements of the
+containers. Each container provides a container-specific iterator, which is a glorified smart pointer that
+knows how to iterate over the elements of that specific container. You can think of an iterator as a pointer
+to a specific element of the container. Like pointers to elements in an array, iterators can move to the next
+element with ~operator++~. Similarly, you can usually use ~operator*~ and ~operator->~ on the iterator to
+access the actual element or field of the element. Some iterators allow comparison with ~operator==~ and
+~operator!=~, and support ~operator--~ for moving to previous elements.
+
+All iterators must be copy constructible, copy assignable, and destructible. Lvalues of iterators must be
+swappable. The standard defines five categories of iterators:
+
+| Iteraotr Category       | Operations Required | Comments                                                        |
+|-------------------------+---------------------+-----------------------------------------------------------------|
+| Read (Input Iterator)   | operator++          | Provides read-only access, forward only (no operator-- to move  |
+|                         | operator*           | backward).                                                      |
+|                         | operator->          | Iterators can be assigned, copied, and compared for equality.   |
+|                         | copy constructor    |                                                                 |
+|                         | operator=           |                                                                 |
+|                         | operator==          |                                                                 |
+|                         | operator!=          |                                                                 |
+|-------------------------+---------------------+-----------------------------------------------------------------|
+| Write (Output Iterator) | operator++          | Provides write-only access, forward only.                       |
+|                         | operator*           | Iterators can be assigned, but cannot be compared for equality. |
+|                         | copy constructor    | Note the absence of operator->.                                 |
+|                         | operator=           |                                                                 |
+|-------------------------+---------------------+-----------------------------------------------------------------|
+| Forward Iterator        | Capabilities of     | Provides read/write access, forward only.                       |
+|                         | input iterators,    | Iterators can be assigned, copied, and compared for equality.   |
+|                         | plus: default       |                                                                 |
+|                         | constructor         |                                                                 |
+|-------------------------+---------------------+-----------------------------------------------------------------|
+| Bidirectional Iterator  | Capabilities of     | Provides everything forward iterators provide.                  |
+|                         | forward interators, | Iterators can also move backward to previous element.           |
+|                         | plus: operator--    |                                                                 |
+|-------------------------+---------------------+-----------------------------------------------------------------|
+| Random Access Iterator  | Bidirectional       | Equivalent to dumb pointers: Iterators support pointer          |
+|                         | capability,         | arithmetic, array index syntax, and all forms of                |
+|                         | plus:               | comparison.                                                     |
+|                         | operator+           |                                                                 |
+|                         | operator-           |                                                                 |
+|                         | operator+=          |                                                                 |
+|                         | operator-=          |                                                                 |
+|                         | operator<           |                                                                 |
+|                         | operator>           |                                                                 |
+|                         | operator<=          |                                                                 |
+|                         | operator>=          |                                                                 |
+|                         | operator[]          |                                                                 |
+|-------------------------+---------------------+-----------------------------------------------------------------|
+
+There is no formal class hierarchy of these iterators, because the implementations for each container are not
+part of the standard hierarchy. However, one can deduce a hierarchy based on the functionality they are
+required to provide. Specifically, every ~random access iteraotr~ is also ~bidirectional~, every
+~bidirectional iterator~ is also ~forward~, and every ~forward iterator~ is also ~input~ and ~output~.
+
+Additionally, you can use ~std::distance()~ to compute the distance between two iterators of a container.
+
+Every container class in the STL that supports iterators provide public typedefs for its iterator types called
+~iterator~ and ~const_iterator~. For example, a ~const~ iterator for a ~vector~ of ~ints~ has as type
+~std::vector<int>::const_iterator~. Containers that allow you to iterate over its elements in reverse order
+also provide public typedefs called ~reverse_iterator~ and ~const_reverse_iterator~.
+
+The containers also provide a method ~begin()~ that returns an iterator referring to the first element in the
+containers. The ~end()~ method returns an iterator to the "past-the-end" value of the sequence of elements.
+That is, ~end()~ returns an iterator that is equal to the result of applying ~operator++~ to an iterator
+referring to the last element in the sequence. Together ~begin()~ and ~end()~ provide a half-open range that
+includes the first element but not the last: =[begin,end)=.
+
+Iterator Methods:
+  - ~begin()~ and ~end()~ methods that return ~non-const~ iterators.
+  - ~cbegin()~ and ~cend()~ methods that return ~const~ iterators.
+  - ~rbegin()~ and ~rend()~ methods that return ~non-const~ reverse iterators.
+  - ~crbegin()~ and ~crend()~ methods that return ~const~ reverse iterators.
+
+Iterator global non-member functions (Recommended):
+  - ~std::begin()~ and ~std::end()~ (since c++11)
+  - ~std::cbegin()~ and ~std::cend()~ (since c++14)
+  - ~std::rbegin()~ and ~std::rend()~ (since c++14)
+  - ~std::crbegin()~ and ~std::crend()~ (since c++14)
+
+*** Iterator Adapters
+The Standard Library provides four iterator adapters: special iterators built on top of other iterators. All
+four iterator adapters are defined in the ~<iterator>~ header.
+
+**** Reverse Iterators
+The STL provides a ~reverse_iterator~ class that iterates through a bidirectional or random-access iterator in
+a reverse direction. Every reversible container in the STL, which happens to be every container that's part of
+the standard except ~forward_list~ and the unordered associative containers, supplies a ~typedef
+reverse_iterator~ and methods called ~rbegin()~ and ~rend()~. The method ~rbegin()~ returns a
+~reverse_iterator~ pointing to the last element of the container, and ~rend()~ returns a ~reverse_iterator~
+pointing to the element before the first element of the container. Applying ~operator++~ to a
+~reverse_iterator~ calls ~operator--~ on the underlying container iterator, and vice versa.
+
+The ~reverse_iterator~ is useful mostly with algorithms in the STL that have no equivalents that work in
+reverse order. For example, the basic ~find()~ algorithm searches for the first element in a sequence. If you
+want to find the last element in the sequence, you can use a ~reverse_iterator~ instead. Note that when you
+call an algorithm such as ~find()~ with a ~reverse_iterator~, it returns a ~reverse_iterator~ as well. You can
+always obtain the underlying iterator from a ~reverse_iterator~ by calling the ~base()~ method on the
+~reverse_iterator~. However, due to the implementation details of ~reverse_iterator~, the iterator returned
+from ~base()~ always refers to one element past the element referred to by the ~reverse_iterator~ on which
+it's called.
+
+**** Stream Iterators
+The STL provides adapters that allow you to treat input and output streams as input and output iterators.
+Using these iterators, you can adapt input and output streams so that they can serve as sources and
+destinations, respectively, in the various STL algorithms. The ~ostream_iterator~ class is an output stream
+iterator. It is a template class that takes the element type as a type parameter. Its constructor takes an
+output stream and a string to write to the stream following each element. The ~ostream_iterator~ class writes
+elements using ~operator<<~.
+
+Similarly, you can use the input stream iterator, ~istream_iterator~, to read values from an input stream
+using the iterator abstraction. Elements are read using ~operator>>~. An ~istream_iterator~ can be used as
+sources in the algorithms and container methods.
+
+**** Insert Iterators
+Algorithms like ~copy()~ don't insert elements into a container; they simply replace old elements in a range
+with new ones. In order to make algorithms like ~copy()~ more useful, the STL provides three insert iterator
+adapters that actually insert elements into a container. They are templatized on a container type, and take
+the actual container reference in their constructor. By supplying the necessary iterator interfaces, these
+adapters can be used as the destination iterators of algorithms like ~copy()~. However, instead of replacing
+elements in the container, they make calls on their container to actually insert new elements.
+
+The basic ~insert_iterator~ calls ~insert(position, element)~ on the container, the ~back_insert_iterator~
+calls ~push_back(element)~, and the ~front_insert_iterator~ calls ~push_front(element)~.
+
+One huge benefit of ~insert_iterator~ is that it allows you to use associative containers as destinations of
+the modifying algorithms. Chapter 17 explains that the problem with associative containers is that you are not
+allowed to modify the elements over which you iterate. By using an ~insert_iterator~, you can instead insert
+elements, allowing the container to sort them properly internally. Associative containers actually support a
+form of ~insert()~ that takes an iterator position, and are supposed to use the position as a "hint," which
+they can ignore. When you use an ~insert_iterator~ on an associative container, you can pass the ~begin()~ or
+~end()~ iterator of the container to use as the hint.
+
+**** Move Iterators
+Move semantics can be used to prevent unnecessary copying in cases where you know that the source object will
+be destroyed after an assignment or copy construction. There is an iterator adapter called ~move_iterator~
+(which can be created calling the function ~make_move_iterator()~). The dereferencing operator for a
+~move_iterator~ automatically converts the value to an ~rvalue~ reference, which means that the value can be
+moved to a new destination without the overhead of copying. Before you can use move semantics, you need to
+make sure your objects are supporting it.
+
+*** STL Containers
+**** vector
+Stores a sequence of elements and provides random access to these elements. You can think of a vector as an
+array of elements that grows dynamically as you insert elements, and provides some bounds checking. Like an
+array, the elements of a vector are stored in contiguous memory.
+
+Header:                <vector>
+Container class name:  vector
+Container type:        Sequential
+Insertion Performance: Amortized O(1) at end; O(N-p) for an insert at position p
+Deletion Performance:  O(1) at end; O(N-p) for a delete at position p
+Lookup Performance:    O(1)
+When to Use:           Need quick lookup. Don't mind slower insertion/deletion. Whenever you would use a
+                       standard C-style array that should dynamically grow/shrink in size
+**** list
+Double linked list structure. Like an array or vector, it stores a sequence of elements. However, unlike an
+array or vector, the elements of a list are not necessarily in contiguous memory. Instead, each element in
+the list specifies where to find the next and previous elements in the list (usually via pointers).
+
+Header:                <list>
+Container class name:  list
+Container type:        Sequential
+Insertion Performance: O(1) once you are at the position where to insert the element
+Deletion Performance:  O(1) once you are at the position where to delete the element
+Lookup Performance:    O(N); Statistically O(N/2)
+When to Use:           Need quick insertion/deletion. Don't mind slower lookup
+
+**** forward_list
+Singly linked list.
+
+Header:                <forward_list>
+Container class name:  forward_list
+Container type:        Sequential
+Insertion Performance: O(1) once you are at the position where to insert the element
+Deletion Performance:  O(1) once you are at the position where to delete the element
+Lookup Performance:    O(N); Statistically O(N/2)
+When to Use:           When you need the benefits of a list but require only forward iteration
+
+**** deque
+Double-ended queue although it behaves more like a vector instead of a queue.
+
+Header:                <deque>
+Container class name:  deque
+Container type:        Sequential
+Insertion Performance: Amortized O(1) at beginning or end; O(min(N-p, p)) for an insert at position p
+Deletion Performance:  O(1) at beginning or end; O(min(N-p, p)) for a delete at position p
+Lookup Performance:    O(1)
+When to Use:           Not usually needed; use a vector or list instead
+
+**** array
+Replacement for standard C-style arrays.
+
+Header                 <array>
+Container class name:  array
+Container type:        Sequential
+Insertion Performance: N/A
+Deletion Performance:  N/A
+Lookup Performance:    O(1)
+When to Use:           When you need a fixed-size array to replace a standard C-style array
+
+**** queue
+Standard first in, first out (FIFO) container. A queue is a container in which you insert elements at one end
+and take them out at the other end.
+
+Header:                <queue>
+Container class name:  queue
+Container type:        Container Adapter
+Insertion Performance: Depends on the underlying container; O(1) for list, amortized O(1) for deque
+Deletion Performance:  Depends on the underlying container; O(1) for list and deque
+Lookup Performance:    N/A
+When to Use:           When you want FIFO structure
+
+**** priority_queue
+Provides queue functionality in which each element has a priority. Elements are removed from the queue in
+priority order. In the case of priority ties, the order in which elements are removed is undefined.
+
+Header:                <queue>
+Container class name:  priority_queue
+Container type:        Container Adapter
+Insertion Performance: Depends on the underlying container; amortized O(log(N)) for vector and deque
+Deletion Performance:  Depends on the underlying container; O(log(N)) for vector and deque
+Lookup Performance:    N/A
+When to Use:           When you want a queue with priority
+
+**** stack
+Provides standard first-in, last-out (FILO) semantics, also known as last-in, first-out (LIFO). Like a queue,
+elements are inserted and removed from the container. However, in a stack, the most recent element inserted
+is the first one removed.
+
+Header:                <stack>
+Container class name:  stack
+Container type:        Container Adapter
+Insertion Performance: Depends on the underlying container; O(1) for list, amortized O(1) for vector and deque
+Deletion Performance:  Depends on the underlying container; O(1) for list, vector and deque
+Lookup Performance:    N/A
+When to Use:           When you want FILO/LIFO structure
+
+**** set and multiset
+Set of elements loosely analogous to the notion of a mathematical set: Each element is unique, and there is at
+most one instance of the element in the set. The elements are kept in order. Note that a set does not allow
+duplicate elements. That is, each element in the set must be unique. If you want duplicate elements, you must
+use a multiset, also defined in the <set> header file.
+
+Header:                <set>
+Container class name:  set, multiset
+Container type:        Sorted Associative
+Insertion Performance: O(log(N))
+Deletion Performance:  O(log(N))
+Lookup Performance:    O(log(N))
+When to Use:           When you want a sorted collection of elements with equal lookup, insertion,
+                       and deletion times
+**** map and multimap
+Stores key/value pairs. A map keeps its elements in sorted order, based on the key values, not the object values.
+A multimap is a map that allows duplicate keys.
+
+Header:                <map>
+Container class name:  map, multimap
+Container type:        Sorted Associative
+Insertion Performance: O(log(N))
+Deletion Performance:  O(log(N))
+Lookup Performance:    O(log(N))
+When to Use:           When you want a sorted collection to associate keys with values with equal lookup,
+                       insertion, and deletion times.
+**** unordered_set and unordered_multiset
+An unordered_set is similar to a standard set except that the standard set sorts its elements while the
+unordered_set doesn't sort its elements.
+
+Header:                <unordered_set>
+Container class name:  unordered_set, unordered_multiset
+Container type:        Unordered associative / hash table
+Insertion Performance: Average case O(1); worst case O(N)
+Deletion Performance:  Average case O(1); worst case O(N)
+Lookup Performance:    Average case O(1); worst case O(N)
+When to Use:           When you want a collection of elements with equal lookup, insertion, and deletion times
+                       and don't require the elements to be sorted. Performance can be better than with normal
+                       set but that depends on the elements
+**** unordered_map and unordered_multimap
+An unordered_map is similar to a standard map except that the standard map sorts its elements while the
+unordered_map doesn't sort its elements.
+
+Header:                <unordered_map>
+Container class name:  unordered_map, unordered_multimap
+Container type:        Unordered associative / hash table
+Insertion Performance: Average case O(1); worst case O(N)
+Deletion Performance:  Average case O(1); worst case O(N)
+Lookup Performance:    Average case O(1); worst case O(N)
+When to Use:           When you want to associate keys with values with equal lookup, insertion, and deletion
+                       times and don't require the elements to be sorted. Performance can be better than with
+                       normal map but that depends on the elements.
+**** bitset
+This is not a container in the normal sense, in that it does not implement a specific data structure in which
+you insert and remove elements; they have a fixed size and don't support iterators. You can think of them as
+a sequence of Boolean values that you can read and write.
+
+Header:                <bitset>
+Container class name:  bitset
+Container type:        Special
+Insertion Performance: N/A
+Deletion Performance:  N/A
+Lookup Performance:    N/A
+When to Use:           When you want a collection of flags
+
+*** STL Algorithms <algorithms>
+**** Non-Modifying Sequence Algorithms
+The non-modifying algorithms are those that look at a sequence of elements and return some information about
+the elements. As "non-modifying" algorithms, they cannot change the values of elements or the order of
+elements withing the sequence. With these algorithms, you should rarely need to write a for loop to iterate
+over a sequence of values.
+
+***** Search Algorithms
+These algorithms do not require the sequence to be sorted.
+
+| Algorithm Name  | Algorithm Synopsis                                                 | Complexity |
+|-----------------+--------------------------------------------------------------------+------------|
+| adjacent_find() | Finds the first of two consecutive elements that are equal to each | Linear     |
+|                 | other or are equivalent to each other as specified by a predicate. |            |
+|-----------------+--------------------------------------------------------------------+------------|
+| find()          | Finds the first element that matches a value or causes a predicate | Linear     |
+| find_if()       | to return true.                                                    |            |
+|-----------------+--------------------------------------------------------------------+------------|
+| find_first_of() | Like find, except searches for one of several elements at the same | Quadratic  |
+|                 | time.                                                              |            |
+|-----------------+--------------------------------------------------------------------+------------|
+| find_if_not()   | Finds the first element that causes a predicate to return false.   | Linear     |
+|-----------------+--------------------------------------------------------------------+------------|
+| search()        | Finds the first (search()) or last (find_end()) subsequence in a   | Quadratic  |
+| find_end()      | sequence that matches another sequence or whose elements are       |            |
+|                 | equivalent, as specified by a predicate.                           |            |
+|-----------------+--------------------------------------------------------------------+------------|
+| search_n()      | Finds the first instance of n consecutive elements that are equal  | Linear     |
+|                 | to a given value or relate to that value according to a predicate. |            |
+|-----------------+--------------------------------------------------------------------+------------|
+
+***** Comparison Algorithms
+The following comparison algorithms are provided. None of them require the source sequences to be ordered.
+All of them have a linear worst-case complexity.
+
+| Algorithm Name            | Algorithm Synopsis                                                         |
+|---------------------------+----------------------------------------------------------------------------|
+| equal()                   | Determines if two sequences are equal by checking if parallel elements are |
+|                           | equal or match a predicate.                                                |
+|---------------------------+----------------------------------------------------------------------------|
+| mismatch()                | Returns the first element in each sequence that does not match the element |
+|                           | in the same location in the other sequence.                                |
+|---------------------------+----------------------------------------------------------------------------|
+| lexicographical_compare() | Compares two sequences to determine their "lexicographical" ordering.      |
+|                           | Compares each element of the first sequence with its equivalent element in |
+|                           | the second. If one element is less than the other, that sequence is        |
+|                           | lexicographically first. If the elements are equal, compares the next      |
+|                           | elements in order.                                                         |
+|---------------------------+----------------------------------------------------------------------------|
+
+***** Utility Algorithms
+| Algorithm Name | Algorithm Synopsis                                                                    |
+|----------------+---------------------------------------------------------------------------------------|
+| all_of()       | Returns true if the predicate returns true for all the elements in the sequence or if |
+|                | the sequence is empty; false otherwise.                                               |
+|----------------+---------------------------------------------------------------------------------------|
+| any_of()       | Returns true if the predicate returns true for at least one element in the sequence;  |
+|                | false otherwise.                                                                      |
+|----------------+---------------------------------------------------------------------------------------|
+| none_of()      | Returns true if the predicate returns false for all the elements in the sequence or   |
+|                | if the sequence is empty; false otherwise.                                            |
+|----------------+---------------------------------------------------------------------------------------|
+| count()        | Counts the number of elements matching a value or that cause a predicate to return    |
+| count_if()     | true.                                                                                 |
+|----------------+---------------------------------------------------------------------------------------|
+
+**** Modifying Sequence Algorithms
+The modifying algorithms modify some or all of the elements in a sequence. Some of them modify elements in
+place, so that the original sequence changes. Others copy the results to a different sequence so that the
+original sequence is unchanged. All of them have a linear worst-case complexity.
+
+***** General
+| Algorithm Name     | Algorithm Synopsis                                                                   |
+|--------------------+--------------------------------------------------------------------------------------|
+| copy()             | Copies elements from one sequence to another.                                        |
+| copy_backward()    |                                                                                      |
+|--------------------+--------------------------------------------------------------------------------------|
+| copy_if()          | Copies elements for which a predicate returns true from one sequence to another.     |
+|--------------------+--------------------------------------------------------------------------------------|
+| copy_n()           | Copies n elements from one sequence to another.                                      |
+|--------------------+--------------------------------------------------------------------------------------|
+| fill()             | Sets all elements in the sequence to a new value.                                    |
+|--------------------+--------------------------------------------------------------------------------------|
+| fill_n()           | Sets the first n elements in the sequence to a new value.                            |
+|--------------------+--------------------------------------------------------------------------------------|
+| generate()         | Calls a specified function to generate a new value for each element in the sequence. |
+|--------------------+--------------------------------------------------------------------------------------|
+| generate_n()       | Calls a specified function to generate a new value for the first n elements in the   |
+|                    | sequence.                                                                            |
+|--------------------+--------------------------------------------------------------------------------------|
+| move()             | Moves elements from one sequence to another. This uses efficient move semantics.     |
+| move_backward()    |                                                                                      |
+|--------------------+--------------------------------------------------------------------------------------|
+| remove()           | Removes elements that match a given value or that cause a predicate to return true,  |
+| remove_if()        | either in place or by copying the results to a different sequence.                   |
+| remove_copy()      |                                                                                      |
+| remove_copy_if()   |                                                                                      |
+|--------------------+--------------------------------------------------------------------------------------|
+| replace()          | Replaces all elements matching a value or that cause a predicate to return true with |
+| replace_if()       | a new element, either in place or by copying the results to a different sequence.    |
+| replace_copy()     |                                                                                      |
+| replace_copy_if()  |                                                                                      |
+|--------------------+--------------------------------------------------------------------------------------|
+| reverse()          | Reverses the order of the elements in the sequence, either in place or by copying    |
+| reverse_copy()     | the results to a different sequence.                                                 |
+|--------------------+--------------------------------------------------------------------------------------|
+| rotate()           | Swaps the first and second "halves" of the sequence, either in place or by copying   |
+| rotate_copy()      | the results to a different sequence. The two subsequences to be swapped need not be  |
+|                    | equal in size.                                                                       |
+|--------------------+--------------------------------------------------------------------------------------|
+| shuffle()          | Shuffles the sequence by randomly reordering the elements. It is possible to         |
+| random_shuffle()   | specify the properties of the random number generator used for shuffling.            |
+|                    | random_shuffle() is deprecated since C++14.                                          |
+|--------------------+--------------------------------------------------------------------------------------|
+| transform()        | Calls a unary function on each element of a sequence or a binary function on         |
+|                    | parallel elements of two sequences.                                                  |
+|--------------------+--------------------------------------------------------------------------------------|
+| unique()           | Removes consecutive duplicates from the sequence, either in place or by copying      |
+| unique_copy()      | results to a different sequence.                                                     |
+|--------------------+--------------------------------------------------------------------------------------|
+
+***** Operational Algorithms
+| Algorithm Name | Algorithm Synopsis                                                               |
+|----------------+----------------------------------------------------------------------------------|
+| for_each()     | Executes a function on each element in the sequence. This algorithm has a linear |
+|                | complexity and does not require the source sequence to be ordered.               |
+|----------------+----------------------------------------------------------------------------------|
+
+***** Swap Algorithms
+| Algorithm Name | Algorithm Synopsis                                 |
+|----------------+----------------------------------------------------|
+| iter_swap()    | Swaps two elements or sequences of elements.       |
+| swap_ranges()  |                                                    |
+|----------------+----------------------------------------------------|
+| swap()         | Swaps two values, defined in the <utility> header. |
+|----------------+----------------------------------------------------|
+
+***** Partition Algorithms
+| Algorithm Name     | Algorithm Synopsis                                                | Complexity  |
+|--------------------+-------------------------------------------------------------------+-------------|
+| is_partitioned()   | Returns true if all elements for which a predicate returns true   | Linear      |
+|                    | are before all elements for which it returns false.               |             |
+|--------------------+-------------------------------------------------------------------+-------------|
+| partition()        | Sorts the sequence such that all elements for which a predicate   | Linear      |
+|                    | returns true are before all elements for which it returns false,  |             |
+|                    | without preserving the original order of the elements within      |             |
+|                    | each partition.                                                   |             |
+|--------------------+-------------------------------------------------------------------+-------------|
+| stable_partition() | Sorts the sequence such that all elements for which a predicate   | Linear      |
+|                    | returns true are before all elements for which it returns false,  | Logarithmic |
+|                    | while preserving the original order of the elements within each   |             |
+|                    | partition.                                                        |             |
+|--------------------+-------------------------------------------------------------------+-------------|
+| partition_copy()   | Copies elements from one sequence to two different sequences. The | Linear      |
+|                    | target sequence is selected based on the result of a predicate,   |             |
+|                    | either true or false.                                             |             |
+|--------------------+-------------------------------------------------------------------+-------------|
+| partition_point()  | Returns an iterator such that all elements before this iterator   | Logarithmic |
+|                    | return true for a predicate and all elements after this iterator  |             |
+|                    | return false for that predicate.                                  |             |
+|--------------------+-------------------------------------------------------------------+-------------|
+
+***** Sorting Algorithms
+| Algorithm Name      | Algorithm Synopsis                                                      | Complexity  |
+|---------------------+-------------------------------------------------------------------------+-------------|
+| is_sorted()         | Checks if a sequence is sorted or which subsequence is sorted.          | Linear      |
+| is_sorted_until()   |                                                                         |             |
+|---------------------+-------------------------------------------------------------------------+-------------|
+| nth_element()       | Relocates the nth element of the sequence such that the element in      | Linear      |
+|                     | the position pointed to by nth is the element that would be in that     |             |
+|                     | position if the whole range were sorted, and it rearranges all elements |             |
+|                     | such that all elements preceding the nth element are less than the new  |             |
+|                     | nth element, and the ones following it are greater than the new nth     |             |
+|                     | element.                                                                |             |
+|---------------------+-------------------------------------------------------------------------+-------------|
+| partial_sort()      | Partially sorts the sequence: The first n elements (specified by        | Linear      |
+| partial_sort_copy() | iterators) are sorted; the rest are not. They are sorted either in      | Logarithmic |
+|                     | place or by copying them to a new sequence.                             |             |
+|---------------------+-------------------------------------------------------------------------+-------------|
+| sort()              | Sorts elements in place, either preserving the order of duplicates      | Linear      |
+| stable_sort()       | elements or not.                                                        | Logarithmic |
+|---------------------+-------------------------------------------------------------------------+-------------|
+
+***** Binary Search Algorithms
+The following binary search algorithms require the sequence to be at least partitioned on the element that is
+searched for. This could, for example, be achieved by applying ~std::partition()~. A sorted sequence also
+meets this requirement. All these algorithms have logarithmic complexity.
+
+| Algorithm Name  | Algorithm Synopsis                                                                       |
+|-----------------+------------------------------------------------------------------------------------------|
+| lower_bound()   | Finds the beginning, (lower_bound()), end (upper_bound()), or both sides (equal_range()) |
+| upper_bound()   | of the range including a specified element.                                              |
+| equal_range()   |                                                                                          |
+|-----------------+------------------------------------------------------------------------------------------|
+| binary_search() | Finds a value in a sequence.                                                             |
+|-----------------+------------------------------------------------------------------------------------------|
+
+***** Set Algorithms
+Set algorithms are special modifying algorithms that perform set operations on sequences. They are most
+appropriate on sequences from set containers, but work on sorted sequences from most containers.
+
+| Algorithm Name            | Algorithm Synopsis                                             | Complexity         |
+|---------------------------+----------------------------------------------------------------+--------------------|
+| inplace_merge()           | Merges two sorted sequences in place.                          | Linear Logarithmic |
+|---------------------------+----------------------------------------------------------------+--------------------|
+| merge()                   | Merges two sorted sequences by copying them to a new sequence. | Linear             |
+|---------------------------+----------------------------------------------------------------+--------------------|
+| includes()                | Determines if every element from one sequence is in another    | Linear             |
+|                           | sequence.                                                      |                    |
+|---------------------------+----------------------------------------------------------------+--------------------|
+| set_union()               | Performs the specified set operation on two sorted sequences,  | Linear             |
+| set_intersection()        | copying results to a third sorted sequence.                    |                    |
+| set_difference()          |                                                                |                    |
+| set_symetric_difference() |                                                                |                    |
+|---------------------------+----------------------------------------------------------------+--------------------|
+
+***** Heap Algorithms
+A heap is a standard data structure in which the elements of an array or sequence are ordered in a semi-sorted
+fashion so that finding the "top" elements is quick. Six algorithms allow you to work with heaps.
+
+| Algorithm Name  | Algorithm Synopsis                                                        | Complexity  |
+|-----------------+---------------------------------------------------------------------------+-------------|
+| is_heap()       | Checks if a range of elements is a heap.                                  | Linear      |
+|-----------------+---------------------------------------------------------------------------+-------------|
+| is_heap_until() | Finds the largest subrange in the given range of elements that is a heap. | Linear      |
+|-----------------+---------------------------------------------------------------------------+-------------|
+| make_heap()     | Creates a heap from a range of elements.                                  | Linear      |
+|-----------------+---------------------------------------------------------------------------+-------------|
+| push_heap()     | Adds or removes an element from the heap.                                 | Logarithmic |
+| pop_heap()      |                                                                           |             |
+|-----------------+---------------------------------------------------------------------------+-------------|
+| sort_heap()     | Converts the heap into a range of ascending sorted elements.              | Linear      |
+|                 |                                                                           | Logarithmic |
+|-----------------+---------------------------------------------------------------------------+-------------|
+
+***** Minimum/Maximum Algorithms
+| Algorithm Name   | Algorithm Synopsis                                                                    |
+|------------------+---------------------------------------------------------------------------------------|
+| min()            | Returns the minimum or maximum of two or more values.                                 |
+| max()            |                                                                                       |
+|------------------+---------------------------------------------------------------------------------------|
+| minmax()         | Returns the minimum and maximum of two or more values as a pair.                      |
+|------------------+---------------------------------------------------------------------------------------|
+| min_element()    | Finds the minimum or maximum element in a sequence.                                   |
+| max_element()    |                                                                                       |
+|------------------+---------------------------------------------------------------------------------------|
+| minmax_element() | Finds the minimum and maximum element in a sequence and returns the result as a pair. |
+|------------------+---------------------------------------------------------------------------------------|
+
+***** Numerical Processing Algorithms
+The <numeric> header provides the following numerical processing algorithms. None of them require the source
+sequences to be ordered. All of them have a linear complexity.
+
+| Algorithm Name        | Algorithm Synopsis                                                                  |
+|-----------------------+-------------------------------------------------------------------------------------|
+| accumulate()          | "Accumulates" the values of all the elements in a sequence. The default behavior is |
+|                       | to sum the elements, but the caller can supply a different binary function instead. |
+|-----------------------+-------------------------------------------------------------------------------------|
+| adjacent_difference() | Generates a new sequence in which each element is the difference (or other binary   |
+|                       | operation) of the parallel element, and its predecessor, in the source sequence.    |
+|-----------------------+-------------------------------------------------------------------------------------|
+| inner_product()       | Similar to accumulate(), but works on two sequences. Calls a binary function        |
+|                       | (multiplication by default) on parallel elements in the sequences, accumulating the |
+|                       | result using another binary function (addition by default). If the sequences        |
+|                       | represent mathematical vectors, the algorithm calculates the dot product of the     |
+|                       | vectors.                                                                            |
+|-----------------------+-------------------------------------------------------------------------------------|
+| iota()                | Fills a sequence with successively incrementing values starting with a given value. |
+|-----------------------+-------------------------------------------------------------------------------------|
+| partial_sum()         | Generates a new sequence in which each element is the sum (or other binary          |
+|                       | operation) of the parallel element, and all preceding elements, in the source       |
+|                       | sequence.                                                                           |
+|-----------------------+-------------------------------------------------------------------------------------|
+
+***** Permutation Algorithms
+| Algorithm Name     | Algorithm Synopsis                                                       | Complexity |
+|--------------------+--------------------------------------------------------------------------+------------|
+| is_permutation()   | Returns true if the elements in one range are a permutation of the       | Quadratic  |
+|                    | elements in another range.                                               |            |
+|--------------------+--------------------------------------------------------------------------+------------|
+| next_permutation() | Modifies the sequence by transforming it into its lexicographical "next" | Linear     |
+| prev_premutation() | or "previous" permutation. Successive calls to one or the other will     |            |
+|                    | permute the sequence into all possible permutations of its elements if   |            |
+|                    | you start with a properly sorted sequence. Returns false if no more      |            |
+|                    | permutations exist.                                                      |            |
+|--------------------+--------------------------------------------------------------------------+------------|
+
+*** What's Missing from the STL
+The STL is powerful, but it's not perfect. Here is a list of omissions and unsupported functionality:
+- The STL does not guarantee any thread safety for accessing containers simultaneously from multiple threads.
+- The STL does not provide any generic tree or graph structures. Although maps and sets are generally
+  implemented as balanced binary trees, the STL does not expose this implementation in the interface. If you
+  need a tree or graph structure for something like writing a parser, you will need to implement your own or
+  find an implementation in another library.
+
+It is important to keep in mind that the STL is extensible. You can write your own containers or algorithms
+that will work with existing algorithms or containers. So, if the STL doesn't provide exactly what you need,
+consider writing your desired code such that it works with the STL.
+
+** Lambda Expressions
+Lambda expressions allow you to write anonymous functions inline, removing the need to write a separate
+function or a function object. Lambda expressions can make code easier to read and understand.
+
+#+BEGIN_SRC c++
+  // Basic lambda
+  auto basicLambda = [] { cout << "Hello from Lambda" << endl; };
+  basicLambda();
+
+  // Lambda with parameters
+  auto parametersLambda = [](int value) { cout << "The value is " << value << endl; };
+  parametersLambda(42);
+
+  // Lambda returning a value
+  auto returningLambda = [](int a, int b) -> int { return a + b; };
+  int sum = returningLambda(11, 22);
+
+  // Lambda returning a value, with return type omitted
+  auto returningLambda2 = [](int a, int b) { return a + b; };
+  sum = returningLambda2(11, 22);
+
+  // Lambda capturing a variable by value
+  double data = 1.23;
+  auto capturingVLambda = [data] { cout << "Data = " << data << endl; };
+  capturingVLambda();
+
+  // Lambda capturing a variable by value
+  auto capturingVLambda2 = [data]() mutable {
+    data *= 2;
+    cout << "Data = " << data << endl;
+  };
+  capturingVLambda2();
+
+  // Lambda capturing a variable by reference
+  auto capturingRLambda = [&data] { data *= 2; };
+  capturingRLambda();
+
+  // Generic Lambdas (C++14)
+  auto isGreaterThan100 = [](auto n) { return n > 100; };
+  auto result = isGreaterThan100(120);    // int parameter
+  auto result = isGreaterThan100(120.55); // double parameter
+
+  // Lambda Capture Expressions
+  double pi = 3.1415;
+  auto myLambda = [myCapture = "Pi: ", pi]{ std::cout << myCapture << pi; };
+
+  auto myPtr = std::make_unique<double>(3.1415);
+  auto myLambda = [p = std::move(myPtr)]{ std::cout << *p; };
+
+  auto myPtr = std::make_unique<double>(3.1415);
+  auto myLambda = [myPtr = std::move(myPtr)] { std::cout << *myPtr; };
+#+END_SRC
+
+*** Capture block examples
+[&x]        -> Captures only x by reference and nothing else.
+[x]         -> Captures only x by value and nothing else.
+[=, &x, &y] -> Captures by value by default, except variables x and y, which are captured by reference.
+[&, x]      -> Captures by reference by default, except variable x, which is captured by value.
+[&x, &x]    -> Is illegal because identifiers cannot be repeated.
+[this]      -> Captures the surrounding object. In the body of the lambda expression you can access this
+               object, even without using ~this->~.
+
+*** Lambda Expressions as Return Type
+#+BEGIN_SRC c++
+  function<int(void)> multiplyBy2Lambda(int x) {
+    return [x]{ return 2*x; }; // captures x by value, reference wouldn't work here
+  }
+
+  // C++14 supports function return type deduction
+  auto multiplyBy2Lambda(int x) {
+    return [x]{ return 2 * x; }; // captures x by value, reference wouldn't work here
+  }
+
+  // The function can be called as follows
+  auto fn = multiplyBy2Lambda(5);
+  cout << fn() << endl; // Ouput will be 10
+#+END_SRC
+
+** The Chrono Library
+The Chrono Library is a collection of classes to work with times.
+
+*** Duration
+A ~duration~, which represents an interval between two points in time, is specified by the templatized
+~duration~ class. The ~duration~ class stores a numbers of ticks and a tick period. The tick period is the
+time in seconds between two ticks and is represented as a compile-time ~ratio~ constant, which means it could
+be a fraction of a second. The ~duration template accepts two template parameters and is defined as follows:
+
+#+BEGIN_SRC c++
+  template <class Rep, class Period = ratio<1>> class duration {...}
+#+END_SRC
+
+The first template parameter, ~Rep~, is the type of variable storing the number of ticks and should be an
+arithmetic type, for example ~long~, ~double~, and so on. The second template parameter, ~Period~, is the
+rational constant representing the period of a tick. If you don't specify the tick period, the default value
+~ratio<1>~ is used, which represents a tick period of 1 second.
+
+Three constructors are provided: the default constructor; one that accepts a single value, the number of
+ticks; and one that accepts another ~duration~. The latter can be used to convert from one ~duration~ to
+another ~duration~, for example from minutes to seconds.
+
+#+BEGIN_SRC c++
+  duration<long> d1;                  // A duration where each tick is one second
+  duration<long, ratio<1>> d2;        // The same, ratio<1> is the default tick period
+  duration<long, ratio<60>> d3;       // A duration in minutes (tick period = 60 seconds)
+  duration<double, ratio<1, 60>> d4;  // A duration where each tick period is a sixtieth of a second
+  duration<long long, milli> d5;      // A duration where each tick period is one millisecond
+  duration<long> d6(30);              // 30 seconds
+  duration<double, ratio<60>> d7(d6); // Converts d6 into minutes, resulting in 0.5 minutes
+#+END_SRC
+
+*** Clock
+A clock is a class consisting of a ~time_point~ and a ~duration~. Three clocks are defined by the standard.
+The first is called ~system_clock~ and represents the wall clock time from the system-wide realtime clock. The
+second is called ~steady_clock~, a clock that guarantees its ~time_point~ will never decrease, which is not
+guaranteed for ~system_clock~ because the system clock can be adjusted at any time. The third is the
+~high_resolution_clock~, which has the shortest possible tick period. Depending on your compiler, it is
+possible for the ~high_resolution_clock~ to be a synonym for ~steady_clock~ or ~system_clock~.
+
+*** Time point
+A point in time is represented by the ~time_point~ class and stored as a ~duration~ relative to the epoch. A
+~time_point~ is always associated with a certain ~clock~ and the epoch is the origin of this associated
+~clock~. For example, the epoch for the classic Unix/Linux time is 1st of January 1970, and durations are
+measured in seconds. The epoch for Windows is 1st of January 1601 and durations are measured in 100 nanosecond
+units. Other operating systems have different epoch dates and duration units.
+
+** Type Traits
+Type traits allow you to make decisions based on types at compile time. For example, you can write a template
+that requires a type that is derived from a certain type, or a type that is convertible to a certain type, or
+a type that is integral, and so on. The standard defines several helper classes for this. All type
+traits-related functionality is defined in the ~<type_traits>~ header file.
+
+- Primary type categories      :: ~is_void~, ~is_integral~, ~is_floating_point~, ~is_pointer~, ...
+- Composited type categories   :: ~is_reference~, ~is_object~, ~is_scalar~, ...
+- Type properties              :: ~is_const~, ~is_literal_type~, ~is_polymorphic~, ~is_unsigned~,
+     ~is_constructible~, ~is_copy_constructible~, ~is_move_constructible~, ~is_assignable~,
+     ~is_trivially_copyable~, ...
+- Type relations               :: ~is_same~, ~is_base_of~, ~is_convertible~
+- const-volatile modifications :: ~remove_const~, ~add_const~, ...
+- Sign modifications           :: ~make_signed~, ~make_unsigned~
+- Reference modifications      :: ~remove_reference~, ~add_lvalue_reference~, ~add_rvalue_reference~
+- Other transformations        :: ~enable_if~, ~conditional~, ...
+
+** Multithreaded Programming
+*** Race Conditions
+Race conditions can occur when multiple threads want to read/write to a shared memory location. For example,
+suppose you have a shared variable and one thread increments this value while another thread decrements it.
+Incrementing and decrementing the value means that the current value needs to be retrieved from memory,
+incremented or decremented, and stored back in memory. On older architectures, such as PDP-11 and VAX, this
+used to be implemented with an INC processor instruction, which was atomic. On modern x86 processors, the INC
+instruction is not atomic anymore, meaning that other instructions could be executed in the middle of this
+operation, which might cause the code to retrieve a wrong value.
+
+*** Deadlocks
+If you opt to solve a race condition by using a synchronization method, such as mutual exclusion, you might
+run into another common problem with multithreaded programming: Deadlocks. Deadlocks are threads blocking
+indefinitely because they are waiting to acquire access to resources currently locked by other blocked
+threads. For example, suppose you have two threads and two resources, A and B. Both threads require a lock on
+both resources, but they acquire the locks in different order. You should try to avoid any possible deadlock
+situation altogether. If you need to acquire multiple locks, the recommended way is to use the standard
+~std::lock()~ or ~std::try_lock()~ functions. These functions obtain or try to obtain a lock on several
+resources, doing their best to prevent deadlocks.
+
+*** Tearing
+Tearing means that part of your data has been written to memory, while part hasn't been written yet. If
+another thread reads that data at that exact moment it sees inconsistent data.
+
+*** Cache Coherency
+Cache coherency is important to keep in mind. If one thread writes a piece of data, that thread immediately
+sees this new data, but this does not mean that all threads see this new data immediately! CPUs have caches
+and the cache structure on multicore processors is complicated. If one core modifies your data, it is changed
+immediately in its cache; but, this change is not immediately visible to cores using a different cache. So,
+even simple data types, such as Booleans, need to be synchronized when reading and writing to them from
+multiple threads.
+
+*** Thread Local Storage
+The standard supports the concept of thread local storage. With a keyword called ~thread_local~, you can mark
+any variable as thread local, which means that each thread will have its own unique copy of the variable and
+it will last for the entire duration of the thread. For each thread, the variable is initialized exactly once.
+For example, in the following code, every thread shares one-and-only-one copy of ~k~, while each thread has
+its own unique copy of ~n~:
+#+BEGIN_SRC c++
+  thread_local int n;
+  int k;
+  void doWork() {
+    // perform some computation
+  }
+#+END_SRC
+Note that if the ~thread_local~ variable is declared in the scope of a function, its behavior is as if it were
+declared ~static~, except that every thread has its own unique copy and is initialized exactly once per thread,
+no matter how many times that function is called in that thread.
+
+*** Canceling Threads
+The standard does not include any mechanism for cancelling a running thread from inside another thread. The
+best way to achieve this is to provide some communication mechanism that the two threads agree upon. The
+simplest mechanism is to have a shared variable, which the target thread checks periodically to determine if
+it should terminate. Other threads can set this shared variable to indirectly instruct the thread to shut
+down. Care has to be taken to avoid race conditions and cache coherency problems with reading and writing to
+this shared variable. Atomic variables or condition variables can help avoid these problems.
+
+*** Retrieving Results from Threads
+In most cases you are probably interested in results produced by a given thread. For example, if your thread
+performs some mathematical calculations, you really would like to get the results out of the thread once the
+thread is finished. One way is to pass a pointer or reference to a result variable to the thread in which the
+thread stores the results. Another method is to store the results inside a class member variable of a function
+object, which you can retrieve later once the thread has finished executing.
+
+However, there is another and easier method to obtain a result from threads: ~futures~. They also make it
+easier to handle errors that occur inside your threads.
+
+*** Copying and Rethrowing Exceptions
+The whole exception mechanism in C++ works perfectly, as long as it stays within one single thread. Every
+thread can throw its own exceptions, but they need to be caught within their own thread. Exceptions thrown in
+one thread cannot be caught in another thread. This introduces quite a few problems when you would like to use
+exception handling in combination with multithreaded programming.
+
+Without the standard threading library it's very difficult if not impossible to gracefully handle exceptions
+across threads. The standard threading library solves this issue with the following exception-related
+functions. These functions not only work with ~std::exceptions~, but with all kinds of exceptions, ~ints~,
+~strings~, custom exceptions, and so on:
+#+BEGIN_SRC c++
+  exception_ptr current_exception() noexcept;
+#+END_SRC
+This function is intended to be called from inside a catch block, and returns an ~exception_ptr~ object that
+refers to the exception currently being handled, or a copy of the currently handled exception, or a null
+~exception_ptr~ object if no exception is being handled. This referenced exception object remains valid for as
+long as there is an object of type ~exception_ptr~ that is referencing it. ~exception_ptr~ is of type
+~NullablePointer~, which means it can easily be tested with a simple if statement.
+#+BEGIN_SRC c++
+  [[noreturn]] void rethrow_exception(exception_ptr p);
+#+END_SRC
+This function rethrows the exception referenced by the ~exception_ptr~ parameter. Rethrowing the referenced
+exception does not have to be done in the same thread that generated the referenced exception in the first
+place, which makes this feature perfectly suited for handling exceptions across different threads. The
+~[[[[noreturn]]]]~ attribute makes it clear that this function never returns normally.
+
+*** Atomic Operations Library
+Atomic types allow atomic access, which means that concurrent reading and writing without additional
+synchronization is allowed. Without atomic operations, incrementing a variable is not thread-safe because the
+compiler first loads the value from memory into a register, increments it, and then stores the result back in
+memory. Another thread might touch the same memory during this increment operation, which is a race condition.
+
+You need to include the ~<atomic>~ header to use these atomic types. The standard defines named integral
+atomic types for all primitive types. The following table lists a few:
+
+| Named Atomic Type | Equivalent Atomic Type     |
+|-------------------+----------------------------|
+| atomic_bool       | atomic<bool>               |
+| atomic_char       | atomic<char>               |
+| atomic_uchar      | atomic<unsigned char>      |
+| atomic_int        | atomic<int>                |
+| atomic_uint       | atomic<unsigned int>       |
+| atomic_long       | atomic<long>               |
+| atomic_ulong      | atomic<unsigned long>      |
+| atomic_llong      | atomic<long long>          |
+| atomic_ullong     | atomic<unsigned long long> |
+| atomic_wchar_t    | atomic<wchar_t>            |
+|-------------------+----------------------------|
+
+When accessing a piece of data from multiple threads, atomics also solve other problems such as cache
+coherence, memory ordering, compiler optimizations, and so on. Basically, it's virtually never safe to read
+and write to the same piece of data from multiple threads without using atomics or explicit synchronization
+mechanisms.
+
+*** Mutual Exclusion
+If you are writing multithreaded applications, you have to be sensitive to sequencing of operations. If your
+threads read and write shared data, this can be a problem. There are many ways to avoid this problem, such as
+never actually sharing data between threads (or atomics for simple types). However, if you can't avoid sharing
+data, you must provide for synchronization so that only one thread at a time can change the data.
+
+**** Mutex Classes
+Mutex stands for mutual exclusion. The mutual exclusion classes are all defined in the ~<mutex>~ header file
+and are in the ~std~ namespace. The basic mechanism of using a mutex is as follows:
+
+- A thread that wants to use (read/write) memory shared with other threads tries to lock a mutex object. If
+  another thread is currently holding this lock, the new thread that wants to gain access blocks until the
+  lock is released, or until a timeout interval expires.
+- Once the thread has obtained the lock, it is free to use the shared memory. Of course, this assumes that all
+  threads that want to use the shared data all correctly acquire a lock on the mutex.
+- After the thread is finished with reading/writing to the shared memory, it releases the lock to give some
+  other thread an opportunity to obtain the lock to the shared memory. If two or more threads are waiting on
+  the lock, there are no guarantees as to which thread is granted the lock and thus allowed to proceed.
+
+The standard provides non-timed mutex and timed mutex classes.
+
+***** Non-Timed Mutex Classes
+The library has two non-timed mutex classes: ~std::mutex~ and ~std::recursive_mutex~. Each supports the
+following methods:
+
+- lock() :: The calling thread tries to obtain the lock and blocks until the lock has been acquired. It blocks
+     indefinitely. If there is a desire to limit the amount of time the thread blocks, you should use a timed
+     mutex.
+- try_lock() :: The calling thread tries to obtain the lock. If the lock is currently held by another thread,
+     the call returns immediately. If the lock has been obtained, ~try_lock()~ returns ~true~, otherwise it
+     returns ~false~.
+- unlock() :: Releases the lock held by the calling thread, making it available for another thread.
+
+~std::mutex~ is a standard mutual exclusion class with exclusive ownership semantics. There can be only one
+thread owning the mutex. If another thread wants to obtain ownership of this mutex, it either blocks when
+using ~lock()~, or fails when using ~try_lock()~. A thread already having ownership of a ~std::mutex~ is not
+allowed to call ~lock()~ or ~try_lock()~ again on that mutex. This might lead to a deadlock!
+
+~std::recursive_mutex~ behaves almost identically to ~std::mutex~, except that a thread already having
+ownership of a recursive mutex is allowed to call ~lock()~ or ~try_lock()~ again on the same recursive mutex.
+The calling thread should call the ~unlock()~ method as many times as it obtained a lock on the recursive
+mutex.
+
+***** Timed Mutex Classes
+The library provides three timed mutex classes: ~std::timed_mutex~, ~std::recursive_timed_mutex~, and
+~std::shared_timed_mutex~; all support the normal ~lock()~, ~try_lock()~, and ~unlock()~ methods.
+Additionally, they support the following:
+
+- try_lock_for(rel_time) :: The calling thread tries to obtain the lock for a certain relative time. If the
+     lock could not be obtained after the given timeout, the call fails and returns ~false~. If the lock could
+     be obtained within the timeout, the call succeeds and returns ~true~.
+- try_lock_until(abs_time) :: The calling thread tries to obtain the lock until the system time equals or
+     exceeds the specified absolute time. If the lock could be obtained before this time, the call returns
+     ~true~. If the system time passes the given absolute time, the function stops trying to obtain the lock
+     and returns ~false~.
+
+A thread already having ownership of a ~timed_mutex~ is not allowed to call one of the previous lock calls
+again on that mutex. This might lead to a deadlock!
+
+~recursive_timed_mutex~ behaves almost identically to ~timed_mutex~, except that a thread already
+having ownership of a recursive mutex is allowed to call one of the previous lock calls again on the
+same mutex. The calling thread should call the ~unlock()~ method as many times as it obtained a lock
+on the recursive mutex.
+
+The ~shared_timed_mutex~ class supports the concept of shared lock ownership, also known as readers-writers
+lock. A thread can either get exclusive ownership or shared ownership of the lock. Exclusive ownership, also
+known as a write lock, can be acquired only when there are no other threads having exclusive or shared
+ownership. Shared ownership, also known as a read lock, can be acquired if there is no other thread having
+exclusive ownership, but other threads are allowed to have acquired shared ownership. The ~shared_timed_mutex~
+class supports ~lock()~, ~try_lock()~, ~try_lock_for()~, ~try_lock_until()~, and ~unlock()~, all discussed
+earlier. These methods acquire and release exclusive locks. Additionally they have the following shared
+ownership-related methods:
+
+- lock_shared() :: The calling thread tries to obtain the shared ownership lock and blocks until the lock has
+     been acquired.
+- try_lock_shared() :: The calling thread tries to obtain the shared ownership lock. If an exclusive lock is
+     currently held by another thread, the call returns immediately. If the lock has been obtained,
+     ~try_lock()~ returns ~true~, otherwise it returns ~false~.
+- try_lock_shared_for(rel_time) :: The calling thread tries to obtain the shared ownership lock for a certain
+     relative time. If the lock could not be obtained after the given timeout, the call fails and returns
+     ~false~. If the lock could be obtained within the timeout, the call succeeds and returns ~true~.
+- try_lock_shared_until(abs_time) :: The calling thread tries to obtain the shared ownership lock until the
+     system time equals or exceeds the specified absolute time. If the lock could be obtained before this
+     time, the call returns ~true~. If the system time passes the given absolute time, the function stops
+     trying to obtain the lock and returns ~false~.
+- unlock_shared() :: Releases shared ownership.
+
+**** Locks
+A lock class is a RAII class that makes it easier to correctly obtain and release a lock on a mutex; the
+destructor of the lock class automatically releases the associated mutex. The standard defines three types of
+locks: ~std::lock_guard~, ~std::unique_lock~, and ~std::shared_lock~.
+
+***** lock_guard
+~lock_guard~ is a simple lock with two constructors.
+
+- explicit lock_guard(mutex_type& m); :: A constructor accepting a reference to a mutex. This one tries to
+     obtain a lock on the mutex and blocks until the lock is obtained.
+- lock_guard(mutex_type& m, adopt_lock_t); :: A constructor accepting a reference to a mutex and an instance of
+     the ~std::adopt_lock_t~ struct. The lock assumes that the calling thread already has obtained a lock on
+     the referenced mutex and will manage this lock.
+
+***** unique_lock
+~std::unique_lock~ is a more sophisticated lock that allows you to defer lock acquisition until later in
+the execution, long after the declaration. You can use the ~owns_lock()~ method to see if the lock has
+been acquired. A ~unique_lock~ also has a bool conversion operator, which can be used to check if the
+lock has been acquired. ~unique_lock~ has several constructors:
+
+- explicit unique_lock(mutex_type& m); :: A constructor accepting a reference to a mutex. This one tries to
+     obtain a lock on the mutex and blocks until the lock is obtained.
+- unique_lock(mutex_type& m, defer_lock_t) noexcept; :: A constructor accepting a reference to a mutex and an
+     instance of the ~std::defer_lock_t~ struct. The ~unique_lock~ stores the reference to the mutex, but does
+     not immediately try to obtain a lock. A lock can be obtained later.
+- unique_lock(mutex_type& m, try_to_lock_t); :: A constructor accepting a reference to a mutex and an instance
+     of the ~std::try_to_lock_t~ struct. The lock tries to obtain a lock to the referenced mutex, but if it
+     failes it does not block.
+- unique_lock(mutex_type& m, adopt_lock_t) :: A constructor accepting a reference to a mutex and an instance
+     of the ~std::adopt_lock_t~ struct. The lock assumes that the calling thread already has obtained a lock
+     on the referenced mutex and will manage this lock.
+- unique_lock(mutex_type& m, const chrono::time_point<Clock, Duration>& abs_time ); :: A constructor accepting
+     a reference to a mutex and an absolute time. The constructor tries to obtain a lock until the system time
+     passes the given absolute time.
+- unique_lock(mutex_type& m, const chrono::duration<Rep, Period>& rel_time); :: A constructor accepting a
+     reference to a mutex and a relative time. The constructor tries to get a lock on the mutex with the given
+     relative timeout.
+
+The ~unique_lock~ class also has the following methods: ~lock()~, ~try_lock()~, ~try_lock_for()~,
+~try_lock_until()~, and ~unlock()~, which behave as explained in the section on timed mutex classes.
+
+***** shared_lock
+The ~shared_lock~ class has the same type of constructors and the same methods as ~unique_lock~. The
+difference is that the ~shared_lock~ class calls the shared ownership related methods on the underlying shared
+mutex. Thus, the methods of ~shared_lock~ are called ~lock()~, ~try_lock()~, and so on, but on the underlying
+shared mutex they call ~lock_shared()~, ~try_lock_shared()~, and so on. This is done so that ~shared_lock~ has
+the same interface as ~unique_lock~, and can be used as a stand-in replacement for ~unique_lock~ but acquires
+a shared lock instead of an exclusive lock.
+
+***** Acquiring Multiple Locks at Once
+C++ has two generic lock functions that you can use to obtain locks on multiple mutex objects at once without
+the risk of creating deadlocks. Both are defined in the std namespace, and both are variadic template
+functions:
+  - template <class L1, class L2, class... L3> void lock(L1&, L2&, L3&...); :: This generic function locks all
+       the given mutex objects in an unspecified order without the risk of deadlocks. If one of the mutex lock
+       calls throws an exception, ~unlock()~ is called on all locks that have already been obtained.
+  - template <class L1, class L2, class... L3> int try_lock(L1&, L2&, L3&...); :: ~try_lock()~ tries to obtain
+       a lock on all the given mutex objects by calling ~try_lock()~ on each of them in sequence. It returns
+       -1 if all calls to ~try_lock()~ succeed. If any ~try_lock()~ fails, ~unlock()~ is called on all locks
+       that have already been obtained, and the return value is the zero-based index of the parameter position
+       of the mutex on which ~try_lock()~ failed.
+
+ The following example demonstrates how to use the generic ~lock()~ function. The ~process()~ function first
+ creates two locks, one for each mutex, and gives an instance of ~std::defer_lock_t~ as a second argument to
+ tell ~unique_lock~ not to acquire the lock during construction. The call to ~lock()~ then acquires both locks
+ without the risk of deadlocks:
+#+BEGIN_SRC c++
+  mutex mut1;
+  mutex mut2;
+  void process() {
+    unique_lock<mutex> lock1(mut1, defer_lock_t());
+    unique_lock<mutex> lock2(mut2, defer_lock_t());
+    lock(lock1, lock2);
+    // Locks acquired
+  }
+  int main() {
+    process();
+  }
+#+END_SRC
+
+**** std::call_once
+You can use ~std::call_once()~ in combination with ~std::once_flag~ to make sure a certain function or method
+is called exactly one time no matter how many threads try to call ~call_once()~. Only one ~call_once()~
+invocation actually calls the given function or method; this invocation is called the effective ~call_once()~.
+This effective invocation on a specific ~once_flag~ instance finishes before all other ~call_once()~
+invocations on the same ~once_flag~ instance. Other threads calling ~call_once()~ on the same ~once_flag~
+instance block until the effective call is finished.
+
+*** Condition Variables
+Condition variables allow a thread to block until a certain condition is set by another thread or until the
+system time reaches a specified time. They allow for explicit inter-thread communication. There are two kinds
+of condition variables available, both defined in the ~<condition_variable>~ header file:
+  - std::condition_variable :: A condition variable that can wait only on a ~unique_lock<mutex>~, which,
+       according to the standard, allows for maximum efficiency on certain platforms.
+  - std::condition_variable_any :: A condition variable that can wait on any kind of object, including custom
+       lock types.
+
+The condition_variable class supports the following methods.
+  - notify_one() :: Wakes up one of the threads waiting on this condition variable.
+  - notify_all() :: Wakes up all threads waiting on this condition variable.
+  - wait(unique_lock<mutex>& lk) :: The thread calling ~wait()~ should already have acquired a lock on ~lk~.
+       The effect of calling ~wait()~ is that it atomically calls ~lk.unlock()~ and then blocks the thread,
+       waiting for a notification. When the thread is unblocked by a ~notify_one()~ or ~notify_all()~ call in
+       another thread, the function calls ~lk.lock()~ again, possibly blocking on the lock and then returning.
+  - wait_for(unique_lock<mutex>& lk, const chrono::duration<Rep, Period>& rel_time) :: Similar to the previous
+       ~wait()~ method, except that the thread is unblocked by a ~notify_one()~ call, a ~notify_all()~ call,
+       or when the given timeout has expired.
+  - wait_until(unique_lock<mutex>& lk, const chrono::time_point<Clock, Duration>& abs_time) :: Similar to
+       ~wait()~, except that the thread is unblocked by a ~notify_one()~ call, a ~notify_all()~ call, or when
+       the system time passes the given absolute time.
+
+The ~condition_variable_any~ class supports the same methods as the ~condition_variable~ class except that it
+accepts any kind of lock class instead of only a ~unique_lock<mutex>~. Your lock class should have a ~lock()~
+and ~unlock()~ method.
+
+Threads waiting on a condition variable can wake up when another thread calls ~notify_one()~ or
+~notify_all()~, or with a relative timeout, or when the system time reaches a certain time, but can also wake
+up spuriously. This means that a thread can wake up even if no other thread has called any notify method.
+Thus, when a thread waits on a condition variable and wakes up, it needs to check whether it woke up because
+of a notify or not. One way to check for this is using one of the versions of ~wait()~ accepting a predicate.
+
+*** Futures
+Using ~std::thread~ to launch a thread that calculates a single result does not make it easy to get the
+computed result back once the thread has finished executing. Another problem with ~std::thread~ is handling
+errors like exceptions. If a thread throws an exception and this exception is not handled by the thread
+itself, the C++ runtime calls ~std::terminate~, which usually terminates the whole application. You can avoid
+this by using ~std::future~, which is able to transport an uncaught exception to another thread, which can
+then handle the exception however it wants. Of course, it's good practice to always try to handle exceptions
+in the threads themselves as much as possible, preventing them from leaving the thread.
+
+~std::future~ and ~std::promise~ work together to make it easier to retrieve a result from a function that ran
+in the same thread or in another thread. Once a function, running in the same thread or in another thread, has
+calculated the value that it wants to return, it puts this value in a ~promise~. This value can then be
+retrieved through a ~future~. You can think of a future/promise pair as an inter-thread communication channel
+for a result.
+
+If you want to give the C++ runtime more control over whether or not a thread is created to calculate
+something, you can use ~std::async()~. It accepts a function to be executed and returns a ~future~ that you
+can use to retrieve the result. There are two ways in which ~async()~ can call your function:
+  - Creating a new thread to run your function asynchronously.
+  - Running your function at the time you call ~get()~ on the returned ~future~.
+
+If you call ~async()~ without additional arguments, the runtime automatically chooses one of the two methods
+depending on factors like the number of processors in your system and the amount of concurrency already taking
+place. You can force the runtime to use one or the other method by specifying a ~launch::async~ (create a new
+thread) or ~launch::deferred~ (use current thread) policy argument.
+
+*** Thread Pools
+Instead of creating and deleting threads dynamically throughout your program lifetime, you can create a pool
+of threads that can be used as needed. This technique is often used in programs that want to handle some kind
+of event in a thread. In most environments, the ideal number of threads is equal to the number of processing
+cores. If there are more threads than cores, threads will have to be suspended to allow other threads to run,
+and this will ultimately add overhead. Note that while the ideal number of threads is equal to the number of
+cores, this applies only in the case where the threads are compute bound and cannot block for any other
+reason, including I/O. When threads can block, it is often appropriate to run more threads than there are
+cores. Determining the optimal number of threads in such cases may involve throughput measurements.
+
+Because not all processing is identical, it is not uncommon to have threads from a thread pool receive, as
+part of their input, a function object or lambda expression that represents the computation to be done.
+
+Because threads from a thread pool are pre-existing, it is vastly more efficient for the operating system to
+schedule one to run than it is to create one in response to an input. Furthermore, the use of a thread pool
+allows you to manage the number of threads created, so depending on the platform, you may have just one thread
+or thousands of threads.
+
+*** Threading Design and Best Practices
+- Before terminating the application, always use ~join()~ to wait for background threads to finish :: Make
+     sure you use ~join()~ on all background threads before terminating your application. This will make sure
+     all those background threads have the time to do proper cleanup. Background threads for which there is no
+     ~join()~ will terminate abruptly when the main thread is terminated.
+- The best synchronization is no synchronization :: Multithreaded programming becomes much easier if you
+     manage to design your different threads in such a way that all threads working on shared data read only
+     from that shared data and never write to it, or only write to parts never read by other threads. In that
+     case there is no need for any synchronization and you cannot have problems like race conditions or
+     deadlocks.
+- Try to use the single-thread ownership pattern :: This means that a block of data is owned by no more than
+     one thread at a time. Owning the data means that no other thread is allowed to read/write to the data.
+     When the thread is finished with the data, the data can be passed off to another thread, which now has
+     sole and complete responsibility/ownership of the data. No synchronization is necessary in this case.
+- Use atomic types and operations when possible :: Atomic types and atomic operations make it easier to write
+     race-condition and deadlock-free code, because they handle synchronization automatically. If atomic types
+     and operations are not possible in your multithreaded design, and you need shared data, you have to use a
+     mutual exclusion mechanism to ensure proper synchronization.
+- Use locks to protect mutable shared data :: If you need mutable shared data to which multiple threads can
+     write, and you cannot use atomic types and operations; you have to use a locking mechanism to make sure
+     reads and writes between different threads are synchronized.
+- Release locks as soon as possible :: When you need to protect your shared data with a lock, make sure you
+     release the lock as soon as possible. While a thread is holding a lock, it is blocking other threads
+     waiting for the same lock, possibly hurting performance.
+- Make sure to acquire multiple locks in the same order :: If multiple threads need to acquire multiple locks,
+     they must be acquired in the same order in all threads to prevent deadlocks. You should use the generic
+     ~std::lock()~ or ~std::try_lock()~ to minimize the chance of violating lock ordering restrictions.
+- Use a multithreading-aware profiler :: Use a multithreading-aware profiler to find performance bottlenecks
+     in your multithreaded applications and to find out if your multiple threads are indeed utilizing all
+     available processing power in your system. An example of a multithreading-aware profiler is the profiler
+     in certain editions of Microsoft Visual Studio.
+- Understand the multithreading support features of your debugger :: Most debuggers have at least basic
+     support for debugging multithreaded applications. You should be able to get a list of all running threads
+     in your application, and you should be able to switch to any one of those threads to inspect their call
+     stack. You can use this, for example, to inspect deadlocks because you can see exactly what each thread
+     is doing.
+- Use thread pools instead of creating and destroying a lot of threads dynamically :: Your performance
+     decreases if you dynamically create and destroy a lot of threads. In that case it's better to use a
+     thread pool to reuse existing threads.
+- Use higher-level multithreading libraries :: Where possible, use higher-level multithreading libraries such
+     as Intel Threading Building Blocks (TBB), Microsoft Parallel Patterns Library (PPL), and so on, rather
+     than reinventing the wheel. Multithreaded programming is hard to get right and is error prone. More often
+     than not, your wheel may not be as round as you think.
+
+** Efficient C++
+*** Language-Level Efficiency (Only for objects, not primitive types)
+- Pass Objects by Reference (pass-by-reference) :: Pass-by-value incurs copying costs that are avoided with
+     pass-by-reference. Objects passed by value must call constructors and destructors on them and all their
+     data members.
+- Return Objects by Reference (retury-by-reference) :: Just as you should pass objects by reference to
+     functions, you should also return them by reference from functions in order to avoid copying the objects
+     unnecessarily. Unfortunately, it is sometimes impossible to return objects by reference, such as when you
+     write overloaded ~operator+~ and other similar operators. You should never return a reference or a
+     pointer to a local object that will be destroyed when the function exits. Since C++11, the language has
+     support for move semantics, which allows you to efficiently return objects by value, instead of using
+     reference semantics.
+- Catch Exceptions by Reference :: You should catch exceptions by reference in order to avoid an extra copy.
+     Throwing exceptions is heavy in terms of performance, so any little thing you can do to improve their
+     efficiency will help.
+- Use Move Semantics :: You should implement a move constructor and move assignment operator for your objects,
+     which allow the C++ compiler to use move semantics. With move semantics for your objects, returning them
+     by value from a function will be efficient without incurring large copying costs.
+- Avoid Creating Temporary Objects :: The compiler creates temporary, unnamed objects in several
+     circumstances. For example after writing a global ~operator+~ for a class, you can add objects of that
+     class to other types, as long as those types can be converted to objects of that class. In general, the
+     compiler constructs a temporary object whenever your code converts a variable of one type to another type
+     for use in a larger expression. This rule applies mostly to function calls.
+
+     You should generally attempt to avoid cases in which the compiler is forced to construct temporary
+     objects. Although it is impossible to avoid in some situations, you should at least be aware of the
+     existence of this "feature" so you aren't surprised by performance and profiling results.
+
+     Move semantics are also used by the compiler to make working with temporary objects more efficient.
+     That's another reason to add move semantics to your classes.
+- Use Inline Methods and Functions :: The code for an inline method or function is inserted directly into the
+     code where it is called, avoiding the overhead of a function call. You should mark as inline all
+     functions and methods that you think can qualify for this optimization. However, remember that inlining
+     requests by the programmer are only a recommendation to the compiler, which is allowed to refuse them.
+
+     On the other hand, some compilers inline appropriate functions and methods during their optimization
+     steps, even if those functions aren't marked with the inline keyword. Thus, you should read your compiler
+     documentation before wasting a lot of effort deciding which functions to inline.
+
+*** Design-Level Efficiency
+The design choices in your program affect its performance far more than do language details such as
+pass-by-reference. For example, if you choose an algorithm for a fundamental task in your application that
+runs in ~O(n^2)~ time instead of a simpler one that runs in ~O(n)~ time, you could potentially perform the
+square of the number of operations that you really need. To put numbers on that, a task that uses an ~O(n^2)~
+algorithm and performs one million operations would perform only one thousand with an ~O(n)~ algorithm. Even
+if that operation is optimized beyond recognition at the language level, the simple fact that you perform one
+million operations when a better algorithm would use only one thousand will make your program very
+inefficient. Always choose your algorithms carefully.
+
+In addition to your choice of algorithms, design-level efficiency includes specific tips and tricks. Instead
+of writing your own data structures and algorithms, you should use existing ones, such as the STL or the Boost
+libraries, as much as possible because these are written by experts. You should also think about incorporating
+multithreading in your design.
+
+Here are two more design techniques for optimizing your program: caching, and object pools.
