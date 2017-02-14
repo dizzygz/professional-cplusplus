@@ -4,6 +4,7 @@
 -Wpedantic
 -g
 -O0
+-DDEBUG
 -I/usr/include/
 -I/usr/include/c++/5/
 -I.

@@ -738,12 +738,94 @@
 
 *** Chapter 16 - Understanding Containers and Iterators
 **** Notes
+- If you want to store pointers in containers use ~unique_ptr~ if the container becomes owner of the
+  pointed-to object, or ~shared_ptr~ if the container shares ownership with other owners. Do not use the old
+  deprecated ~auto_ptr~ class in containers because it does not implement copying correctly (as far as the STL
+  is concerned).
+- The STL containers call the copy constructor and assignment operator for elements often, so make those
+  operations efficient. You can also increase performance by implementing move semantics for your elements.
+- Iterators might not be implemented internally as pointers, so it is better to use the term "refers to"
+  instead of "points to" when discussing the elements accessible via an iterator.
+- Only the =sequential containers=, =associative containers=, and =unordered associative containers= provide
+  iterators. The =container adapters= and ~bitset~ class do not support iteration over their elements.
+- ~const_iterator~ and ~const_reverse_iterator~ provide read-only access to elements of the container.
+- The half-open range concept of iterators also applies to iterator ranges that are passed to container
+  methods such as ~insert()~ and ~erase()~.
+- All ~vector~ element accesses run with constant complexity.
+- The ~operator[]~ on a ~vector~ normally returns a reference to the element, which can be used on the
+  left-hand side of assignment statements. If ~operator[]~ is called on a ~const vector~ object, it returns a
+  reference to a ~const~ element, which cannot be used as the target of an assignment.
+- Comparing two ~vectors~ with ~operator==~ or ~operator!=~ requires the individual elements to be comparable
+  with ~operator==~. Comparing two ~vectors~ with ~operator<~, ~operator>~, ~operator<=~, or ~operator>=~
+  requires the individual elements to be comparable with ~operator<~. If you intend to store objects of a
+  custom class in a ~vector~, make sure to write those operators.
+- Use pre-increment instead of post-increment when possible because pre-increment is at least as efficient,
+  and usually more efficient. ~iter++~ must return a new iterator object, while ~++iter~ can simply return a
+  reference to ~iter~.
+- If you do not need to modify the elements of a ~vector~, you should use a ~const_iterator~. This rule will
+  make it easier to guarantee correctness of your code and allows compilers to perform certain optimizations.
+- There are versions of ~push_back()~ and ~insert()~ that take an =lvalue= or an =rvalue= as parameter. The
+  =lvalue= versions allocate memory as needed to store the new elements, and store copies of the element
+  arguments. The =rvalue= versions use move semantics to move ownership of the object to a ~vector~ instead of
+  copying the object.
+- All STL containers implement move semantics by including a move constructor and move assignment operator.
+  These use =rvalue= references. A big benefit of this is that you can easily return an STL container from a
+  function by value without performance degradation.
+- C++ supports emplace operations on most STL containers, including ~vector~. Emplace means "to put into
+  place." An example is ~emplace_back()~ on a ~vector~ object, which does not copy or move anything. Instead,
+  it makes space in the container and constructs the object in place.
+- You can think of the ~vector<bool>~ specialization as a bit-field instead of a ~vector~. The ~bitset~
+  container provides a more full-featured bit-field implementation than does ~vector<bool>~. However, the
+  benefit of ~vector<bool>~ is that it can change size dynamically.
+- In practice, the little amount of space saved by packing ~bools~ hardly seems worth the extra effort. Even
+  worse, accessing and modifying elements in a ~vector<bool>~ is much slower than, for example, in a
+  ~vector<int>~. Many C++ experts recommend avoiding ~vector<bool>~ in favor of the ~bitset~, or ~vector<int>~
+  if you need a dynamically sized bit field.
+- C++ provides synchronization classes to allow thread-safe access to shared objects. Without explicit
+  synchronization, no STL class can be used safely from multiple threads.
+- The head element of the ~priority_queue~ is the one with the "highest" priority, by default, determined
+  according to ~operator<~ such that elements that are "less" than other elements have lower priority.
+- ~map~ and the other associative containers do provide a version of ~insert()~ that takes an iterator
+  position. However, that position is only a "hint" to the container as to the correct position. The container
+  is not required to insert the element at that position.
+- ~multimaps~ allow you to insert identical key/value pairs. If you want to avoid this redundacy, you must
+  check explicitly before inserting a new element.
+- The ~lower_bound()~, ~upper_bound()~, and ~equal_range()~ methods of ~multimap~ exist for ~maps~ as well,
+  but their usefulness is limited because a ~map~ cannot have multiple elements with the same key.
+- ~unordered_multimaps~ allow you to insert identical key/value pairs. If you want to avoid this redundancy,
+  you must check explicitly before inserting a new element.
 
 **** Warnings
+- Like "real" array indexing, the ~operator[]~ on a ~vector~ does not provide bounds checking.
+- ~pop_back()~ does not return the element that it removed. If you want the element you must first retrieve it
+  with ~back()~.
+- Methods such as ~insert()~ and ~erase()~ that take a ~vector~ range as arguments assume that the beginning
+  and ending iterators refer to elements in the same container, and that the end iterator refers to an element
+  at or past the begin iterator. The methods will not work correctly if these preconditions are not met!
+- Reserving space for elements changes the capacity, but not the size. That is, it doesn't actually create
+  elements. Don't access elements past a vector's size.
+- The fact that references returned from ~vector<bool>~ are really proxies means that you can't take their
+  addresses to obtain pointers to the actual elements in the container.
+- Lists ~list class on <list> header~ do not provide random access to elements.
+- Splicing is destructive to the ~list~ passed as an argument: It removes the spliced elements from one ~list~
+  in order to insert them into the other.
+- When you have a choice, use the ~list~ specific methods rather than the generic STL algorithms because the
+  former are more efficient. Sometimes you don't have a choice and you must use the ~list~ specific methods;
+  for example, ~std::sort()~ requires ~RandomAccessIterators~, which a ~list~ does not provide.
+- Using plain old pointer types in ~pairs~ is risky because the ~pair~ copy constructor and assignment
+  operator perform only shallow copies and assignments of pointer types. However, you can safely store smart
+  pointers like ~shared_ptr~ in a ~pair~.
+- You can modify element valus through non-const iterators, but the compiler will generate an error if you try
+  to modify the key of an element, even through a non-const iterator, because it would destroy the sorted
+  order of the elements in the ~map~.
+- Functions such as ~std::begin()~ and ~std::end()~ only work on stack-based C-style arrays, not on heap-based
+  C-style arrays.
 
 *** Chapter 17 - Mastering STL Algorithms
 **** Notes
+
 **** Warnings
+
 *** Chapter 18 - String Localization and Regular Expressions
 **** Notes
 **** Warnings
@@ -1908,7 +1990,14 @@ as ~int~ and ~double~ to your own classes. Each container instance stores object
 they are homogeneous collections. If you need non fixed-sized heterogeneous collections, you could create a
 class that has multiple derived classes, and each derived class could wrap an object of your required type.
 
+One of the template type parameters for STL containers is a so-called =allocator=. The container can use this
+=allocator= to allocate and deallocate memory for elements. Some containers, such as a ~map~; also accept a
+=comparator= as one of the template type parameters. This =comparator= is used to order elements. Both of
+these template parameters have default values.
+
 *** Overview
+High level functionality of the STL is shown on the following table:
+
 | Functionality       | Header Files         | Description                                                       |
 |---------------------+----------------------+-------------------------------------------------------------------|
 | Strings             | <string>             | Build-int string class. Technically a ~typedef~ for a char        |
@@ -1982,40 +2071,43 @@ class that has multiple derived classes, and each derived class could wrap an ob
 |---------------------+----------------------+-------------------------------------------------------------------|
 
 *** STL requirements on elements
-| Method      | Description                                          | Notes                                      |
-|-------------+------------------------------------------------------+--------------------------------------------|
-| Copy        | Creates a new element that is "equal to the old one, | Uses every time you insert an element,     |
-| Constructor | but that can safely be destructed without affecting  | except when using an emplace method.       |
-|             | the old one.                                         |                                            |
-|-------------+------------------------------------------------------+--------------------------------------------|
-| Move        | Creates a new element by moving all content from a   | Used when the source element is an rvalue, |
-| Constructor | source element to the new element.                   | and will be destroyed after the            |
-|             |                                                      | construction of the new element; also used |
-|             |                                                      | when a vector grows in size, for example.  |
-|-------------+------------------------------------------------------+--------------------------------------------|
-| Assignment  | Replaces the contents of an element with a copy of   | Used every time you modify an element.     |
-| Operator    | the source element.                                  |                                            |
-|-------------+------------------------------------------------------+--------------------------------------------|
-| Move        | Replaces the contents of an element by moving all    | Used when the source element is an rvalue, |
-| Assignment  | content from a source element.                       | and will be destroyed after the assignment |
-| Operator    |                                                      | operation.                                 |
-|-------------+------------------------------------------------------+--------------------------------------------|
-| Destructor  | Cleans up an element.                                | Used every time you remove an element, or, |
-|             |                                                      | for example, when a vector grows in size   |
-|             |                                                      | and the elements are not movable.          |
-|-------------+------------------------------------------------------+--------------------------------------------|
-| Default     | Constructs an element without any arguments.         | Required only for certain operations, such |
-| Constructor |                                                      | as the vector::resize() method with one    |
-|             |                                                      | argument, and the map::operator[] access.  |
-|-------------+------------------------------------------------------+--------------------------------------------|
-| operator==  | Compares two elements for equality.                  | Required for keys in unordered containers, |
-|             |                                                      | and for certain operations, such as        |
-|             |                                                      | operator== on two containers.              |
-|-------------+------------------------------------------------------+--------------------------------------------|
-| operator<   | Determines if one element is less than another.      | Required for keys in associative           |
-|             |                                                      | containers and for certain operations,     |
-|             |                                                      | such as ~operator<~ on two containers.     |
-|-------------+------------------------------------------------------+--------------------------------------------|
+The specific requirements on elements in containers using the default allocator and comparator are shown in
+the following table:
+
+| Method      | Description                                  | Notes                                       |
+|-------------+----------------------------------------------+---------------------------------------------|
+| Copy        | Creates a new element that is "equal" to the | Uses every time you insert an element,      |
+| Constructor | old one, but that can safely be destructed   | except when using an emplace method.        |
+|             | without affecting the old one.               |                                             |
+|-------------+----------------------------------------------+---------------------------------------------|
+| Move        | Creates a new element by moving all content  | Used when the source element is an rvalue,  |
+| Constructor | from a source element to the new element.    | and will be destroyed after the             |
+|             |                                              | construction of the new element; also used  |
+|             |                                              | when a vector grows in size, for example.   |
+|-------------+----------------------------------------------+---------------------------------------------|
+| Assignment  | Replaces the contents of an element with a   | Used every time you modify an element.      |
+| Operator    | copy of the source element.                  |                                             |
+|-------------+----------------------------------------------+---------------------------------------------|
+| Move        | Replaces the contents of an element by       | Used when the source element is an rvalue,  |
+| Assignment  | moving all content from a source element.    | and will be destroyed after the assignment  |
+| Operator    |                                              | operation.                                  |
+|-------------+----------------------------------------------+---------------------------------------------|
+| Destructor  | Cleans up an element.                        | Used every time you remove an element, or,  |
+|             |                                              | for example, when a vector grows in size    |
+|             |                                              | and the elements are not movable.           |
+|-------------+----------------------------------------------+---------------------------------------------|
+| Default     | Constructs an element without any arguments. | Required only for certain operations, such  |
+| Constructor |                                              | as the ~vector::resize()~ method with one   |
+|             |                                              | argument, and the ~map::operator[]~ access. |
+|-------------+----------------------------------------------+---------------------------------------------|
+| operator==  | Compares two elements for equality.          | Required for keys in unordered containers,  |
+|             |                                              | and for certain operations, such as         |
+|             |                                              | ~operator==~ on two containers.             |
+|-------------+----------------------------------------------+---------------------------------------------|
+| operator<   | Determines if one element is less than       | Required for keys in associative            |
+|             | another.                                     | containers and for certain operations,      |
+|             |                                              | such as ~operator<~ on two containers.      |
+|-------------+----------------------------------------------+---------------------------------------------|
 
 *** Iterators
 The STL uses the iterator pattern to provide a generic abstraction for accessing the elements of the
@@ -2029,43 +2121,43 @@ access the actual element or field of the element. Some iterators allow comparis
 All iterators must be copy constructible, copy assignable, and destructible. Lvalues of iterators must be
 swappable. The standard defines five categories of iterators:
 
-| Iteraotr Category       | Operations Required | Comments                                                        |
-|-------------------------+---------------------+-----------------------------------------------------------------|
-| Read (Input Iterator)   | operator++          | Provides read-only access, forward only (no operator-- to move  |
-|                         | operator*           | backward).                                                      |
-|                         | operator->          | Iterators can be assigned, copied, and compared for equality.   |
-|                         | copy constructor    |                                                                 |
-|                         | operator=           |                                                                 |
-|                         | operator==          |                                                                 |
-|                         | operator!=          |                                                                 |
-|-------------------------+---------------------+-----------------------------------------------------------------|
-| Write (Output Iterator) | operator++          | Provides write-only access, forward only.                       |
-|                         | operator*           | Iterators can be assigned, but cannot be compared for equality. |
-|                         | copy constructor    | Note the absence of operator->.                                 |
-|                         | operator=           |                                                                 |
-|-------------------------+---------------------+-----------------------------------------------------------------|
-| Forward Iterator        | Capabilities of     | Provides read/write access, forward only.                       |
-|                         | input iterators,    | Iterators can be assigned, copied, and compared for equality.   |
-|                         | plus: default       |                                                                 |
-|                         | constructor         |                                                                 |
-|-------------------------+---------------------+-----------------------------------------------------------------|
-| Bidirectional Iterator  | Capabilities of     | Provides everything forward iterators provide.                  |
-|                         | forward interators, | Iterators can also move backward to previous element.           |
-|                         | plus: operator--    |                                                                 |
-|-------------------------+---------------------+-----------------------------------------------------------------|
-| Random Access Iterator  | Bidirectional       | Equivalent to dumb pointers: Iterators support pointer          |
-|                         | capability,         | arithmetic, array index syntax, and all forms of                |
-|                         | plus:               | comparison.                                                     |
-|                         | operator+           |                                                                 |
-|                         | operator-           |                                                                 |
-|                         | operator+=          |                                                                 |
-|                         | operator-=          |                                                                 |
-|                         | operator<           |                                                                 |
-|                         | operator>           |                                                                 |
-|                         | operator<=          |                                                                 |
-|                         | operator>=          |                                                                 |
-|                         | operator[]          |                                                                 |
-|-------------------------+---------------------+-----------------------------------------------------------------|
+| Iteraotr Category       | Operations Required | Comments                                                 |
+|-------------------------+---------------------+----------------------------------------------------------|
+| Read (Input Iterator)   | operator++          | Provides read-only access, forward only (no ~operator--~ |
+|                         | operator*           | to move backward).                                       |
+|                         | operator->          | Iterators can be assigned, copied, and compared for      |
+|                         | copy constructor    | equality.                                                |
+|                         | operator=           |                                                          |
+|                         | operator==          |                                                          |
+|                         | operator!=          |                                                          |
+|-------------------------+---------------------+----------------------------------------------------------|
+| Write (Output Iterator) | operator++          | Provides write-only access, forward only.                |
+|                         | operator*           | Iterators can be assigned, but cannot be compared        |
+|                         | copy constructor    | for equality.                                            |
+|                         | operator=           | Note the absence of ~operator->~.                        |
+|-------------------------+---------------------+----------------------------------------------------------|
+| Forward Iterator        | Capabilities of     | Provides read/write access, forward only.                |
+|                         | input iterators,    | Iterators can be assigned, copied, and compared for      |
+|                         | plus: default       | equality.                                                |
+|                         | constructor         |                                                          |
+|-------------------------+---------------------+----------------------------------------------------------|
+| Bidirectional Iterator  | Capabilities of     | Provides everything forward iterators provide.           |
+|                         | forward interators, | Iterators can also move backward to previous element.    |
+|                         | plus: operator--    |                                                          |
+|-------------------------+---------------------+----------------------------------------------------------|
+| Random Access Iterator  | Bidirectional       | Equivalent to dumb pointers: Iterators support pointer   |
+|                         | capability,         | arithmetic, array index syntax, and all forms of         |
+|                         | plus:               | comparison.                                              |
+|                         | operator+           |                                                          |
+|                         | operator-           |                                                          |
+|                         | operator+=          |                                                          |
+|                         | operator-=          |                                                          |
+|                         | operator<           |                                                          |
+|                         | operator>           |                                                          |
+|                         | operator<=          |                                                          |
+|                         | operator>=          |                                                          |
+|                         | operator[]          |                                                          |
+|-------------------------+---------------------+----------------------------------------------------------|
 
 There is no formal class hierarchy of these iterators, because the implementations for each container are not
 part of the standard hierarchy. However, one can deduce a hierarchy based on the functionality they are
@@ -2086,15 +2178,15 @@ referring to the last element in the sequence. Together ~begin()~ and ~end()~ pr
 includes the first element but not the last: =[begin,end)=.
 
 Iterator Methods:
-  - ~begin()~ and ~end()~ methods that return ~non-const~ iterators.
-  - ~cbegin()~ and ~cend()~ methods that return ~const~ iterators.
-  - ~rbegin()~ and ~rend()~ methods that return ~non-const~ reverse iterators.
+  - ~begin()~   and ~end()~   methods that return ~non-const~ iterators.
+  - ~cbegin()~  and ~cend()~  methods that return ~const~ iterators.
+  - ~rbegin()~  and ~rend()~  methods that return ~non-const~ reverse iterators.
   - ~crbegin()~ and ~crend()~ methods that return ~const~ reverse iterators.
 
 Iterator global non-member functions (Recommended):
-  - ~std::begin()~ and ~std::end()~ (since c++11)
-  - ~std::cbegin()~ and ~std::cend()~ (since c++14)
-  - ~std::rbegin()~ and ~std::rend()~ (since c++14)
+  - ~std::begin()~   and ~std::end()~   (since c++11)
+  - ~std::cbegin()~  and ~std::cend()~  (since c++14)
+  - ~std::rbegin()~  and ~std::rend()~  (since c++14)
   - ~std::crbegin()~ and ~std::crend()~ (since c++14)
 
 *** Iterator Adapters
@@ -2158,7 +2250,328 @@ be destroyed after an assignment or copy construction. There is an iterator adap
 moved to a new destination without the overhead of copying. Before you can use move semantics, you need to
 make sure your objects are supporting it.
 
-*** STL Containers
+*** STL Containers Overview
+**** Sequential Containers
+***** vector
+The STL ~vector~ container is similar to a standard C-style array: the elements are stored in contiguous
+memory, each in its own "slot." You can index into a ~vector~, as well as add new elements to the back or
+insert them anywhere else. Inserting and deleting elements into and from a ~vector~ generally takes linear
+time, though these operations actually run in amortized constant time at the end of a ~vector~. Random access
+of individual elements has a constant complexity.
+
+The ~vector~ iterator is random access, which means that you can move it backward or forward, or jump around.
+
+A ~vector~ stores copies of the objects, and its destructor calls the destructor for each of the objects. The
+copy constructor and assignment operator of the ~vector~ class perform deep copies of all the elements in the
+~vector~. Thus, for efficiency, you should pass ~vectors~ by reference or ~const~ reference to functions and
+methods. In addition to normal copying and assignment, ~vectors~ provide an ~assign()~ method that removes all
+the current elements and adds any number of new elements. This method is useful if you want to reuse a
+~vector~.
+
+You can remove elements from any point in a ~vector~ with ~erase()~ and you can remove all elements with
+~clear()~. There are two forms of ~erase()~: one accepting a single iterator to remove a single element, and
+one accepting two iterators specifying a range of elements to remove. If you want to remove a number of
+elements that satisfy a certain condition, one solution would be to write a loop iterating over all the
+elements and erasing every element that matches the condition. However, this solution has quadratic
+complexity, which is very bad for performance. In this case, the quadratic complexity can be avoided by using
+the =remove-erase-idiom=, which has a linear complexity.
+
+Inserting or erasing elements in a ~vector~ causes all subsequent elements to shift up or down to make room
+for, or fill in the holes left by, the affected elements. Thus, these operations take linear complexity.
+Furthermore, all iterators referring to the insertion or removal point or subsequent positions are invalid
+following the action. The iterators are not "magically" moved to keep up with the elements that are shifted up
+or down in the vector — that's up to you.
+
+Also keep in mind that an internal vector reallocation can cause invalidation of all iterators referring to
+elements in the ~vector~, not just those referring to elements past the point of insertion or deletion.
+
+~vector~ provides two methods for obtaining information about its size: ~size()~ and ~capacity()~. The
+~size()~ method returns the number of elements in a ~vector~, while ~capacity()~ returns the number of
+elements that it can hold without a reallocation. Thus, the number of elements that you can insert without
+causing a reallocation is ~capacity() – size()~. You can query whether a ~vector~ is empty with the ~empty()~
+method. A ~vector~ can be empty but have nonzero capacity.
+
+One way to preallocate space is to call ~reserve()~, which allocates enough memory to hold the specified
+number of elements. Another way to preallocate space is to specify, in the constructor or with the ~resize()~
+method, how many elements you want a ~vector~ to store. This method actually creates a ~vector~ of that size
+(and probably of that capacity).
+
+***** deque
+~deque~ (abbreviation for double-ended queue) is almost identical to ~vector~, but is used far less
+frequently. It is defined in the ~<deque>~ header file. The principle differences are as follows:
+  - Elements are not stored contiguously in memory.
+  - A ~deque~ supports true constant-time insertion and removal of elements at both the front and the back (a
+    ~vector~ supports amortized constant time at just the back).
+  - A ~deque~ provides ~push_front()~, ~pop_front()~, and ~emplace_front()~, which the ~vector~ omits.
+  - A ~deque~ does not expose its memory management scheme via ~reserve()~ or ~capacity()~.
+
+***** list
+The STL ~list~ class, defined in the ~<list>~ header file, is a standard doubly linked list. It supports
+constant-time insertion and deletion of elements at any point in the list, but provides slow (linear) time
+access to individual elements. In fact, the list does not even provide random-access operations like
+~operator[]~. Only through iterators can you access individual elements.
+
+A ~list~ iterator is bidirectional, not random access like a ~vector~ iterator. That means that you cannot add
+and subtract list iterators from each other, or perform other pointer arithmetic on them. For example, if ~p~
+is a list iterator, you can traverse through the elements of the list by doing ~++p~ or ~--p~, but you cannot
+use the addition or subtraction operator; ~p+n~ or ~p-n~ does not work.
+
+A ~list~ supports the same add element and remove element methods as a ~vector~, including ~push_back()~,
+~pop_back()~, ~emplace()~, ~emplace_back()~, the five forms of ~insert()~, the two forms of ~erase()~, and
+~clear()~. Like a ~deque~, it also provides ~push_front()~, ~emplace_front()~, and ~pop_front()~. The amazing
+thing about a list is that all these methods (except for ~clear()~) run in constant time, once you've found
+the correct position. Thus, a list is appropriate for applications that perform many insertions and deletions
+from the data structure, but do not need quick index-based element access.
+
+Like ~deques~, and unlike ~vectors~, ~lists~ do not expose their underlying memory model. Consequently, they
+support ~size()~, ~empty()~ and ~resize()~, but not ~reserve()~ or ~capacity()~. Note that the ~size()~ method
+on a ~list~ has constant complexity, which is not the case for the ~size()~ method on a ~forward_list~.
+
+The linked-list characteristics of a ~list~ allow it to ~splice~, or insert, an entire ~list~ at any position
+in another ~list~ in constant time.
+
+***** forward_list
+A ~forward_list~, defined in the ~<forward_list>~ header file, is similar to a ~list~ except that it is a
+singly linked list while a ~list~ is a doubly linked list. This means that ~forward_list~ supports only
+forward iteration and, because of this, ranges need to be specified differently compared to a ~list~. If you
+want to modify any list, you need access to the element before the first element of interest. Since a
+~forward_list~ does not have an iterator that supports going backward, there is no easy way to get to the
+preceding element. For this reason, ranges that will be modified; for example, ranges supplied to ~erase()~
+and ~splice()~, must be open at the beginning. The ~begin()~ function seen earlier returns an iterator to the
+first element and thus can be used only to construct a range that is closed at the beginning. The
+~forward_list~ class therefore defines a ~before_begin()~ method, which returns an iterator that points to an
+imaginary element before the beginning of the list. You cannot dereference this iterator as it points to
+invalid data. However, incrementing this iterator by one will make it the same as the iterator returned by
+~begin()~; so it can be used to make a range that is open at the beginning.
+
+***** array
+An ~array~, defined in the ~<array>~ header file, is similar to a ~vector~ except that it is of a fixed size;
+it cannot grow or shrink in size. The purpose of this is to allow an ~array~ to be allocated on the stack,
+rather than always demanding heap access as ~vector~ does. Just like ~vectors~, ~arrays~ support random-access
+iterators, and elements are stored in contiguous memory.
+
+It has support for ~front()~, ~back()~, ~at()~, and ~operator[]~. It also supports a ~fill()~ method to fill
+the array with a specific element. Because it is fixed in size, it does not support ~push_back()~,
+~pop_back()~, ~insert()~, ~erase()~, ~clear()~, ~resize()~, ~reserve()~, and ~capacity()~. A disadvantage
+compared to a ~vector~ is that the ~swap()~ method of an ~array~ runs in linear time while it has constant
+complexity for a ~vector~. ~arrays~ can also not be moved in constant time, while ~vectors~ can. An array has
+a ~size()~ method, which is a clear advantage over C-style arrays. Note that the ~array~ declaration requires
+two template parameters; the first specifies the type of the elements, and the second specifies the fixed
+number of elements in the ~array~.
+
+**** Container Adapters
+***** queue
+The ~queue~ container adapter, defined in the header file ~<queue>~, provides standard "first-in, first-out"
+(FIFO) semantics. As usual, it's written as a class template, which looks like this:
+#+BEGIN_SRC
+  template <class T, class Container = deque<T>> class queue;
+#+END_SRC
+
+The ~T~ template parameter specifies the type that you intend to store in the ~queue~. The second template
+parameter allows you to stipulate the underlying container that the ~queue~ adapts. However, the ~queue~
+requires the sequential container to support both ~push_back()~ and ~pop_front()~, so you have only two
+built-in choices: ~deque~ and ~list~. For most purposes, you can just stick with the default ~deque~.
+
+The ~queue~ interface is extremely simple: there are only eight methods plus the constructor and the normal
+comparison operators. The ~push()~ and ~emplace()~ methods add a new element to the tail of the ~queue~, and
+~pop()~ removes the element at the head of the ~queue~. You can retrieve references to, without removing, the
+first and last elements with ~front()~ and ~back()~, respectively. As usual, when called on ~const~ objects,
+~front()~ and ~back()~ return ~const~ references; and when called on non-const objects they return non-const
+(read/write) references. The ~queue~ also supports ~size()~, ~empty()~, and ~swap()~.
+
+***** priority_queue
+A priority queue is a queue that keeps its elements in sorted order. Instead of a strict FIFO ordering, the
+element at the head of the queue at any given time is the one with the highest priority. This element could be
+the oldest on the queue or the most recent. If two elements have equal priority, their relative order in the
+queue is undefined.
+
+The priority_queue container adapter is also defined in ~<queue>~. Its template definition looks something
+like this (slightly simplified):
+#+BEGIN_SRC
+  template <class T, class Container = vector<T>, class Compare = less<T>>;
+#+END_SRC
+
+The ~priority_queue~ provides even fewer operations than does the ~queue~. The ~push()~ and ~emplace()~
+methods allow you insert elements, ~pop()~ allowrs you to remove elements, and ~top()~ returns a ~const~
+reference to the head element. Like the ~queue~, the ~priority_queue~ supports ~size()~, ~empty()~ and
+~swap()~. However, it does not provide any comparison operators.
+
+~top()~ returns a ~const~ reference even when called on a non-const object, because modifying the element
+might change its order, which is not allowed. The ~priority_queue~ provides no mechanism to obtain the tail
+element.
+
+***** stack
+A ~stack~ is almost identical to a ~queue~, except that it provides first-in, last-out (FILO) semantics,
+also known as last-in, first-out (LIFO), instead of FIFO. It is defined in the ~<stack>~ header file. The
+template definition looks like this:
+#+BEGIN_SRC
+  template <class T, class Container = deque<T>> class stack;
+#+END_SRC
+
+You can use ~vector~, ~list~, or ~deque~ as the underlying container for the ~stack~.
+
+Like the ~queue~, the ~stack~ provides ~push()~, ~emplace()~, and ~pop()~. The difference is that ~push()~
+adds a new element to the top of the ~stack~ , "pushing down" all elements inserted earlier, and ~pop()~
+removes the element from the top of the ~stack~, which is the most recently inserted element. The ~top()~
+method returns a ~const~ reference to the top element if called on a ~const~ object and a non-const reference
+if called on a non-const object. The ~stack~ also supports ~empty()~, ~size()~, ~swap()~, and the standard
+comparison operators.
+
+**** Associative Containers
+***** map
+A ~map~, defined in the ~<map>~ header file, stores key/value pairs instead of just single values. Insertion,
+lookup, and deletion are all based on the key; the value is just "along for the ride." The term "map" comes
+from the conceptual understanding that the container "maps" keys to values.
+
+A ~map~ keeps elements in sorted order, based on the keys, so that insertion, deletion, and lookup all take
+logarithmic time. Because of the order, when you enumerate the elements, they come out in the ordering imposed
+by the type's ~operator<~ or a user-defined comparator. It is usually implemented as some form of balanced
+tree, such as a red-black tree. However, the tree structure is not exposed to the client.
+
+You should use a ~map~ whenever you need to store and retrieve elements based on a "key" and you would like to
+have them in a certain order.
+
+The ~map~ template takes four types: the key type, the value type, the comparison type, and the allocator
+type. The comparison type is similar to the comparison type for ~priority_queue~. It allows you to specify a
+different comparison class than the default. When using the default, make sure that your keys all respond to
+~operator<~ appropriately.
+
+***** multimap
+A ~multimap~ is a ~map~ that allows multiple elements with the same key. Like ~maps~, ~multimaps~ support
+uniform initialization. The interface is almost identical to the ~map~ interface, with the following changes:
+  - ~multimaps~ do not provide ~operator[]~. The semantics of this operator do not make sense if there can be
+    multiple elements with a single key.
+  - Inserts on ~multimaps~ always succeed. Thus, the ~multimap~ ~insert()~ method that adds a single element
+    returns only an iterator.
+
+The trickiest aspect of ~multimaps~ is looking up elements. You can't use ~operator[]~, because it is not
+provided. ~find()~ isn't very useful because it returns an iterator referring to any one of the elements with
+a given key (not necessarily the first element with that key).
+
+However, ~multimaps~ store all elements with the same key together and provide methods to obtain iterators for
+this sub-range of elements with the same key in the container. The ~lower_bound()~ and ~upper_bound()~ methods
+each return a single iterator referring to the first and one-past-the-last elements matching a given key. If
+there are no elements matching that key, the iterators returned by ~lower_bound()~ and ~upper_bound()~ will be
+equal to each other.
+
+If you need to obtain both iterators bounding the elements with a given key, it's more efficient to use
+~equal_range()~ instead of calling ~lower_bound()~ followed by calling ~upper_bound()~. ~equal_range()~
+returns a pair of the two iterators that would be returned by ~lower_bound()~ and ~upper_bound()~.
+
+***** set
+A ~set~, defined in ~<set>~, is very similar to a ~map~. The difference is that instead of storing key/value
+pairs, in ~sets~ the value itself is the key. ~sets~ are useful for storing information in which there is no
+explicit key, but which you want to have in sorted order without any duplicates, with quick insertion, lookup,
+and deletion.
+
+The interface supplied by ~set~ is almost identical to that of ~map~. The main difference is that ~set~
+doesn't provide ~operator[]~.
+
+You cannot change the key/value of elements in a ~set~ because modifying elements of a ~set~ while they are in
+the container would destroy the order.
+
+***** multiset
+A ~multiset~ is to a ~set~ what a ~multimap~ is to a ~map~. A ~multiset~ supports all the operations of
+a ~set~, but it allows multiple elements that are equal to each other to be stored in the container
+simultaneously.
+
+**** Unordered associative containers or hash tables
+***** unordered_map
+~unordered_map~ is defined in ~<unordered_map>~ as a class template:
+#+BEGIN_SRC
+  template <class Key,
+            class T,
+            class Hash = hash<Key>,
+            class Pred = std::equal_to<Key>,
+            class Alloc = std::allocator<std::pair<const Key, T>>>
+  class unordered_map;
+#+END_SRC
+
+As with a normal ~map~, all keys in an ~unordered_map~ should be unique. The method ~load_factor()~ returns
+the average number of elements per bucket to give you an indication on the number of collisions. The
+~bucket_count()~ method returns the number of buckets in the container. It also provides a ~local_iterator~
+and ~const_local_iterator~ allowing you to iterate over the elements in a single bucket; but, these may not be
+used to iterate across buckets. The ~bucket(key)~ method returns the index of the bucket that contains the
+given key; ~begin(n)~ returns a ~local_iterator~ referring to the first element in the bucket with index ~n~,
+and ~end(n)~ returns a ~local_iterator~ referring to one-past-the-last element in the bucket with index ~n~.
+
+***** unordered_multimap
+An ~unordered_multimap~ is an ~unordered_map~ that allows multiple elements with the same key. Their
+interfaces are almost identical, with the following changes:
+  - ~unordered_multimaps~ do not provide ~operator[]~. The semantics of this operator do not make sense if
+    there can be multiple elements with a single key.
+  - Inserts on ~unordered_multimaps~ always succeed. Thus, the ~unordered_multimap::insert()~ method that adds
+    a single element returns only an iterator.
+
+As discussed earlier with ~multimaps~, looking up elements in ~unordered_multimaps~ cannot be done using
+~operator[]~ because it is not provided. You can use ~find()~ but it returns an iterator referring to any one
+of the elements with a given key (not necessarily the first element with that key). Instead, it's best to use
+the ~equal_range()~ method, which returns a pair of iterators: one referring to the first element matching a
+given key and one referring to one-past-the-last element matching a given key. The use of ~equal_range()~ is
+exactly the same as discussed for ~multimaps~
+
+***** unordered_set
+The ~<unordered_set>~ header file defines ~unordered_set~ and ~unordered_multiset~, which are very similar to
+~set~ and ~multiset~, respectively; except that they do not sort their keys and that they use a hash function.
+The differences between ~unordered_set~ and ~unordered_map~ are similar to the differences between ~set~ and
+~map~.
+
+***** unordered_multiset
+The ~<unordered_set>~ header file defines ~unordered_set~ and ~unordered_multiset~, which are very similar to
+~set~ and ~multiset~, respectively; except that they do not sort their keys and that they use a hash function.
+The differences between ~unordered_set~ and ~unordered_map~ are similar to the differences between ~set~ and
+~map~.
+
+**** Other Containers
+***** Standard C-Style Arrays
+Recall that "dumb" pointers are bona fide iterators because they support the required operators. This point is
+more than just a piece of trivia. It means that you can treat standard C-style arrays as STL containers by
+using pointers to their elements as iterators. Standard C-style arrays, of course, don't provide methods like
+~size()~, ~empty()~, ~insert()~, and ~erase()~, so they aren't true STL containers. Nevertheless, because they
+do support iterators through pointers, you can use them in any algorithms or methods that supports iterators.
+Remember that the name of an array alone is interpreted as the address of the first element, the iterator
+referring to the end must be one-past-the-last element, so it's the address of the first element plus the
+array size.
+
+***** Strings
+You can think of a ~string~ as a sequential container of characters. Thus, it shouldn't be surprising to learn
+that a C++ string is a full-fledged sequential container. It contains ~begin()~ and ~end()~ methods that
+return iterators into the ~string~, ~insert()~, ~push_back()~ and ~erase()~ methods, ~size()~, ~empty()~, and
+all the rest of the sequential container basics. It resembles a ~vector~ quite closely, even providing methods
+~reserve()~ and ~capacity()~.
+
+In addition to the STL sequential container methods, ~strings~ provide a whole host of useful methods and
+friend functions. The string interface is actually quite a good example of a cluttered interface.
+
+***** Streams
+Input and output streams are not containers in the traditional sense: they do not store elements. However,
+they can be considered sequences of elements, and as such share some characteristics with STL containers. C++
+streams do not provide any STL-related methods directly, but the STL supplies special iterators called
+~istream_iterator~ and ~ostream_iterator~ that allow you to "iterate" through input and output streams.
+
+***** bitset
+A ~bitset~ is a fixed-length abstraction of a sequence of bits. A bit can represent only two values, 1 and 0,
+which can be referred to as on/off, true/false, etc. A ~bitset~ also uses the terminology set and unset. You
+can toggle or flip a bit from one value to the other.
+
+A ~bitset~ is not a true STL container: it's of fixed size, it's not templatized on an element type, and it
+doesn't support iteration. However, it's a useful utility, which is often lumped with the containers.
+
+A ~bitset~, defined in ~<bitset>~, is templatized on the number of bits it stores. The default constructor
+initializes all fields of a ~bitset~ to 0. An alternative constructor creates a ~bitset~ from a string of 0
+and 1 characters.
+
+You can adjust the values of individual bits with the ~set()~, ~reset()~, and ~flip()~ methods, and you can
+access and set individual fields with an overloaded ~operator[]~. Note that ~operator[]~ on a non-const object
+returns a proxy object to which you can assign a Boolean value, call ~flip()~, or complement with ~. You can
+also access individual fields with the ~test()~ method. Additionally, you can stream ~bitsets~ with the normal
+insertion and extraction operators. A ~bitset~ is streamed as a string of 0 and 1 characters.
+
+In addition to the basic bit manipulation routines, a ~bitset~ provides implementations of all the bitwise
+operators: ~& , | , ^ , ~ , << , >> , &= , |= , ^= , <<= , and >>=~. They behave just as they would on a
+"real" sequence of bits.
+
+*** STL Containers Reference
 **** vector
 Stores a sequence of elements and provides random access to these elements. You can think of a vector as an
 array of elements that grows dynamically as you insert elements, and provides some bounds checking. Like an

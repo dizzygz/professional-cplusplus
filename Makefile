@@ -1,5 +1,5 @@
 CC=clang++
-CFLAGS=-std=c++14 -Wall -Wextra -Wpedantic -g -O0
+CFLAGS=-std=c++14 -Wall -Wextra -Wpedantic -g -O0 -DDEBUG
 SRC=src
 BIN=bin
 RM=rm -rf
@@ -176,3 +176,45 @@ ch14: clean
 
 ch15: clean
 	$(CC) $(CFLAGS) -o $(BIN)/01_NumericLimits $(SRC)/ch15/01_numeric_limits/numeric_limits.cpp
+
+ch16: clean
+	@$(CP) $(SRC)/ch16/11_StudentEnrollment/course1.txt $(BIN)/course1.txt && $(CP) $(SRC)/ch16/11_StudentEnrollment/course2.txt $(BIN)/course2.txt && $(CP) $(SRC)/ch16/11_StudentEnrollment/course3.txt $(BIN)/course3.txt && $(CP) $(SRC)/ch16/11_StudentEnrollment/dropped.txt $(BIN)/dropped.txt
+	$(CC) $(CFLAGS) -o $(BIN)/01_TestScores $(SRC)/ch16/01_TestScores/01_TestScores.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/01_TestScoresDynamic $(SRC)/ch16/01_TestScores/02_TestScoresDynamic.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/01_TestScoresIterator $(SRC)/ch16/01_TestScores/03_TestScoresIterator.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/03_VectorCopyAssign $(SRC)/ch16/03_VectorCopyAssign/demo.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/04_VectorCompare $(SRC)/ch16/04_VectorCompare/compare.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/05_VectorIteratorsAccesingFields $(SRC)/ch16/05_VectorIterators/01_AccessingFields.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/05_VectorIteratorsConstIterator $(SRC)/ch16/05_VectorIterators/02_ConstIterator.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/05_VectorIteratorsOps $(SRC)/ch16/05_VectorIterators/04_IteratorOps.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/06_VectorAddRemove $(SRC)/ch16/06_VectorAddRemove/AddRemove.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/07_CreateVectorOfSize $(SRC)/ch16/07_CreateVectorOfSize/CreateVectorOfSize.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/08_MovePushBack $(SRC)/ch16/08_MovePushBack/MovePushBack.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/09_RoundRobin $(SRC)/ch16/09_RoundRobin/main.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/10_ListSplice $(SRC)/ch16/10_ListSplice/ListSplice.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/11_StudentEnrollment $(SRC)/ch16/11_StudentEnrollment/Enrollment.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/12_ForwardList $(SRC)/ch16/12_ForwardList/forward_list.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/13_StdArray $(SRC)/ch16/13_std_array/std_array.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/14_PacketBuffer $(SRC)/ch16/14_PacketBuffer/main.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/15_ErrorCorrelatorPqueue $(SRC)/ch16/15_ErrorCorrelatorPqueue/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/16_ErrorCorrelatorStack $(SRC)/ch16/16_ErrorCorrelatorStack/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/17_Pair $(SRC)/ch16/17_Pair/PairTest.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/18_Map $(SRC)/ch16/18_MapBasics/01_Map.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/18_MapUniformInit $(SRC)/ch16/18_MapBasics/02_MapUniformInit.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/18_MapInsert $(SRC)/ch16/18_MapBasics/03_MapInsert.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/18_MapIndexOperator $(SRC)/ch16/18_MapBasics/04_MapIndexOperator.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/18_MapIterators $(SRC)/ch16/18_MapBasics/06_MapIterators.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/18_MapLookup $(SRC)/ch16/18_MapBasics/07_MapLookup.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/18_MapFind $(SRC)/ch16/18_MapBasics/08_MapFind.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/18_MapErase $(SRC)/ch16/18_MapBasics/09_MapErase.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/19_BankAccount $(SRC)/ch16/19_BankAccount/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/20_BuddyList $(SRC)/ch16/20_BuddyList/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/21_AccessControlList $(SRC)/ch16/21_AccessControlList/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/22_CustomHash $(SRC)/ch16/22_CustomHash/CustomHash.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/23_UnorderedMap $(SRC)/ch16/23_unordered_map/unordered_map.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/24_PhoneBook $(SRC)/ch16/24_PhoneBook/PhoneBook.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/25_ArrayIterators $(SRC)/ch16/25_ArrayIterators/ArrayIterators.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/26_StringContainer $(SRC)/ch16/26_StringContainers/StringExample.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/27_BitsetBasics $(SRC)/ch16/27_BitsetBasics/01_BitsetBasics.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/27_BitsetBasicsBitwiseOperators $(SRC)/ch16/27_BitsetBasics/02_BitwiseOperators.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/28_CableCompany $(SRC)/ch16/28_CableCompany/*.cpp
