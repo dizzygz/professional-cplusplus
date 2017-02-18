@@ -218,3 +218,54 @@ ch16: clean
 	$(CC) $(CFLAGS) -o $(BIN)/27_BitsetBasics $(SRC)/ch16/27_BitsetBasics/01_BitsetBasics.cpp
 	$(CC) $(CFLAGS) -o $(BIN)/27_BitsetBasicsBitwiseOperators $(SRC)/ch16/27_BitsetBasics/02_BitwiseOperators.cpp
 	$(CC) $(CFLAGS) -o $(BIN)/28_CableCompany $(SRC)/ch16/28_CableCompany/*.cpp
+
+ch17: clean
+	$(CC) $(CFLAGS) -o $(BIN)/01_AlgorithmOverview_Find $(SRC)/ch17/01_AlgorithmOverview/01_Find.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/01_AlgorithmOverview_FindIf $(SRC)/ch17/01_AlgorithmOverview/02_FindIf.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/01_AlgorithmOverview_FindIfLambda $(SRC)/ch17/01_AlgorithmOverview/03_FindIfLambda.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/01_AlgorithmOverview_Accumulate $(SRC)/ch17/01_AlgorithmOverview/04_Accumulate.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/02_Lambdas_Basic $(SRC)/ch17/02_Lambdas/01_LambdaBasic.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/02_Lambdas_FindIfGeneric $(SRC)/ch17/02_Lambdas/02_FindIfGenericLambda.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/02_Lambdas_MultiplyBy2 $(SRC)/ch17/02_Lambdas/03_multiplyBy2Lambda.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/02_Lambdas_Callback $(SRC)/ch17/02_Lambdas/04_callback.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/02_Lambdas_CountIf $(SRC)/ch17/02_Lambdas/05_count_if.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/02_Lambdas_CountIfRef $(SRC)/ch17/02_Lambdas/06_count_if_ref.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/02_Lambdas_Generate $(SRC)/ch17/02_Lambdas/07_generate.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/03_Functors_Arithmetic $(SRC)/ch17/03_FunctionObjects/01_Arithmetic.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/03_Functors_QueueLess $(SRC)/ch17/03_FunctionObjects/02_QueueLess.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/03_Functors_QueueGreater $(SRC)/ch17/03_FunctionObjects/03_QueueGreater.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/03_Functors_LogicalFunctors $(SRC)/ch17/03_FunctionObjects/04_LogicalFunctors.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/03_Functors_Bind $(SRC)/ch17/03_FunctionObjects/05_bind.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/03_Functors_Ref $(SRC)/ch17/03_FunctionObjects/06_Ref.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/03_Functors_Binders $(SRC)/ch17/03_FunctionObjects/07_Binders.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/03_Functors_Negators $(SRC)/ch17/03_FunctionObjects/08_Negators.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/03_Functors_EmptyString $(SRC)/ch17/03_FunctionObjects/09_EmptyString.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/03_Functors_EmptyStringPtr $(SRC)/ch17/03_FunctionObjects/10_EmptyStringPtr.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/03_Functors_WritingFunctionObject $(SRC)/ch17/03_FunctionObjects/11_WritingFunctionObject.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/03_Functors_WritingFunctionObjectLocal $(SRC)/ch17/03_FunctionObjects/12_WritingFunctionObjectLocal.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/04_NMA_SearchAlgorithms $(SRC)/ch17/04_NonModifyingAlgorithms/01_SearchAlgorithms.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/04_NMA_ComparisonAlgorithms $(SRC)/ch17/04_NonModifyingAlgorithms/02_ComparisonAlgorithms.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/04_NMA_UtilityAlgorithms $(SRC)/ch17/04_NonModifyingAlgorithms/03_utilities.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/05_MA_TransformLambda $(SRC)/ch17/05_ModifyingAlgorithms/01_TransformLambda.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/05_MA_TransformLambdaBinary $(SRC)/ch17/05_ModifyingAlgorithms/02_TransformLambdaBinary.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/05_MA_Copy $(SRC)/ch17/05_ModifyingAlgorithms/03_copy.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/05_MA_CopyBackward $(SRC)/ch17/05_ModifyingAlgorithms/04_copy_backward.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/05_MA_CopyIf $(SRC)/ch17/05_ModifyingAlgorithms/05_copy_if.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/05_MA_CopyN $(SRC)/ch17/05_ModifyingAlgorithms/06_copy_n.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/05_MA_Move $(SRC)/ch17/05_ModifyingAlgorithms/07_move.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/05_MA_Replace $(SRC)/ch17/05_ModifyingAlgorithms/08_Replace.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/05_MA_Remove $(SRC)/ch17/05_ModifyingAlgorithms/09_Remove.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/06_OA_ForEachBasicLambda $(SRC)/ch17/06_OperationalAlgorithms/01_ForEachBasicLambda.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/06_OA_ForEachBasic $(SRC)/ch17/06_OperationalAlgorithms/02_ForEachBasic.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/06_OA_SumAndProdLambda $(SRC)/ch17/06_OperationalAlgorithms/03_SumAndProdLambda.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/06_OA_SumAndProd $(SRC)/ch17/06_OperationalAlgorithms/04_SumAndProd.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/07_PA_PartitionCopy $(SRC)/ch17/07_PartitionAlgorithms/01_partition_copy.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/07_PA_Partition $(SRC)/ch17/07_PartitionAlgorithms/02_partition.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/08_Sorting $(SRC)/ch17/08_SortingAlgorithms/Sorting.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/09_BinarySearch $(SRC)/ch17/09_BinarySearchAlgorithms/binary_search.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/10_SetAlgorithms $(SRC)/ch17/10_SetAlgorithms/01_Sets.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/10_SetAlgorithmsMerge $(SRC)/ch17/10_SetAlgorithms/02_merge.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/11_MinMax $(SRC)/ch17/11_MinMaxAlgorithms/min_max.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/12_NA_InnerProduct $(SRC)/ch17/12_NumericalAlgorithms/01_inner_product.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/12_NA_Iota $(SRC)/ch17/12_NumericalAlgorithms/02_iota.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/13_AuditVoterRolls $(SRC)/ch17/13_AuditVoterRolls/main.cpp

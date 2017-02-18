@@ -823,12 +823,60 @@
 
 *** Chapter 17 - Mastering STL Algorithms
 **** Notes
+- It is recommended to use lambda expressions, if possible, instead of function objects because lambdas are
+  easier to use and easier to understand.
+- It's recommended to always use the transparent operator functors.
+- If you want to compare the elements of two containers of the same type, you can use ~operator==~ or
+  ~operator<~ instead of ~equal()~ or ~lexicographical_compare()~. The algorithms are useful primarly for
+  comparing sequences of elements from different container types.
+- ~transform()~ and the other modifying algorithms often return an iterator referring to the past-the-end
+  value of the destination range.
+- The ~copy()~ algorithm allows you to copy elements from one range to another, starting with the first
+  element and proceeding to the last element in the range. The source and destination ranges must be
+  different, but they can overlap. Note that ~copy()~ doesn't insert elements into the destination range. It
+  just overwrites whatever elements were there already. Thus, you can't use ~copy()~ directly to insert
+  elements into a container, only to overwrite elements that were previously in a container.
+- The ~remove()~ family of functions are stable in that they maintain the order of elements remaining in the
+  container even while moving the retained elements toward the beginning.
+- Sometimes you might encounter non-standard macros to find the minimum and maximum. For example, the GNU C
+  Library (glibc) has macros ~MIN()~ and ~MAX()~, while the ~Windows.h~ header file defines ~min()~ and
+  ~max()~ macros. Because these are macros, they potentially evaluate one of their arguments twice; whereas
+  ~std::min()~ and ~std::max()~ evaluate each argument exactly once. Make sure you always use the C++
+  versions, ~std::min()~ and ~std::max()~.
 
 **** Warnings
+- If ~find()~ fails to find an element, it returns an iterator equal to the end iterator specified in the
+  function call, not the end iterator of the underlying container.
+- If a container provides a method with the same functionality as a generic algorithm, you should use the
+  method instead, because it's faster. For example, the generic ~find()~ algorithm runs in linear time, even
+  on a ~map~, while the ~find()~ method on a ~map~ runs in logarithmic time.
+- It is not recommended to capture all variables from the enclosed scope with ~[=]~, or ~[&]~, or with a
+  capture default, even though it is possible. Instead, you should selectively capture only what's needed in
+  the lambda capture block.
+- The arithmetic function objects are just wrappers around the arithmetic operators. If you use the function
+  objects as callbacks in algorithms, make sure that the objects in your container implement the appropriate
+  operation, such as ~operator*~ or ~operator+~.
+- Before C++11 there was ~bind2nd()~ and ~bind1st()~. Both have been deprecated by C++11. Use lambda
+  expressions or ~bind()~ instead.
+- The algorithms are allowed to make multiple copies of function object predicates and call different ones for
+  different elements. The function call operator needs to be ~const~; thus, you cannot write functors such
+  that they count on any internal state to the object being consistent between calls.
+- Ranges from ~maps~ and ~multimaps~ cannot be used as destinations of modifying algorithms. These algorithms
+  overwrite entire elements, which in a ~map~ consist of key/value pairs. However, ~maps~ and ~multimaps~ mark
+  the key ~const~, so it cannot be assigned to. The same holds for ~set~ and ~multiset~. Your alternative is
+  to use an insert iterator.
+- Make sure that your result range is large enough to hold the result of the set operations. For ~set_union()~
+  and ~set_symmetric_difference()~, the result is at most the sum of the sizes of the two input ranges. For
+  ~set_intersection()~, the result is at most the minimum size of the two input ranges, and for
+  ~set_difference()~ it's at most the size of the first range.
+- With the set algorithms you can't use iterator ranges from associative containers, including ~sets~, to
+  store the results because they don't allow changes to their keys.
 
 *** Chapter 18 - String Localization and Regular Expressions
 **** Notes
+
 **** Warnings
+
 *** Chapter 19 - Additional Library Utilities
 **** Notes
 **** Warnings
@@ -2733,7 +2781,31 @@ Deletion Performance:  N/A
 Lookup Performance:    N/A
 When to Use:           When you want a collection of flags
 
-*** STL Algorithms <algorithms>
+*** STL Algorithms
+**** Overview
+The "magic" behind the algorithms is that they work on iterator intermediaries instead of on the containers
+themselves. In that way, they are not tied to specific container implementations. All the STL algorithms are
+implemented as function templates, where the template type parameters are usually iterator types. The
+iterators themselves are specified as arguments to the function. Templatized functions can usually deduce the
+template types from the function arguments, so you can generally call the algorithms as if they were normal
+functions, not templates.
+
+Algorithms pose certain requirements on iterators passed to it. For instance, ~copy_backward()~ is an example
+of an algorithm that requires a bidirectional iterator, and ~stable_sort()~ is an example of an algorithm
+requiring random access iterators. This means that such algorithms cannot work on containers that do not
+provide the necessary iterators. ~forward_list~ is an example of a container supporting only forward
+iterators, no bidirectional or random access iterators, thus ~copy_backward()~ and ~stable_sort()~ cannot work
+on ~forward_list~.
+
+Most algorithms are defined in the ~<algorithm>~ header file, while some numerical algorithms are defined in
+~<numeric>~. All of them are in the ~std~ namespace.
+
+Just like STL containers, STL algorithms are also optimized to use move semantics at appropriate times. This
+can greatly speed up certain algorithms; for example, ~sort()~. For this reason, it is highly recommended that
+you implement move semantics in your custom element classes that you want to store in containers. Move
+semantics can be added to any class by implementing a move constructor and a move assignment operator. Both
+should be marked as ~noexcept~, because they should not throw exceptions.
+
 **** Non-Modifying Sequence Algorithms
 The non-modifying algorithms are those that look at a sequence of elements and return some information about
 the elements. As "non-modifying" algorithms, they cannot change the values of elements or the order of
@@ -2896,6 +2968,14 @@ original sequence is unchanged. All of them have a linear worst-case complexity.
 |--------------------+-------------------------------------------------------------------+-------------|
 
 ***** Sorting Algorithms
+The STL provides several variations of sorting algorithms. A "sorting algorithm" reorders the contents of a
+container such that an ordering is maintained between sequential elements of the collection. Thus, it applies
+only to sequential collections. Sorting is not relevant to associative containers because they already
+maintain elements in a sorted order. Sorting is not relevant to the unordered associative containers either
+because they have no concept of ordering. Some containers, such as ~list~ and ~forward_list~, provide their
+own sorting methods because these can be implemented more efficiently than a general sort mechanism.
+Consequently, the general sorting algorithms are most useful only for ~vectors~, ~deques~, and ~arrays~.
+
 | Algorithm Name      | Algorithm Synopsis                                                      | Complexity  |
 |---------------------+-------------------------------------------------------------------------+-------------|
 | is_sorted()         | Checks if a sequence is sorted or which subsequence is sorted.          | Linear      |
@@ -2933,6 +3013,16 @@ meets this requirement. All these algorithms have logarithmic complexity.
 ***** Set Algorithms
 Set algorithms are special modifying algorithms that perform set operations on sequences. They are most
 appropriate on sequences from set containers, but work on sorted sequences from most containers.
+
+The set algorithms work on any sorted iterator range. The ~includes()~ algorithm implements standard subset
+determination, checking if all the elements of one sorted range are included in another sorted range, in any
+order.
+
+The ~set_union()~, ~set_intersection()~, ~set_difference()~, and ~set_symmetric_difference()~ algorithms
+implement the standard semantics of those operations. In set theory, the result of union is all the elements
+in either set. The result of intersection is all the elements, which are in both sets. The result of
+difference is all the elements in the first set but not the second. The result of symmetric difference is the
+"exclusive or" of sets: all the elements in one, but not both, sets.
 
 | Algorithm Name            | Algorithm Synopsis                                             | Complexity         |
 |---------------------------+----------------------------------------------------------------+--------------------|
@@ -3020,6 +3110,31 @@ sequences to be ordered. All of them have a linear complexity.
 |                    | permutations exist.                                                      |            |
 |--------------------+--------------------------------------------------------------------------+------------|
 
+*** Remove Erase Idiom on Containers
+Suppose you have a range of elements and you want to remove elements matching a certain condition. The first
+solution that you might think of is to check the documentation to see if your container has an ~erase()~
+method and then iterate over all the elements and call ~erase()~ for each element that matches the condition.
+The ~vector~ is an example of a container that has such an ~erase()~ method. However, if applied to the
+~vector~ container, this solution is very inefficient as it will cause a lot of memory operations to keep the
+vector contiguous in memory, resulting in a quadratic complexity. This solution is also error-prone, because
+you need to be careful that you keep your iterators valid after a call to ~erase()~. The correct solution for
+this problem is the so-called =remove-erase-idiom=, which runs in linear time.
+
+Algorithms have access only to the iterator abstraction, not to the container. Thus the remove algorithms
+cannot really remove them from the underlying container. Instead, the algorithms work by replacing the
+elements that match the given value or predicate with the next element that does not match the given value or
+predicate. The result is that the range becomes partitioned into two sets: the elements to be kept and
+elements to be removed. An iterator is returned that points to the first element in the range of elements to
+be removed. If you want to actually erase these elements from the container, you must use the ~remove()~
+algorithm, then call ~erase()~ on the container to erase all the elements from the returned iterator up to the
+end of the range. This is the =remove-erase-idiom=. As an example removing empty strings from a vector:
+#+BEGIN_SRC
+  void removeEmptyStrings(vector<string>& strings) {
+    auto it = remove_if(begin(strings), end(strings), [](const string& str){ return str.empty(); });
+    strings.erase(it, end(strings));
+  }
+#+END_SRC
+
 *** What's Missing from the STL
 The STL is powerful, but it's not perfect. Here is a list of omissions and unsupported functionality:
 - The STL does not guarantee any thread safety for accessing containers simultaneously from multiple threads.
@@ -3036,6 +3151,7 @@ consider writing your desired code such that it works with the STL.
 Lambda expressions allow you to write anonymous functions inline, removing the need to write a separate
 function or a function object. Lambda expressions can make code easier to read and understand.
 
+*** Basics
 #+BEGIN_SRC c++
   // Basic lambda
   auto basicLambda = [] { cout << "Hello from Lambda" << endl; };
@@ -3058,7 +3174,7 @@ function or a function object. Lambda expressions can make code easier to read a
   auto capturingVLambda = [data] { cout << "Data = " << data << endl; };
   capturingVLambda();
 
-  // Lambda capturing a variable by value
+  // Lambda capturing a variable by value wich can be mutated (e.g. it is non-const)
   auto capturingVLambda2 = [data]() mutable {
     data *= 2;
     cout << "Data = " << data << endl;
@@ -3109,6 +3225,90 @@ function or a function object. Lambda expressions can make code easier to read a
   auto fn = multiplyBy2Lambda(5);
   cout << fn() << endl; // Ouput will be 10
 #+END_SRC
+
+** Function Objects
+*** Overview
+You can overload the function call operator in a class such that objects of the class can be used in place of
+function pointers. These objects are called function objects, or just functors.
+
+Many of the STL algorithms, such as ~find_if()~ and a version of ~accumulate()~, require a function pointer as
+one of the parameters. When you use these functions, you can pass a functor instead of a lambda expression or
+function pointer. C++ provides several predefined functor classes, defined in the ~<functional>~ header file,
+that perform the most commonly used callback operations.
+
+Functor classes often consist of simple one-line expressions. The clumsiness of having to create a function or
+functor class, give it a name that does not conflict with other names, and then use this name is considerable
+overhead for what is fundamentally a simple concept. In these cases, using anonymous (unnamed) functions
+represented by lambda expressions is a big convenience. Their syntax is easier and can make your code easier
+to understand.
+
+C++14 adds support for transparent operator functors, which allow you to omit the template type argument. For
+example, you can just specify ~multiplies<>()~ instead of ~multiplies<int>()~ or ~greater<>~ instead of
+~greater<int>~. It is recommended to always use transparent operator functors.
+
+*** Arithmetic Function Objects
+C++ provides functor class templates for the five binary arithmetic operators: ~plus~, ~minus~, ~multiplies~,
+~divides~, and ~modulus~. Additionally, unary ~negate~ is supplied. These classes are templatized on the type
+of the operands and are wrappers for the actual operators. They take one or two parameters of the template
+type, perform the operation, and return the result.
+
+*** Comparison Function Objects
+In addition to the arithmetic function object classes, the C++ language provides all the standard comparisons:
+~equal_to~, ~not_equal_to~, ~less~, ~greater~, ~less_equal~, and ~greater_equal~. You've already seen ~less~
+in Chapter 16 as the default comparison for elements in the ~priority_queue~ and the associative containers.
+
+*** Logical Function Objects
+C++ provides function object classes for the three logical operations: ~logical_not~ (~operator!~),
+~logical_and~ (~operator&&~), and ~logical_or~ (~operator||~). These logical operations deal only with values
+~true~ and ~false~. Bitwise function objects are covered in the next section.
+
+*** Bitwise Function Objects
+C++ has function objects for all the bitwise operations: ~bit_and (operator&)~, ~bit_or (operator|)~, and
+~bit_xor (operator^)~. C++14 adds ~bit_not (operator~)~ . These bitwise functors can, for example, be used
+together with the ~transform()~ algorithm to perform bitwise operations on all elements in a container.
+
+*** Function Object Adapters
+When you try to use the basic function objects provided by the standard, it often feels as if you're trying to
+put a square peg into a round hole. For example, you can't use the ~less~ function object with ~find_if()~ to
+find an element smaller than some value because ~find_if()~ passes only one argument to its callback each time
+instead of two. The function adapters attempt to rectify this problem and others. They provide a modicum of
+support for functional composition, or combining functions together to create the exact behavior you need.
+
+**** Binders
+Binders can be used to bind parameters of functions to certain values. For this you use ~std::bind()~, defined
+in ~<functional>~, which allows you to bind arguments of a function in a flexible way. You can bind function
+arguments to fixed values and you can even rearrange function arguments in a different order. Arguments that
+are not bound to specific values should be specified as ~_1 , _2 , _3~, and so on. These are defined in the
+~std::placeholders~ namespace.
+
+The ~<functional>~ header defines the ~std::ref()~ and ~std::cref()~ helper functions. These can be used to
+bind references or const references, respectively.
+
+**** Negators
+The negators are functions similar to the binders but they complement the result of a predicate. The function
+~not1()~ complements the result of every call to the predicate it takes as an argument. The "1" in ~not1()~
+refers to the fact that its operand must be a unary function (one that takes a single argument). If its
+operand is a binary function (takes two arguments), you must use ~not2()~ instead.
+
+**** Calling Member Functions
+If you have a container of objects, you sometimes want to pass a pointer to a class method as the callback to
+an algorithm. For example, you might want to find the first empty ~string~ in a ~vector~ of ~strings~ by
+calling ~empty()~ on each ~string~ in the sequence. However, if you just pass a pointer to ~string::empty()~
+to ~find_if()~, the algorithm has no way to know that it received a pointer to a method instead of a normal
+function pointer or functor. The code to call a method pointer is different from that to call a normal
+function pointer, because the former must be called in the context of an object.
+
+C++ provides a conversion function called ~mem_fn()~ that you can call on a method pointer before passing it
+to an algorithm. Note that you have to specify the method pointer as ~&string::empty~. The ~&string::~ part is
+not optional.
+
+*** Writing Your Own Function Objects
+You can write your own function objects to perform more specific tasks than those provided by the predefined
+functors and if you need to do something more complex than suitable for lambda expressions. If you want to be
+able to use the function adapters with these custom functors, you must supply certain ~typedefs~. The easiest
+way to do that is to derive your function object classes from either ~unary_function~ or ~binary_function~,
+depending on whether they take one or two arguments. These two classes, defined in ~<functional>~, are
+templatized on the parameter and return types of the "function" they provide.
 
 ** The Chrono Library
 The Chrono Library is a collection of classes to work with times.
