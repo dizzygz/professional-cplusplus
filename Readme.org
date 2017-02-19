@@ -880,13 +880,27 @@
 
 *** Chapter 19 - Additional Library Utilities
 **** Notes
+- ~std::function~, defined in the ~<functional>~ header file, can be used to create a type that can point to a
+  function, a function object, or a lambda expression; basically anything that is callable. It is called a
+  polymorphic function wrapper. It can be used as a function pointer or as a parameter for a function to
+  implement callbacks. The template parameters for the ~std::function~ template look a bit different than most
+  template parameters. Its syntax is as follows: ~std::function<R(ArgTypes...)>~; ~R~ is the return value type
+  of the function and ~ArgTypes~ is a comma-separated list of argument types for the function.
+- Software-based random number generators can never generate truly random numbers and are therefore called
+  pseudo-random number generators because they rely on mathematical formulas to give the impression of
+  randomness.
 
 **** Warnings
+- You need to make sure that you use a good quality seed for your software-based random number generator. If
+  you initialize the random number generator with the same seed every time, you will create the same sequence
+  of random numbers every time. This is why the seed is usually the current system time.
 
 ** Part IV - Mastering Advanced Features of C++
 *** Chapter 20 - Customizing and Extending the STL
 **** Notes
+
 **** Warnings
+
 *** Chapter 21 - Advanced Templates
 **** Notes
 **** Warnings
@@ -3313,8 +3327,54 @@ way to do that is to derive your function object classes from either ~unary_func
 depending on whether they take one or two arguments. These two classes, defined in ~<functional>~, are
 templatized on the parameter and return types of the "function" they provide.
 
+** Ratios
+The Ratio library allows you to exactly represent any finite rational number that you can use at compile time.
+Ratios are used in the ~std::chrono::duration~ class. Everything is defined in the ~<ratio>~ header file and
+is in the std namespace. The numerator and denominator of a rational number are represented as compile-time
+constants of type ~std::intmax_t~, which is a signed integer type with the maximum width supported by a
+compiler. Because of the compile-time nature of these rational numbers, using them might look a bit
+complicated and different than usual. You cannot define a ratio object the same way as you define normal
+objects, and you cannot call methods on it. You need to use ~typedefs~. For example, the following line
+defines a rational compile-time constant representing 1/60:
+#+BEGIN_SRC
+  typedef ratio<1, 60> r1;
+  intmax_t num = r1::num;   // Access the numerator of r1 (compile-time constant)
+  intmax_t den = r1::den;   // Access the denominator of r1 (compile-time constant)
+#+END_SRC
+
+The library supports adding, subtracting, multiplying, and dividing rational numbers. Because all these
+operations are also happening at compile time, you cannot use the standard arithmetic operators. Instead, you
+need to use specific templates in combination with ~typedefs~. The following arithmetic ratio templates are
+available: ~ratio_add~, ~ratio_subtract~, ~ratio_multiply~, and ~ratio_divide~. These templates calculate the
+result as a new ratio type. This type can be accessed with the embedded ~typedef~ called ~type~. For example,
+the following code first defines two ~ratios~, one representing 1/60 and the other representing 1/30. The
+~ratio_add~ template adds those two rational numbers together to produce the result rational number, which,
+after normalization, is 1/20:
+#+BEGIN_SRC
+  typedef ratio<1, 60> r1;
+  typedef ratio<1, 30> r2;
+  typedef ratio_add<r1, r2>::type result; // Which is 1/20 after normalization
+#+END_SRC
+
+The standard also defines a number of ratio comparison templates: ~ratio_equal~, ~ratio_not_equal~,
+~ratio_less~, ~ratio_less_equal~, ~ratio_greater~, and ~ratio_greater_equal~. Just like the arithmetic ratio
+templates, the ratio comparison templates are all evaluated at compile time. These comparison templates create
+a new type, ~std::integral_constant~, representing the result. An ~integral_constant~ is a ~struct~ template
+that stores a type and a compile-time constant value. For example, ~integral_constant<bool, true>~ stores a
+~Boolean~ with value ~true~, while ~integral_constant<int, 15>~ stores an ~integer~ with value ~15~. The
+result of the ratio comparison templates is either ~integral_constant<bool, true>~ or ~integral_constant<bool,
+false>~. The value associated with an ~integral_constant~ can be accessed using the ~value~ data member. The
+following example demonstrates the use of ~ratio_less~:
+#+BEGIN_SRC
+  typedef ratio<1, 60> r1;
+  typedef ratio<1, 30> r2;
+  typedef ratio_less<r2, r1> res;
+  cout << boolalpha << res::value << endl;
+#+END_SRC
+
 ** The Chrono Library
-The Chrono Library is a collection of classes to work with times.
+The Chrono Library is a collection of classes to work with times. Everything is defined in the ~std::chrono~
+namespace and requires you to include the ~<chrono>~ header file.
 
 *** Duration
 A ~duration~, which represents an interval between two points in time, is specified by the templatized
@@ -3343,6 +3403,12 @@ another ~duration~, for example from minutes to seconds.
   duration<long long, milli> d5;      // A duration where each tick period is one millisecond
   duration<long> d6(30);              // 30 seconds
   duration<double, ratio<60>> d7(d6); // Converts d6 into minutes, resulting in 0.5 minutes
+
+  auto t = hours(1) + minutes(23) + seconds(45);
+  cout << seconds(t).count() << " seconds" << endl;
+
+  auto myDuration = 42min; // C++14, 42 minutes (also "h", "min", "s", "ms", "us" and "ns")
+  auto myDuration = 42s;   // C++14, 42 seconds (also "h", "min", "s", "ms", "us" and "ns")
 #+END_SRC
 
 *** Clock
@@ -3353,12 +3419,54 @@ guaranteed for ~system_clock~ because the system clock can be adjusted at any ti
 ~high_resolution_clock~, which has the shortest possible tick period. Depending on your compiler, it is
 possible for the ~high_resolution_clock~ to be a synonym for ~steady_clock~ or ~system_clock~.
 
+Every clock has a static ~now()~ method to get the current time as a ~time_point~. The ~system_clock~ also
+defines two static helper functions for converting ~time_points~ to and from the ~time_t~ C-style time
+representation. The first is called ~to_time_t()~ converting a given ~time_point~ to a ~time_t~; the second is
+called ~from_time_t()~, which returns a ~time_point~ initialized with a given ~time_t~ value. The ~time_t~
+type is defined in the ~<ctime>~ header file.
+
 *** Time point
 A point in time is represented by the ~time_point~ class and stored as a ~duration~ relative to the epoch. A
 ~time_point~ is always associated with a certain ~clock~ and the epoch is the origin of this associated
 ~clock~. For example, the epoch for the classic Unix/Linux time is 1st of January 1970, and durations are
 measured in seconds. The epoch for Windows is 1st of January 1601 and durations are measured in 100 nanosecond
 units. Other operating systems have different epoch dates and duration units.
+
+The ~time_point~ class contains a function called ~time_since_epoch()~, which returns a duration representing
+the time between the epoch of the associated clock and the stored point in time. A ~time_point~ supports
+arithmetic operations that make sense for time points such as ~+, -, += and -=~. Comparison operators are also
+supported to compare two time points. Two static methods are provided: ~min()~ returning the smallest possible
+point in time, and ~max()~ returning the largest possible point in time.
+
+The ~time_point~ class has three constructors:
+  - time_point() :: constructs a ~time_point~ initialized with ~duration::zero()~. The resulting ~time_point~
+       represents the epoch of the associated clock .
+  - time_point(const duration& d) :: constructs a ~time_point~ initialized with the given ~duration~. The
+       resulting ~time_point~ represents ~epoch + d~.
+  - template<class Duration2> time_point(const time_point<clock, Duration2>& t) :: constructs a ~time_point~
+       initialized with ~t.time_since_epoch()~.
+
+Each ~time_point~ is associated with a ~clock~. To create a ~time_point~, you specify the clock as the
+template parameter: ~time_point<steady_clock> tp1;~
+
+Each ~clock~ also knows its ~time_point~ type, so you can also write it as follows: ~steady_clock::time_point
+tp1;~
+
+** Random Number Generation
+The old ~srand()~ and ~rand()~ functions don't offer much in terms of flexibility. You cannot, for example,
+change the distribution of the generated random numbers. C++11 has added a powerful library to generate random
+numbers by using different algorithms and distributions. The library is defined in the ~<random>~ header file.
+The library has three big components: engines, engine adapters, and distributions. A random number engine is
+responsible for generating the actual random numbers and storing the state for generating subsequent random
+numbers. The distribution determines the range of the generated random numbers and how they are mathematically
+distributed within that range. A random number engine adapter modifies the results of a random number engine
+you associate it with. It's highly recommended to stop using ~srand()~ and ~rand()~, and to start using the
+classes from ~<random>~.
+
+The quality of a random number generator is referred to as its entropy measure. The ~entropy()~ method of the
+~random_device~ class returns 0.0 if it is using a software-based pseudo-random number generator, and returns
+a nonzero value if there is a hardware device attached. The nonzero value is an estimate of the entropy of the
+attached device.
 
 ** Type Traits
 Type traits allow you to make decisions based on types at compile time. For example, you can write a template

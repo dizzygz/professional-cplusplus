@@ -285,3 +285,25 @@ ch18: clean
 	$(CC) $(CFLAGS) -o $(BIN)/06_Regex_Replace1 $(SRC)/ch18/05_RegularExpressions/08_regex_replace_1.cpp
 	$(CC) $(CFLAGS) -o $(BIN)/06_Regex_Replace2 $(SRC)/ch18/05_RegularExpressions/09_regex_replace_2.cpp
 	$(CC) $(CFLAGS) -o $(BIN)/06_Regex_Replace3 $(SRC)/ch18/05_RegularExpressions/10_regex_replace_3.cpp
+
+ch19: clean
+	$(CC) $(CFLAGS) -o $(BIN)/01_Function $(SRC)/ch19/01_Function/01_function.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/01_FunctionCountIf $(SRC)/ch19/01_Function/02_function_count_if.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/01_FunctionCallback $(SRC)/ch19/01_Function/03_function_callback.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/02_Ratios $(SRC)/ch19/02_Ratio/ratios.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/03_ChronoDurations $(SRC)/ch19/03_Chrono/01_durations.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/03_ChronoNowPutTime $(SRC)/ch19/03_Chrono/02_now_put_time.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/03_ChronoNow $(SRC)/ch19/03_Chrono/03_now.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/03_ChronoTiming $(SRC)/ch19/03_Chrono/04_timing.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/03_ChronoTimePoint $(SRC)/ch19/03_Chrono/05_time_point.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/04_RandomOld $(SRC)/ch19/04_Random/01_old.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/04_RandomDevice $(SRC)/ch19/04_Random/02_random_device.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/04_RandomBasic $(SRC)/ch19/04_Random/03_basic.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/04_RandomGenerate $(SRC)/ch19/04_Random/04_generate.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/04_RandomGenerateFunction $(SRC)/ch19/04_Random/05_generate_function.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/04_RandomDistribution $(SRC)/ch19/04_Random/06_uniform_int_distribution.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/05_Pair $(SRC)/ch19/05_Tuple/01_pair.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/05_Tuple $(SRC)/ch19/05_Tuple/02_tuple.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/05_TupleTie $(SRC)/ch19/05_Tuple/03_tuple_tie.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/05_TupleCat $(SRC)/ch19/05_Tuple/04_tuple_cat.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/05_TupleComparison $(SRC)/ch19/05_Tuple/05_tuple_comparison.cpp
