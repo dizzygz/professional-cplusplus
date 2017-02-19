@@ -873,13 +873,16 @@
   store the results because they don't allow changes to their keys.
 
 *** Chapter 18 - String Localization and Regular Expressions
-**** Notes
-
 **** Warnings
+- Never use ~regex_search()~ in a loop to find all occurrences of a pattern in a source string. Instead, use a
+  ~regex_iterator~ or ~regex_token_iterator~.
+- Never try to create a ~regex_iterator~ or ~regex_token_iterator~ with a temporary ~regex~ object.
 
 *** Chapter 19 - Additional Library Utilities
 **** Notes
+
 **** Warnings
+
 ** Part IV - Mastering Advanced Features of C++
 *** Chapter 20 - Customizing and Extending the STL
 **** Notes

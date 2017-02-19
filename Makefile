@@ -269,3 +269,19 @@ ch17: clean
 	$(CC) $(CFLAGS) -o $(BIN)/12_NA_InnerProduct $(SRC)/ch17/12_NumericalAlgorithms/01_inner_product.cpp
 	$(CC) $(CFLAGS) -o $(BIN)/12_NA_Iota $(SRC)/ch17/12_NumericalAlgorithms/02_iota.cpp
 	$(CC) $(CFLAGS) -o $(BIN)/13_AuditVoterRolls $(SRC)/ch17/13_AuditVoterRolls/main.cpp
+
+ch18: clean
+	$(CC) $(CFLAGS) -o $(BIN)/01_WideStrings $(SRC)/ch18/01_WideStrings/wcout.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/02_CharTypes $(SRC)/ch18/02_CharTypes/CharTypes.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/03_Locales $(SRC)/ch18/03_Locales/Locales.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/04_Facets $(SRC)/ch18/04_Facets/use_facet.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/05_Regex_MatchDates1 $(SRC)/ch18/05_RegularExpressions/01_regex_match_dates_1.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/05_Regex_MatchDates2 $(SRC)/ch18/05_RegularExpressions/02_regex_match_dates_2.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/05_Regex_Search $(SRC)/ch18/05_RegularExpressions/03_regex_search_comments.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/05_Regex_Iterator $(SRC)/ch18/05_RegularExpressions/04_regex_iterator.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/06_Regex_TokenIterator1 $(SRC)/ch18/05_RegularExpressions/05_regex_token_iterator_1.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/06_Regex_TokenIterator2 $(SRC)/ch18/05_RegularExpressions/06_regex_token_iterator_2.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/06_Regex_TokenIterator3 $(SRC)/ch18/05_RegularExpressions/07_regex_token_iterator_3.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/06_Regex_Replace1 $(SRC)/ch18/05_RegularExpressions/08_regex_replace_1.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/06_Regex_Replace2 $(SRC)/ch18/05_RegularExpressions/09_regex_replace_2.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/06_Regex_Replace3 $(SRC)/ch18/05_RegularExpressions/10_regex_replace_3.cpp
