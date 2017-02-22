@@ -897,13 +897,11 @@
 
 ** Part IV - Mastering Advanced Features of C++
 *** Chapter 20 - Customizing and Extending the STL
-**** Notes
-
-**** Warnings
-
 *** Chapter 21 - Advanced Templates
 **** Notes
+
 **** Warnings
+
 *** Chapter 22 - Memory Management
 **** Notes
 **** Warnings
@@ -3152,6 +3150,32 @@ end of the range. This is the =remove-erase-idiom=. As an example removing empty
   }
 #+END_SRC
 
+*** Allocators
+Every STL container takes an Allocator type as a template parameter, for which the default usually suffices.
+For example, the vector template definition looks like this:
+#+BEGIN_SRC
+  template <class T, class Allocator = allocator<T>> class vector;
+#+END_SRC
+
+The container constructors then allow you to specify an object of type ~Allocator~. These extra parameters
+permit you to customize the way the containers allocate memory. Every memory allocation performed by a
+container is made with a call to the ~allocate()~ method of the ~Allocator~ object. Conversely, every
+deallocation is performed with a call to the ~deallocate()~ method of the ~Allocator~ object. The standard
+library provides a default ~Allocator~ class called ~allocator~, which implements these methods as wrappers
+for ~operator new~ and ~operator delete~.
+
+If you want containers in your program to use a custom memory allocation and deallocation scheme, you can
+write your own ~Allocator~ class. There are several reasons for using custom allocators. For example, if the
+underlying allocator has unacceptable performance, there are alternatives that can be constructed. Or, if
+memory fragmentation is a problem (lots of different allocations and deallocations leaving unusable small
+holes in memory), a single "pool" of objects of one type can be created, called a memory pool. When
+OS-specific capabilities, such as shared memory segments, must be allocated, using custom allocators allows
+the use of STL containers in those shared memory segments. The use of custom allocators is complex, and there
+are many possible problems if you are not careful, so this should not be approached lightly.
+
+Any class that provides ~allocate()~, ~deallocate()~, and several other required methods and ~typedefs~ can be
+used in place of the default ~allocator~ class. However, in my experience, this feature is rarely used.
+
 *** What's Missing from the STL
 The STL is powerful, but it's not perfect. Here is a list of omissions and unsupported functionality:
 - The STL does not guarantee any thread safety for accessing containers simultaneously from multiple threads.
@@ -3163,6 +3187,117 @@ The STL is powerful, but it's not perfect. Here is a list of omissions and unsup
 It is important to keep in mind that the STL is extensible. You can write your own containers or algorithms
 that will work with existing algorithms or containers. So, if the STL doesn't provide exactly what you need,
 consider writing your desired code such that it works with the STL.
+
+*** Writing your own STL Containers
+The C++ standard contains a list of requirements that any container must fulfill in order to qualify as an STL
+container. Additionally, if you want your container to be sequential (like a ~vector~), associative (like a
+~map~), or unordered associative (like an ~unordered_map~), it must conform to supplementary requirements.
+
+My suggestion when writing a new container is to write the basic container first following the general STL
+rules such as making it a class template, but without worrying too much about the specific details of STL
+conformity. After you've developed the basic implementation, you can add the iterator and methods so that it
+can work with the STL framework.
+
+**** Type Alias Container Requirements
+The C++ standard specifies that every STL container must provide the following ~public~ type aliases:
+| Type Name       | Description                                                                  |
+|-----------------+------------------------------------------------------------------------------|
+| value_type      | The element type stored in the container                                     |
+|-----------------+------------------------------------------------------------------------------|
+| reference       | A reference to the element type stored in the container                      |
+|-----------------+------------------------------------------------------------------------------|
+| const_reference | A reference to a ~const~ element type stored in the container                |
+|-----------------+------------------------------------------------------------------------------|
+| iterator        | A type for iterating over elements of the container                          |
+|-----------------+------------------------------------------------------------------------------|
+| const_iterator  | A version of iterator for iterating over ~const~ elements of the container   |
+|-----------------+------------------------------------------------------------------------------|
+| size_type       | A type that can represent the number of elements in the container; usually   |
+|                 | just ~size_t~ (from ~<cstddef>~)                                             |
+|-----------------+------------------------------------------------------------------------------|
+| difference_type | A type that can represent the difference of two iterators for the container; |
+|                 | usually just ~ptrdiff_t~ (from ~<cstddef>~)                                  |
+|-----------------+------------------------------------------------------------------------------|
+
+**** Method Container Requirements
+In addition to the type aliases, every container must provide the following methods:
+
+| Method                         | Description                                           | Worst Case |
+|                                |                                                       | Complexity |
+|--------------------------------+-------------------------------------------------------+------------|
+| Default Constructor            | Constructs an empty container                         | Constant   |
+|--------------------------------+-------------------------------------------------------+------------|
+| Copy Constructor               | Performs a deep copy of the container                 | Linear     |
+|--------------------------------+-------------------------------------------------------+------------|
+| Move Constructor               | Performs a move constructing operation                | Constant   |
+|--------------------------------+-------------------------------------------------------+------------|
+| Copy Assignment Operator       | Performs a deep copy of the container                 | Linear     |
+|--------------------------------+-------------------------------------------------------+------------|
+| Move Assignment Operator       | Performs a move assignment operation                  | Constant   |
+|--------------------------------+-------------------------------------------------------+------------|
+| Destructor                     | Destroys dynamically allocated memory; calls          |            |
+|                                | destructor on all elements left in container          | Linear     |
+|--------------------------------+-------------------------------------------------------+------------|
+| iterator begin();              | Returns an iterator referring to the first            | Constant   |
+| const_iterator begin() const;  | element in the container                              |            |
+|--------------------------------+-------------------------------------------------------+------------|
+| iterator end();                | Returns an iterator referring to one-past-the-last    | Constant   |
+| const_iterator end() const;    | element in the container                              |            |
+|--------------------------------+-------------------------------------------------------+------------|
+| const_iterator cbegin() const; | Returns a const iterator referring to the first       | Constant   |
+|                                | element in the container                              |            |
+|--------------------------------+-------------------------------------------------------+------------|
+| const_iterator cend() const;   | Returns a ~const~ iterator referring to one-past-the- | Constant   |
+|                                | last element in the container                         |            |
+|--------------------------------+-------------------------------------------------------+------------|
+| operator==                     | Comparison operators that compare two containers,     | Linear     |
+| operator!=                     | element by element                                    |            |
+| operator<                      |                                                       |            |
+| operator>                      |                                                       |            |
+| operator<=                     |                                                       |            |
+| operator>=                     |                                                       |            |
+|--------------------------------+-------------------------------------------------------+------------|
+| void swap(Container&);         | Swaps the contents of the container passed to the     | Constant   |
+|                                | method with the object on which the method is called  |            |
+|--------------------------------+-------------------------------------------------------+------------|
+| size_type size() const;        | Returns the number of elements in the container       | Constant   |
+|--------------------------------+-------------------------------------------------------+------------|
+| size_type max_size() const;    | Returns the maximum number of elements the container  | Constant   |
+|                                | can hold                                              |            |
+|--------------------------------+-------------------------------------------------------+------------|
+| bool empty() const;            | Specifies whether the container has any elements      | Constant   |
+|--------------------------------+-------------------------------------------------------+------------|
+
+**** Reversible Containers
+If your container supplies a bidirectional or random access iterator, it is considered reversible. Reversible
+containers are supposed to supply two additional type aliases:
+
+| Type name              | Description                                                             |
+|------------------------+-------------------------------------------------------------------------|
+| reverse_iterator       | The type for iterating over elements of the container in reverse order. |
+|------------------------+-------------------------------------------------------------------------|
+| const_reverse_iterator | A version of ~reverse_iterator~ for iterating over ~const~ elements     |
+|                        | of the container in reverse order.                                      |
+|------------------------+-------------------------------------------------------------------------|
+
+Additionally, the container should provide ~rbegin()~ and ~rend()~, which are symmetric with ~begin()~ and
+~end()~; and should provide ~crbegin()~ and ~crend()~, which are symmetric with ~cbegin()~ and ~cend()~.
+
+**** Associative Container Type Aliases Requirements
+Associative containers require three additional types:
+
+| Type Name     | Description                                                                            |
+|---------------+----------------------------------------------------------------------------------------|
+| key_type      | The key type with which the container is instantiated                                  |
+|---------------+----------------------------------------------------------------------------------------|
+| key_compare   | The comparison class or function pointer type with which the container is instantiated |
+|---------------+----------------------------------------------------------------------------------------|
+| value_compare | Class for comparing two ~value_type~ elements                                          |
+|---------------+----------------------------------------------------------------------------------------|
+
+**** Associative Container Method Requirements
+The standard prescribes quite a few additional method requirements for associative containers:
+...
 
 ** Lambda Expressions
 Lambda expressions allow you to write anonymous functions inline, removing the need to write a separate

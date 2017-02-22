@@ -307,3 +307,15 @@ ch19: clean
 	$(CC) $(CFLAGS) -o $(BIN)/05_TupleTie $(SRC)/ch19/05_Tuple/03_tuple_tie.cpp
 	$(CC) $(CFLAGS) -o $(BIN)/05_TupleCat $(SRC)/ch19/05_Tuple/04_tuple_cat.cpp
 	$(CC) $(CFLAGS) -o $(BIN)/05_TupleComparison $(SRC)/ch19/05_Tuple/05_tuple_comparison.cpp
+
+ch20: clean
+	# $(CC) $(CFLAGS) -o $(BIN)/01_IA_ReverseIterators $(SRC)/ch20/01_IteratorAdapters/01_ReverseIterators.cpp
+	# $(CC) $(CFLAGS) -o $(BIN)/01_IA_OutputStreamIterators $(SRC)/ch20/01_IteratorAdapters/02_OutputStreamIterators.cpp
+	# $(CC) $(CFLAGS) -o $(BIN)/01_IA_InputStreamIterators $(SRC)/ch20/01_IteratorAdapters/03_InputStreamIterators.cpp
+	# $(CC) $(CFLAGS) -o $(BIN)/01_IA_BackInsertIterator $(SRC)/ch20/01_IteratorAdapters/04_BackInsertIterator.cpp
+	# $(CC) $(CFLAGS) -o $(BIN)/01_IA_InsertIterator $(SRC)/ch20/01_IteratorAdapters/05_InsertIterator.cpp
+	# $(CC) $(CFLAGS) -o $(BIN)/01_IA_MoveIterators $(SRC)/ch20/01_IteratorAdapters/06_MoveIterators.cpp
+	# $(CC) $(CFLAGS) -o $(BIN)/02_WA_FindAll $(SRC)/ch20/02_WritingAlgorithms/01_FindAll.cpp
+	# $(CC) $(CFLAGS) -o $(BIN)/02_WA_IteratorTraitsTest $(SRC)/ch20/02_WritingAlgorithms/02_IteratorTraitsTest.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/03_BasicHashMap $(SRC)/ch20/03_BasicHashmap/main.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/04_FinalHashMap $(SRC)/ch20/04_FinalHashmap/main.cpp
