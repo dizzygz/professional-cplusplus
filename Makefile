@@ -321,25 +321,39 @@ ch20: clean
 	$(CC) $(CFLAGS) -o $(BIN)/04_FinalHashMap $(SRC)/ch20/04_FinalHashmap/main.cpp
 
 ch21: clean
-	# $(CC) $(CFLAGS) -o $(BIN)/01_GridTemplateContainer $(SRC)/ch21/01_GridTemplateContainer/main.cpp
-	# $(CC) $(CFLAGS) -o $(BIN)/02_GridTemplateContainerDefault $(SRC)/ch21/02_GridTemplateContainerDefault/main.cpp
-	# $(CC) $(CFLAGS) -o $(BIN)/03_GridTemplateContainerTemplateTemplate $(SRC)/ch21/03_GridTemplateContainerTemplateTemplate/main.cpp
-	# $(CC) $(CFLAGS) -o $(BIN)/04_GridDefaultElementValue1 $(SRC)/ch21/04_GridDefaultElementValue/SpreadsheetCell.cpp $(SRC)/ch21/04_GridDefaultElementValue/GridTest.cpp
-	# $(CC) $(CFLAGS) -o $(BIN)/04_GridDefaultElementValue2 $(SRC)/ch21/04_GridDefaultElementValue/SpreadsheetCell.cpp $(SRC)/ch21/04_GridDefaultElementValue/GridTestRefNonType.cpp
-	# $(CC) $(CFLAGS) -o $(BIN)/05_GridPartialString1 $(SRC)/ch21/05_GridPartialString/GridTest.cpp
-	# $(CC) $(CFLAGS) -o $(BIN)/05_GridPartialString2 $(SRC)/ch21/05_GridPartialString/GridTestString.cpp
-	# $(CC) $(CFLAGS) -o $(BIN)/06_GridPartialPtr $(SRC)/ch21/06_GridPartialPtr/main.cpp
-	# $(CC) $(CFLAGS) -o $(BIN)/07_FunctionTemplatePtr $(SRC)/ch21/07_FunctionTemplatePtr/*.cpp
-	# $(CC) $(CFLAGS) -o $(BIN)/08_OneDGrid $(SRC)/ch21/08_OneDGrid/OneDGridTest.cpp
-	# $(CC) $(CFLAGS) -o $(BIN)/09_NDGrid $(SRC)/ch21/09_NDGrid/NDGridTest.cpp
-	# $(CC) $(CFLAGS) -o $(BIN)/10_TypeInference $(SRC)/ch21/10_TypeInference/TypeInference.cpp
-	# $(CC) $(CFLAGS) -o $(BIN)/11_VarArgs $(SRC)/ch21/11_VarArgs/VarArgsWithVariadicTemplates.cpp
-	# $(CC) $(CFLAGS) -o $(BIN)/12_VariadicMixins $(SRC)/ch21/12_VariadicMixins/VariadicMixins.cpp
-	# $(CC) $(CFLAGS) -o $(BIN)/13_Factorial $(SRC)/ch21/13_Factorial/Factorial.cpp
-	# $(CC) $(CFLAGS) -o $(BIN)/14_LoopUnrolling $(SRC)/ch21/14_LoopUnrolling/LoopUnrolling.cpp
-	# $(CC) $(CFLAGS) -o $(BIN)/15_PrintTuple $(SRC)/ch21/15_PrintTuple/01_PrintTuple.cpp
-	# $(CC) $(CFLAGS) -o $(BIN)/15_PrintTupleSimplified $(SRC)/ch21/15_PrintTuple/02_PrintTupleSimplified.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/01_GridTemplateContainer $(SRC)/ch21/01_GridTemplateContainer/main.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/02_GridTemplateContainerDefault $(SRC)/ch21/02_GridTemplateContainerDefault/main.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/03_GridTemplateContainerTemplateTemplate $(SRC)/ch21/03_GridTemplateContainerTemplateTemplate/main.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/04_GridDefaultElementValue1 $(SRC)/ch21/04_GridDefaultElementValue/SpreadsheetCell.cpp $(SRC)/ch21/04_GridDefaultElementValue/GridTest.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/04_GridDefaultElementValue2 $(SRC)/ch21/04_GridDefaultElementValue/SpreadsheetCell.cpp $(SRC)/ch21/04_GridDefaultElementValue/GridTestRefNonType.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/05_GridPartialString1 $(SRC)/ch21/05_GridPartialString/GridTest.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/05_GridPartialString2 $(SRC)/ch21/05_GridPartialString/GridTestString.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/06_GridPartialPtr $(SRC)/ch21/06_GridPartialPtr/main.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/07_FunctionTemplatePtr $(SRC)/ch21/07_FunctionTemplatePtr/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/08_OneDGrid $(SRC)/ch21/08_OneDGrid/OneDGridTest.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/09_NDGrid $(SRC)/ch21/09_NDGrid/NDGridTest.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/10_TypeInference $(SRC)/ch21/10_TypeInference/TypeInference.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/11_VarArgs $(SRC)/ch21/11_VarArgs/VarArgsWithVariadicTemplates.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/12_VariadicMixins $(SRC)/ch21/12_VariadicMixins/VariadicMixins.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/13_Factorial $(SRC)/ch21/13_Factorial/Factorial.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/14_LoopUnrolling $(SRC)/ch21/14_LoopUnrolling/LoopUnrolling.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/15_PrintTuple $(SRC)/ch21/15_PrintTuple/01_PrintTuple.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/15_PrintTupleSimplified $(SRC)/ch21/15_PrintTuple/02_PrintTupleSimplified.cpp
 	$(CC) $(CFLAGS) -o $(BIN)/16_TypeTraits_Basic $(SRC)/ch21/16_TypeTraits/01_basic.cpp
 	$(CC) $(CFLAGS) -o $(BIN)/16_TypeTraits_Is_Integral $(SRC)/ch21/16_TypeTraits/02_is_integral.cpp
 	$(CC) $(CFLAGS) -o $(BIN)/16_TypeTraits_Is_Same $(SRC)/ch21/16_TypeTraits/03_is_same.cpp
 	$(CC) $(CFLAGS) -o $(BIN)/16_TypeTraits_Enable_If $(SRC)/ch21/16_TypeTraits/04_enable_if.cpp
+
+ch22: clean
+	$(CC) $(CFLAGS) -o $(BIN)/01_ArrayDelete $(SRC)/ch22/01_ArrayDelete/ArrayDelete.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/02_TicTacToe $(SRC)/ch22/02_tictactoe/tictactoe.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/03_CharacterBoard $(SRC)/ch22/03_CharacterBoard/CharacterBoard.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/04_ArraysAndPointers $(SRC)/ch22/04_ArraysAndPointers/ArraysAndPointers.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/05_FunctionPointers $(SRC)/ch22/05_FunctionPointers/FunctionPointers.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/06_PtrsToMethodsAndMembers $(SRC)/ch22/06_PtrsToMethodsAndMembers/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/07_UniquePtr $(SRC)/ch22/07_unique_ptr/unique_ptr_malloc_int.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/08_SharedPtr_MallocInt $(SRC)/ch22/08_shared_ptr/01_shared_ptr_malloc_int.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/08_SharedPtr_File $(SRC)/ch22/08_shared_ptr/02_shared_ptr_file.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/08_SharedPtr_DoubleDelete $(SRC)/ch22/08_shared_ptr/03_shared_ptr_double_delete.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/08_SharedPtr_ReturnFromFunction $(SRC)/ch22/08_shared_ptr/04_shared_ptr_return_from_function.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/09_Leaky $(SRC)/ch22/09_Leaky/Leaky.cpp

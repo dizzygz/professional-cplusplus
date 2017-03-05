@@ -923,12 +923,69 @@
 
 *** Chapter 22 - Memory Management
 **** Notes
+- Some compilers allow variable-sized arrays on the stack. This is not a standard feature of C++.
+- There are data structures, such as STL containers, that do dynamically adjust their size and that do know
+  their actual size. You should use these STL containers instead of standard arrays because they are much
+  safer to use.
+- You may be wondering whether the first subscript in a two-dimensional array is the x-coordinate or the
+  y-coordinate. The truth is that it doesn't really matter, as long as you are consistent. A four-by-seven
+  grid could be declared as ~char board[4][7]~ or ~char board[7][4]~. For most applications, it is easiest to
+  think of the first subscript as the x-axis and the second as the y-axis.
+- The compiler will refuse to perform a ~static_cast~ on pointers to different data types If the two pointers
+  you are casting are actually pointing to objects that are related through inheritance, the compiler will
+  permit a ~static_cast~. However, a ~dynamic_cast~ is a safer way to accomplish a cast within an inheritance
+  hierarchy.
+- Arrays declared using array syntax can be accessed through a pointer. When an array is passed to a function,
+  it is always passed as a pointer.
+- The C++ compiler uses the declared types of pointers to allow you to perform pointer arithmetic. If you
+  declare a pointer to an ~int~ and increase it by 1, the pointer moves ahead in memory by the size of an
+  ~int~, not by a single byte. This type of operation is most useful with arrays, since they contain
+  homogeneous data that is sequential in memory. Another useful application of pointer arithmetic involves
+  subtraction. Subtracting one pointer from another of the same type gives you the number of elements of the
+  pointed-to type between the two pointers, not the absolute number of bytes between them.
+- Pointers to methods and data members usually won't come up in your programs. However, it's important to keep
+  in mind that you can't dereference a pointer to a non-static method or data member without an object. Every
+  so often, you'll find yourself wanting to try something like passing a pointer to a non-static method to a
+  function such as ~qsort()~ that requires a function pointer, which simply won't work.
+- If your program uses smart pointers by copying them, assigning them, or passing them by value as argumetns
+  to functions, the ~shared_ptr~ is the perfect solution.
+- If you disregard the recommendation for using smart pointers and instead still use dumb pointers, at least
+  set your pointers to ~nullptr~ after deallocating their memory. This prevents you from accidentally deleting
+  the same pointer twice or to use an invalid pointer. It's worth noting that you are allowed to call ~delete~
+  on a ~nullptr~ pointer; it simply will not do anything.
 
 **** Warnings
+- In modern C++ you should avoid low-level memory operations as much as possible in favor of modern constructs
+  such as containers and smart pointers.
+- As a rule of thumb, every line of code that allocates memory with ~new~ and that uses a naked pointer
+  instead of storing the pointer in a smart pointer, should correspond to another line of code that releases
+  the same memory with ~delete~.
+- You should never use ~malloc()~ and ~free()~ in C++. Use only ~new~ and ~delete~.
+- Do not use ~realloc()~ in C++. It is not your friend.
+- Always use ~delete~ on anything allocated with ~new~, and always use ~delete[]~ on anything allocated with
+  ~new[]~.
+- In modern C++ you should avoid using naked C-style pointers. Thus, instead of storing plain-old dumb
+  pointers in plain-old dumb arrays, you should store smart pointers in modern containers. These smart
+  pointers will automatically deallocate memory associated with them.
+- Now that you know all the details to work with arrays, it is recommended to avoid these old C-style arrays
+  as much as possible because they do not provide any memory safety. They are explained here because you will
+  encounter them in legacy code. In new code, you should use the C++ STL containers such as ~std::array~,
+  ~std::vector~, ~std::list~, and so on. For example, use ~vector<T>~ for a one-dimensional dynamic array. Use
+  ~vector<vector<T>>~ for a two-dimensional dynamic array and so on.
+- Arrays are automatically referenced as pointers, but not all pointers are arrays.
+- Do not use the old ~auto_ptr~ smart pointer anymore. Instead use ~unique_ptr~ or ~shared_ptr~.
+- Never assign the result of a memory allocation to a dumb pointer. Whatever memory allocation method you use,
+  always immediately give the memory pointer to a smart pointer, ~unique_ptr~ or ~shared_ptr~.
+- Always use ~make_unique()~ to create a ~unique_ptr~, if your compiler supports it.
+- Always use ~make_shared()~ to create a ~shared_ptr~.
+- Never use a ~shared_ptr~ to manage a pointer to a C-style array. Use ~unique_ptr~ to manage the C-style
+  array, or better yet, use STL containers instead of C-style arrays.
 
 *** Chapter 23 - Multithreaded Programming with C++
 **** Notes
+
 **** Warnings
+
 ** Part V - C++ Software Engineering
 *** Chapter 24 - Maximizing Software Engineering Methods
 **** Notes
