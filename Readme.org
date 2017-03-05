@@ -897,14 +897,35 @@
 
 ** Part IV - Mastering Advanced Features of C++
 *** Chapter 20 - Customizing and Extending the STL
+
 *** Chapter 21 - Advanced Templates
 **** Notes
+- If you want to take a template as a template parameter, you must use a special kind of parameter called a
+  =template template parameter=. Specifying a =template template parameter= is sort of like specifying a
+  function pointer parameter in a normal function. Function pointer types include the return type and
+  parameter types of a function. Similarly, when you specify a =template template parameter=, the full
+  specification of the =template template parameter= includes the parameters to that template.
+- Between all overloaded versions, function template specializations, and specific function template
+  instantiations, the compiler always chooses the "most specific" one to call. If a non-template version is
+  equally specific as a function template instantiation, then the compiler prefers the non-template version.
+- In ~template<typename... Types>~ the three dots behind ~typename~ are not an error. This is the syntax to
+  define a parameter pack for variadic templates. A parameter pack is something than can accept a variable
+  number of arguments. You are allowed to put spaces before and after the three dots.
+- It is better to use the syntax ~template<typename T1, typename... Types>~ for variadic templates. With this
+  definition, trying to instantiate the template with zero template arguments results in a compiler error.
+- Relying on SFINAE (Substitution Failure Is Not An Error) is tricky and complicated. If your use of SFINAE
+  and ~enable_if~ selectively disables the wrong overloads in your overload set, you will get cryptic compiler
+  errors, which will be hard to track down.
 
 **** Warnings
+- Non-type parameters (for templates) cannot be objects, or even ~doubles~ or ~floats~. There are restricted
+  to integral types, ~enums~, pointers, and reference.
 
 *** Chapter 22 - Memory Management
 **** Notes
+
 **** Warnings
+
 *** Chapter 23 - Multithreaded Programming with C++
 **** Notes
 **** Warnings
@@ -933,7 +954,7 @@ functions and methods.
 
 *** Reference Variables
 Reference variables must be initialized as soon as they are created, like this:
-#+BEGIN_SRC c++
+#+BEGIN_SRC
   int x = 3;
   int& xRef = x;
   int& emptyRef; // Does Not Compile!
@@ -942,7 +963,7 @@ Reference variables must be initialized as soon as they are created, like this:
 **** Modifying References
 A reference always refer to the same variable to which it is initialized; references cannot be changed once
 they are created.
-#+BEGIN_SRC c++
+#+BEGIN_SRC
   int x = 3, y = 4;
   int& xRef = x;
   xRef = y; // Changes value of x to 4. Doesn't make xRef refer to y.
@@ -956,7 +977,7 @@ they are created.
 **** References to Pointers and Pointers to References
 You can create references to any type, including pointer types. You cannot declare a reference to a reference,
 or a pointer to a reference.
-#+BEGIN_SRC c++
+#+BEGIN_SRC
   int* intP;            // intP is a pointer to int
   int*& ptrRef = intP;  // ptrRef is a reference to intP
   ptrRef = new int;
@@ -967,7 +988,7 @@ or a pointer to a reference.
 Data members of classes can be references. A reference cannot exist without referring to some other variable.
 Thus, you must initialize reference data members in the constructor initializer, not in the body of the
 constructor.
-#+BEGIN_SRC c++
+#+BEGIN_SRC
   class MyClass {
   public:
     MyClass(int& ref) : mRef(ref) {}
@@ -985,7 +1006,7 @@ the original arguments remain unchanged. References allow you to specify pass-by
 arguments passed to the function. When you use reference parameters, the function receives references to the
 function arguments. If those references are modified, the changes are reflected in the original argument
 variables.
-#+BEGIN_SRC c++
+#+BEGIN_SRC
   void swap(int& first, int& second) {
     int temp = first;
     first = second;
@@ -1039,20 +1060,20 @@ roles. It can mark variables or parameters, and it can mark methods.
 You can use ~const~ to "protect" variables by specifying that they cannot be modified. You can mark any
 variable ~const~, including global variables and class data members. Defining a constant with ~const~ is just
 like defining a variable, except that the compiler guarantees that code cannot change the value.
-#+BEGIN_SRC c++
+#+BEGIN_SRC
   const double PI = 3.141592653589793238462;
   const std::string productName = "Super Hyper Net Modulator";
 #+END_SRC
 
 You can also use ~const~ to specify that parameters to functions or methods should remain unchanged.
-#+BEGIN_SRC c++
+#+BEGIN_SRC
   void mysteryFunction(const std::string* someString) {
     *someString = "Test"; // Will not compile
   }
 #+END_SRC
 
 **** ~const~ Pointers
-#+BEGIN_SRC c++
+#+BEGIN_SRC
   const int* ip; // Same as int const* ip;
   ip = new int[10];
   ip[4] = 5; // DOES NOT COMPILE! (Cannot change the value to wich ip points)
@@ -1074,14 +1095,14 @@ references are ~const~ by default, in that you can't change to what they refer. 
 them ~const~ explicitly. Second, you can't create a reference to a reference, so there is usually only one
 level of indirection with references. The only way to get multiple levels of indirection is to create a
 reference to a pointer.
-#+BEGIN_SRC c++
+#+BEGIN_SRC
   int z;
   int const& zRef = z; // Same as: const int& zRef = z;
   zRef = 4; // DOES NOT COMPILE!
 #+END_SRC
 
 By passing a ~const~ reference you ensure that no copy is made but the original variable cannot be changed.
-#+BEGIN_SRC c++
+#+BEGIN_SRC
   void printString(const std::string& someString) {
     std::cout << someString << std::endl;
   }
@@ -1093,7 +1114,7 @@ the class.
 
 *** The ~constexpr~ Keyword
 Constant expressions are evaluated at compile time.
-#+BEGIN_SRC c++
+#+BEGIN_SRC
   const int getArraySize() { return 32; }
   int main() {
     int myArray[getArraySize()]; // Invalid in C++
@@ -1127,7 +1148,7 @@ By defining a ~constexpr~ constructor you can create constant expression variabl
 - The constructor body cannot be a function-try-block.
 - The constructor body should satisfy the same requirements as the body of a ~constexpr~ function.
 - All data members should be initialized with constant expressions.
-#+BEGIN_SRC c++
+#+BEGIN_SRC
   class Rect {
   public:
     constexpr Rect(int width, int height) : mWidth(width), mHeight(height) {}
@@ -1186,7 +1207,7 @@ initialization has been performed for a certain function.
 *** ~typedef~
 A ~typedef~ provides a new name for an existing type declaration. You can think of a ~typedef~ as syntax for
 introducing a synonym for an existing type declaration without creating a new type.
-#+BEGIN_SRC c++
+#+BEGIN_SRC
   typedef int* IntPtr;
   int* p1;   // p1 is a pointer to int
   IntPtr p2; // p2 is also a pointer to int
@@ -1207,7 +1228,7 @@ The STL uses ~typedefs~ extensively to provide shorter names for types. For exam
 
 *** Type Aliases
 Type aliases are easier to understand than ~typedefs~ in certain situations.
-#+BEGIN_SRC c++
+#+BEGIN_SRC
   typedef int MyInt;
   using MyInt = int; // same as above
 
@@ -1235,7 +1256,7 @@ only.
 ** Casts
 *** ~const_cast~
 You can use ~const_cast~ to cast away const-ness of a variable.
-#+BEGIN_SRC c++
+#+BEGIN_SRC
   extern void ThirdPartyLibraryMethod(char* str);
   void f(const char* str) {
     ThirdPartyLibraryMethod(const_cast<char*>(str));
@@ -1244,7 +1265,7 @@ You can use ~const_cast~ to cast away const-ness of a variable.
 
 *** ~static_cast~
 You can use the ~static_cast~ to perform explicit conversions that are supported directly by the language.
-#+BEGIN_SRC c++
+#+BEGIN_SRC
   int i = 3, j = 4;
   double result = static_cast<double>(i) / j;
 #+END_SRC
@@ -1258,7 +1279,7 @@ Another use for ~static_cast~ is to perform downcasts in an inheritance hierarch
 pointers and references, they do not work with objects themselves. Note that these casts with ~static_cast~ do
 not perform run-time type checking. They allow you to convert any Base pointer to a Derived pointer or Base
 reference to a Derived reference, even if the Base really isn't a Derived at run time.
-#+BEGIN_SRC c++
+#+BEGIN_SRC
   class Base {
   public:
     Base() {}
@@ -1296,7 +1317,7 @@ unrelated by an inheritance hierarchy. This is commonly used to cast a pointer t
 ~void*~ pointer is just a pointer to some location in memory. No type information is associated with a ~void*~
 pointer. You should be very careful with ~reinterpret_cast~ because it allows you to do conversions without
 performing any type checking.
-#+BEGIN_SRC c++
+#+BEGIN_SRC
   class X {};
   class Y {};
 
@@ -1325,7 +1346,7 @@ throws an ~std::bad_cast~ exception (for the reference version). Note that the r
 stored in the vtable of the object. Therefore, in order to use ~dynamic_cast~, your classes must have at least
 one virtual method. If your classes don't have a vtable, trying to use ~dynamic_cast~ will result in a
 compiler error.
-#+BEGIN_SRC c++
+#+BEGIN_SRC
   class Base {
   public:
     Base() {}
@@ -1363,7 +1384,7 @@ while ~static_cast~ and ~reinterpret_cast~ will perform the casting even if they
 An object can be cast or assigned to its parent class. If the cast or assignment is performed on a plain old
 object, this results in slicing. However, slicing does not occur if a derived class is assigned to a pointer
 or reference to its base class.
-#+BEGIN_SRC c++
+#+BEGIN_SRC
   Super mySuper = mySub;  // Slice!
   Super& mySuper = mySub; // No Slice!
 #+END_SRC
@@ -1371,7 +1392,7 @@ or reference to its base class.
 Casting from a base class to one of its derived classes, also called downcasting, is often frowned upon by
 professional C++ programmers because there is no guarantee that the object really belongs to that derived
 class, and because downcasting is a sign of bad design.
-#+BEGIN_SRC c++
+#+BEGIN_SRC
   void presumptuous(Super* inSuper) {
     Sub* mySub = static_cast<Sub*>(inSuper); // BAD!!!
     // Proceed to access Sub methods on mySub.
@@ -1422,7 +1443,7 @@ The =auto= keyword has four completely different meanings:
 
 *** The =decltype= keyword
 The =decltype= keyword takes an expression as argument, and computes the type of that expression. For example:
-#+BEGIN_SRC C++
+#+BEGIN_SRC
   int x = 123;
   decltype(x) y = 456; // The compiler deduces the type of y to be int because that's the type of x
 #+END_SRC
@@ -1431,7 +1452,7 @@ The =decltype= keyword takes an expression as argument, and computes the type of
 Using =auto= to deduce the type of an expression strips away reference qualifiers and const qualifiers.
 =decltype= does not strip those, but might cause code duplication. C++14 solves this by introducing
 =decltype(auto)=.
-#+BEGIN_SRC c++
+#+BEGIN_SRC
   const string message = "Test";
   const string& foo() { return message; }
 
@@ -1464,7 +1485,7 @@ object pointed to.
 the move assignment operator and move constructor, which explains why you can return a =unique_ptr= from a
 function.
 
-#+BEGIN_SRC C++
+#+BEGIN_SRC
   Employee *emp = new Employee;               // normal "naked" pointer
   auto emp = std::make_unique<Employee>();    // std::unique_ptr smart pointer (C++14)
   std::unique_ptr<Employee> emp(new Employee) // std::unique_ptr smart pointer (C++11)
@@ -1484,7 +1505,7 @@ owner of the data, and the object referenced by the pointer is freed. You can't 
 =const_pointer_cast()=, =dynamic_pointer_cast()=, and =static_pointer_cast()= are functions available to cast
 =shared_ptrs=.
 
-#+BEGIN_SRC c++
+#+BEGIN_SRC
   auto emp = std::make_shared<Employee>();    // std::shared_ptr smart pointer (C++14)
   std::shared_ptr<Employee> emp(new Employee) // std::shared_ptr smart pointer (C++11)
 
@@ -1598,7 +1619,7 @@ Again, these rules apply recursively. The lowest member of the chain is always d
 - Move Assignment Operator (C++11 or higher)
 - Destructor (Should be virtual)
 
-#+BEGIN_SRC c++
+#+BEGIN_SRC
   Spreadsheet();                             // ctor
   Spreadsheet(const Spreadsheet& src);       // copy ctor
   Spreadsheet(Spreadsheet&& src) noexcept;   // move ctor
@@ -1668,7 +1689,7 @@ Sub& Sub::operator=(const Sub& inSub) {
 #+END_SRC
 
 *** Multiple Inheritance
-#+BEGIN_SRC c++
+#+BEGIN_SRC
   class Baz : public Foo, public Bar {};
 #+END_SRC
 
@@ -3304,7 +3325,7 @@ Lambda expressions allow you to write anonymous functions inline, removing the n
 function or a function object. Lambda expressions can make code easier to read and understand.
 
 *** Basics
-#+BEGIN_SRC c++
+#+BEGIN_SRC
   // Basic lambda
   auto basicLambda = [] { cout << "Hello from Lambda" << endl; };
   basicLambda();
@@ -3363,7 +3384,7 @@ function or a function object. Lambda expressions can make code easier to read a
                object, even without using ~this->~.
 
 *** Lambda Expressions as Return Type
-#+BEGIN_SRC c++
+#+BEGIN_SRC
   function<int(void)> multiplyBy2Lambda(int x) {
     return [x]{ return 2*x; }; // captures x by value, reference wouldn't work here
   }
@@ -3517,7 +3538,7 @@ A ~duration~, which represents an interval between two points in time, is specif
 time in seconds between two ticks and is represented as a compile-time ~ratio~ constant, which means it could
 be a fraction of a second. The ~duration template accepts two template parameters and is defined as follows:
 
-#+BEGIN_SRC c++
+#+BEGIN_SRC
   template <class Rep, class Period = ratio<1>> class duration {...}
 #+END_SRC
 
@@ -3530,7 +3551,7 @@ Three constructors are provided: the default constructor; one that accepts a sin
 ticks; and one that accepts another ~duration~. The latter can be used to convert from one ~duration~ to
 another ~duration~, for example from minutes to seconds.
 
-#+BEGIN_SRC c++
+#+BEGIN_SRC
   duration<long> d1;                  // A duration where each tick is one second
   duration<long, ratio<1>> d2;        // The same, ratio<1> is the default tick period
   duration<long, ratio<60>> d3;       // A duration in minutes (tick period = 60 seconds)
@@ -3658,7 +3679,7 @@ any variable as thread local, which means that each thread will have its own uni
 it will last for the entire duration of the thread. For each thread, the variable is initialized exactly once.
 For example, in the following code, every thread shares one-and-only-one copy of ~k~, while each thread has
 its own unique copy of ~n~:
-#+BEGIN_SRC c++
+#+BEGIN_SRC
   thread_local int n;
   int k;
   void doWork() {
@@ -3697,7 +3718,7 @@ Without the standard threading library it's very difficult if not impossible to 
 across threads. The standard threading library solves this issue with the following exception-related
 functions. These functions not only work with ~std::exceptions~, but with all kinds of exceptions, ~ints~,
 ~strings~, custom exceptions, and so on:
-#+BEGIN_SRC c++
+#+BEGIN_SRC
   exception_ptr current_exception() noexcept;
 #+END_SRC
 This function is intended to be called from inside a catch block, and returns an ~exception_ptr~ object that
@@ -3705,7 +3726,7 @@ refers to the exception currently being handled, or a copy of the currently hand
 ~exception_ptr~ object if no exception is being handled. This referenced exception object remains valid for as
 long as there is an object of type ~exception_ptr~ that is referencing it. ~exception_ptr~ is of type
 ~NullablePointer~, which means it can easily be tested with a simple if statement.
-#+BEGIN_SRC c++
+#+BEGIN_SRC
   [[noreturn]] void rethrow_exception(exception_ptr p);
 #+END_SRC
 This function rethrows the exception referenced by the ~exception_ptr~ parameter. Rethrowing the referenced
@@ -3894,7 +3915,7 @@ functions:
  creates two locks, one for each mutex, and gives an instance of ~std::defer_lock_t~ as a second argument to
  tell ~unique_lock~ not to acquire the lock during construction. The call to ~lock()~ then acquires both locks
  without the risk of deadlocks:
-#+BEGIN_SRC c++
+#+BEGIN_SRC
   mutex mut1;
   mutex mut2;
   void process() {

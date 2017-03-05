@@ -309,13 +309,37 @@ ch19: clean
 	$(CC) $(CFLAGS) -o $(BIN)/05_TupleComparison $(SRC)/ch19/05_Tuple/05_tuple_comparison.cpp
 
 ch20: clean
-	# $(CC) $(CFLAGS) -o $(BIN)/01_IA_ReverseIterators $(SRC)/ch20/01_IteratorAdapters/01_ReverseIterators.cpp
-	# $(CC) $(CFLAGS) -o $(BIN)/01_IA_OutputStreamIterators $(SRC)/ch20/01_IteratorAdapters/02_OutputStreamIterators.cpp
-	# $(CC) $(CFLAGS) -o $(BIN)/01_IA_InputStreamIterators $(SRC)/ch20/01_IteratorAdapters/03_InputStreamIterators.cpp
-	# $(CC) $(CFLAGS) -o $(BIN)/01_IA_BackInsertIterator $(SRC)/ch20/01_IteratorAdapters/04_BackInsertIterator.cpp
-	# $(CC) $(CFLAGS) -o $(BIN)/01_IA_InsertIterator $(SRC)/ch20/01_IteratorAdapters/05_InsertIterator.cpp
-	# $(CC) $(CFLAGS) -o $(BIN)/01_IA_MoveIterators $(SRC)/ch20/01_IteratorAdapters/06_MoveIterators.cpp
-	# $(CC) $(CFLAGS) -o $(BIN)/02_WA_FindAll $(SRC)/ch20/02_WritingAlgorithms/01_FindAll.cpp
-	# $(CC) $(CFLAGS) -o $(BIN)/02_WA_IteratorTraitsTest $(SRC)/ch20/02_WritingAlgorithms/02_IteratorTraitsTest.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/01_IA_ReverseIterators $(SRC)/ch20/01_IteratorAdapters/01_ReverseIterators.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/01_IA_OutputStreamIterators $(SRC)/ch20/01_IteratorAdapters/02_OutputStreamIterators.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/01_IA_InputStreamIterators $(SRC)/ch20/01_IteratorAdapters/03_InputStreamIterators.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/01_IA_BackInsertIterator $(SRC)/ch20/01_IteratorAdapters/04_BackInsertIterator.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/01_IA_InsertIterator $(SRC)/ch20/01_IteratorAdapters/05_InsertIterator.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/01_IA_MoveIterators $(SRC)/ch20/01_IteratorAdapters/06_MoveIterators.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/02_WA_FindAll $(SRC)/ch20/02_WritingAlgorithms/01_FindAll.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/02_WA_IteratorTraitsTest $(SRC)/ch20/02_WritingAlgorithms/02_IteratorTraitsTest.cpp
 	$(CC) $(CFLAGS) -o $(BIN)/03_BasicHashMap $(SRC)/ch20/03_BasicHashmap/main.cpp
 	$(CC) $(CFLAGS) -o $(BIN)/04_FinalHashMap $(SRC)/ch20/04_FinalHashmap/main.cpp
+
+ch21: clean
+	# $(CC) $(CFLAGS) -o $(BIN)/01_GridTemplateContainer $(SRC)/ch21/01_GridTemplateContainer/main.cpp
+	# $(CC) $(CFLAGS) -o $(BIN)/02_GridTemplateContainerDefault $(SRC)/ch21/02_GridTemplateContainerDefault/main.cpp
+	# $(CC) $(CFLAGS) -o $(BIN)/03_GridTemplateContainerTemplateTemplate $(SRC)/ch21/03_GridTemplateContainerTemplateTemplate/main.cpp
+	# $(CC) $(CFLAGS) -o $(BIN)/04_GridDefaultElementValue1 $(SRC)/ch21/04_GridDefaultElementValue/SpreadsheetCell.cpp $(SRC)/ch21/04_GridDefaultElementValue/GridTest.cpp
+	# $(CC) $(CFLAGS) -o $(BIN)/04_GridDefaultElementValue2 $(SRC)/ch21/04_GridDefaultElementValue/SpreadsheetCell.cpp $(SRC)/ch21/04_GridDefaultElementValue/GridTestRefNonType.cpp
+	# $(CC) $(CFLAGS) -o $(BIN)/05_GridPartialString1 $(SRC)/ch21/05_GridPartialString/GridTest.cpp
+	# $(CC) $(CFLAGS) -o $(BIN)/05_GridPartialString2 $(SRC)/ch21/05_GridPartialString/GridTestString.cpp
+	# $(CC) $(CFLAGS) -o $(BIN)/06_GridPartialPtr $(SRC)/ch21/06_GridPartialPtr/main.cpp
+	# $(CC) $(CFLAGS) -o $(BIN)/07_FunctionTemplatePtr $(SRC)/ch21/07_FunctionTemplatePtr/*.cpp
+	# $(CC) $(CFLAGS) -o $(BIN)/08_OneDGrid $(SRC)/ch21/08_OneDGrid/OneDGridTest.cpp
+	# $(CC) $(CFLAGS) -o $(BIN)/09_NDGrid $(SRC)/ch21/09_NDGrid/NDGridTest.cpp
+	# $(CC) $(CFLAGS) -o $(BIN)/10_TypeInference $(SRC)/ch21/10_TypeInference/TypeInference.cpp
+	# $(CC) $(CFLAGS) -o $(BIN)/11_VarArgs $(SRC)/ch21/11_VarArgs/VarArgsWithVariadicTemplates.cpp
+	# $(CC) $(CFLAGS) -o $(BIN)/12_VariadicMixins $(SRC)/ch21/12_VariadicMixins/VariadicMixins.cpp
+	# $(CC) $(CFLAGS) -o $(BIN)/13_Factorial $(SRC)/ch21/13_Factorial/Factorial.cpp
+	# $(CC) $(CFLAGS) -o $(BIN)/14_LoopUnrolling $(SRC)/ch21/14_LoopUnrolling/LoopUnrolling.cpp
+	# $(CC) $(CFLAGS) -o $(BIN)/15_PrintTuple $(SRC)/ch21/15_PrintTuple/01_PrintTuple.cpp
+	# $(CC) $(CFLAGS) -o $(BIN)/15_PrintTupleSimplified $(SRC)/ch21/15_PrintTuple/02_PrintTupleSimplified.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/16_TypeTraits_Basic $(SRC)/ch21/16_TypeTraits/01_basic.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/16_TypeTraits_Is_Integral $(SRC)/ch21/16_TypeTraits/02_is_integral.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/16_TypeTraits_Is_Same $(SRC)/ch21/16_TypeTraits/03_is_same.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/16_TypeTraits_Enable_If $(SRC)/ch21/16_TypeTraits/04_enable_if.cpp
