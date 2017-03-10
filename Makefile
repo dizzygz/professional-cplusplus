@@ -357,3 +357,24 @@ ch22: clean
 	$(CC) $(CFLAGS) -o $(BIN)/08_SharedPtr_DoubleDelete $(SRC)/ch22/08_shared_ptr/03_shared_ptr_double_delete.cpp
 	$(CC) $(CFLAGS) -o $(BIN)/08_SharedPtr_ReturnFromFunction $(SRC)/ch22/08_shared_ptr/04_shared_ptr_return_from_function.cpp
 	$(CC) $(CFLAGS) -o $(BIN)/09_Leaky $(SRC)/ch22/09_Leaky/Leaky.cpp
+
+ch23: clean
+	# $(CC) $(CFLAGS) -pthread -o $(BIN)/01_Thread_function $(SRC)/ch23/01_thread/01_ThreadFunction.cpp
+	# $(CC) $(CFLAGS) -pthread -o $(BIN)/01_Thread_FunctionObject $(SRC)/ch23/01_thread/02_ThreadFunctionObject.cpp
+	# $(CC) $(CFLAGS) -pthread -o $(BIN)/01_Thread_Lambda $(SRC)/ch23/01_thread/03_ThreadLambda.cpp
+	# $(CC) $(CFLAGS) -pthread -o $(BIN)/01_Thread_MemFunc $(SRC)/ch23/01_thread/04_ThreadMemFunc.cpp
+	# $(CC) $(CFLAGS) -pthread -o $(BIN)/02_ExceptionsWithThreads $(SRC)/ch23/02_ExceptionsWithThreads/ExceptionsWithThreads.cpp
+	# $(CC) $(CFLAGS) -pthread -o $(BIN)/03_Atomics_IncFuncNonAtomic $(SRC)/ch23/03_atomic/01_inc_func_non_atomic.cpp
+	# $(CC) $(CFLAGS) -pthread -o $(BIN)/03_Atomics_IncFuncAtomic $(SRC)/ch23/03_atomic/02_inc_func_atomic.cpp
+	# $(CC) $(CFLAGS) -pthread -o $(BIN)/03_Atomics_IncFuncAtomicOptimal $(SRC)/ch23/03_atomic/03_inc_func_atomic_optimal.cpp
+	# $(CC) $(CFLAGS) -pthread -o $(BIN)/03_Atomics_FetchAdd $(SRC)/ch23/03_atomic/04_fetch_add.cpp
+	# $(CC) $(CFLAGS) -pthread -o $(BIN)/04_Mutex_MultipleLocks $(SRC)/ch23/04_mutex/01_multiple_locks.cpp
+	# $(CC) $(CFLAGS) -pthread -o $(BIN)/04_Mutex_CallOnce $(SRC)/ch23/04_mutex/02_call_once.cpp
+	# $(CC) $(CFLAGS) -pthread -o $(BIN)/04_Mutex_ThreadFunctionObjectWithMutex $(SRC)/ch23/04_mutex/03_ThreadFunctionObjectWithMutex.cpp
+	# $(CC) $(CFLAGS) -pthread -o $(BIN)/04_Mutex_ThreadFunctionObjectWithTimedMutex $(SRC)/ch23/04_mutex/04_ThreadFunctionObjectWithTimedMutex.cpp
+	# $(CC) $(CFLAGS) -pthread -o $(BIN)/04_Mutex_DoubleCheckedLocking $(SRC)/ch23/04_mutex/05_double_checked_locking.cpp
+	# $(CC) $(CFLAGS) -pthread -o $(BIN)/05_Future_PackagedTask $(SRC)/ch23/05_future/01_packaged_task.cpp
+	# $(CC) $(CFLAGS) -pthread -o $(BIN)/05_Future_Async $(SRC)/ch23/05_future/02_async.cpp
+	# $(CC) $(CFLAGS) -pthread -o $(BIN)/05_Future_AsyncErrorHandling $(SRC)/ch23/05_future/03_async_error_handling.cpp
+	$(CC) $(CFLAGS) -pthread -o $(BIN)/06_Logger_FirstVersion $(SRC)/ch23/06_Logger/FirstVersion/*.cpp
+	$(CC) $(CFLAGS) -pthread -o $(BIN)/06_Logger_FinalVersion $(SRC)/ch23/06_Logger/FinalVersion/*.cpp

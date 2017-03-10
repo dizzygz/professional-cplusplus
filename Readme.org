@@ -983,8 +983,38 @@
 
 *** Chapter 23 - Multithreaded Programming with C++
 **** Notes
+- By default, accessing ~cout~ from different threads is thread-safe and without any data races, unless you
+  have called ~cout.sync_with_stdio(false)~ before the first output or input operation. However, even though
+  there are no data races, output from different threads can still be interleaved!
+- Thread function arguments are always copied into some internal storage for the thread. Use ~std::ref()~ from
+  the ~<functional>~ header to pass them by reference.
+- Function objects are always copied into some internal storage for the thread. If you want to execute
+  ~operator()~ on a specific instance of your function object instead of copying it, you should use
+  ~std::ref()~ from the ~<functional>~ header to pass your instance by reference.
+- You should try to minimize the amount of synchronization, either atomics or explicit synchronization,
+  because it lowers performance.
+- It is recommended to limit the time a lock is held as much as possible, otherwise you are blocking other
+  threads for too long.
+- A ~future~ returned by a call to ~async()~ blocks in its destructor until the result is available.
 
 **** Warnings
+- To prevent multithreading problems, try to design your programs so that multiple threads need not read and
+  write to shared memory. Or, use a synchronization method as described in the "Mutual Exclusion" section, or
+  atomic operations described in the "Atomic Operations Library" section.
+- In real-world applications, you should avoid using ~join()~, because it causes the thread calling ~join()~
+  to block. Often there are better ways. For example, in a GUI application, a thread that finishes can post a
+  message to the UI thread. The UI thread itself has a message loop processing messages like mouse moves,
+  button clicks, and so on. This message loop can also receive messages from threads, and you can react to
+  them however you want, all without blocking the UI thread with a ~join()~ call.
+- Do not manually call one of the lock and unlock methods on any of the ~mutex~ classes. Mutex locks are
+  resources, and, as all resources, they almost exclusively should be acquired using the RAII (Resource
+  Acquisition Is Initialization) paradigm. The standard defines a number of RAII lock classes. Using them is
+  critical to avoid deadlocks. They automatically unlock a ~mutex~ when a lock object goes out of scope, so
+  you don't need to manually call ~unlock()~ at the right time.
+- The double-checked locking pattern is explained here because you might encounter it in existing code.
+  Double-checked locking is sensitive to race conditions, cache coherency, and so on; It is hard to get right.
+  It's recommended to avoid this pattern as much as possible in new code. Instead, use other mechanisms such
+  as simple locks, atomic variables, and ~call_once()~ without any double checking.
 
 ** Part V - C++ Software Engineering
 *** Chapter 24 - Maximizing Software Engineering Methods
@@ -3748,7 +3778,7 @@ declared ~static~, except that every thread has its own unique copy and is initi
 no matter how many times that function is called in that thread.
 
 *** Canceling Threads
-The standard does not include any mechanism for cancelling a running thread from inside another thread. The
+The standard does not include any mechanism for canceling a running thread from inside another thread. The
 best way to achieve this is to provide some communication mechanism that the two threads agree upon. The
 simplest mechanism is to have a shared variable, which the target thread checks periodically to determine if
 it should terminate. Other threads can set this shared variable to indirectly instruct the thread to shut
@@ -3824,6 +3854,10 @@ If you are writing multithreaded applications, you have to be sensitive to seque
 threads read and write shared data, this can be a problem. There are many ways to avoid this problem, such as
 never actually sharing data between threads (or atomics for simple types). However, if you can't avoid sharing
 data, you must provide for synchronization so that only one thread at a time can change the data.
+
+Scalars such as Booleans and integers can often be synchronized properly with atomic operations; but, when
+your data is more complex, and you need to use that data from multiple threads, you must provide explicit
+synchronization.
 
 **** Mutex Classes
 Mutex stands for mutual exclusion. The mutual exclusion classes are all defined in the ~<mutex>~ header file
@@ -3972,7 +4006,7 @@ functions:
  creates two locks, one for each mutex, and gives an instance of ~std::defer_lock_t~ as a second argument to
  tell ~unique_lock~ not to acquire the lock during construction. The call to ~lock()~ then acquires both locks
  without the risk of deadlocks:
-#+BEGIN_SRC
+ #+BEGIN_SRC
   mutex mut1;
   mutex mut2;
   void process() {
@@ -3984,7 +4018,7 @@ functions:
   int main() {
     process();
   }
-#+END_SRC
+ #+END_SRC
 
 **** std::call_once
 You can use ~std::call_once()~ in combination with ~std::once_flag~ to make sure a certain function or method
