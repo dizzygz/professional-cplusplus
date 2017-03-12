@@ -1019,7 +1019,11 @@
 ** Part V - C++ Software Engineering
 *** Chapter 24 - Maximizing Software Engineering Methods
 **** Notes
-**** Warnings
+- Is software too new, or is it really a different type of discipline with inherent qualities contributing to
+  the occurrence of bugs, unusable results, and doomed projects?
+- The upfront specification of all requirements makes the Waterfall Model unusable for many organizations
+  because it is not dynamic enough.
+
 *** Chapter 25 - Writing Efficient C++
 **** Notes
 **** Warnings
