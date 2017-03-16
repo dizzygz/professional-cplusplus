@@ -1026,10 +1026,41 @@
 
 *** Chapter 25 - Writing Efficient C++
 **** Notes
+- An efficient, or high-performance, program runs as fast as is possible for the particular tasks.
+- Language-level efficiency involves using the language as efficiently as possible, for example, passing
+  objects by reference instead of by value. However, this will only get you so far. Much more important is
+  design-level efficiency, which includes choosing efficient algorithms, avoiding unnecessary steps and
+  computations, and selecting appropriate design optimizations. Optimizing existing code, more often than not,
+  involves replacing a bad algorithm or data structure with a better, more efficient one.
+- If a function must modify an object, you can pass the object by reference. If the function should not modify
+  the object, you can pass it by ~const~ reference.
+- Avoid using pass-by-pointer, which is a relatively obsolete method for pass-by-reference, and is a throwback
+  to the C language, rarely suitable for C++ (unless passing ~nullptr~ has meaning in your design).
+- Since C++11, the language has support for move semantics, which allows you to efficiently return objects by
+  value, instead of using reference semantics. You should implement a move constructor and move assignment
+  operator for your objects, which allow the C++ compiler to use move semantics. With move semantics for your
+  objects, returning them by value from a function will be efficient without incurring large copying costs.
+- You should generally attempt to avoid cases in which the compiler is forced to construct temporary objects.
+  Although it is impossible to avoid in some situations, you should at least be aware of the existence of this
+  "feature" so you aren't surprised by performance and profiling results. Move semantics are also used by the
+  compiler to make working with temporary objects more efficient. That's another reason to add move semantics
+  to your classes.
+- Always keep in mind that maintaining caches takes code, memory, and processing time. On top of that, caches
+  can be a source of subtle bugs. You should only add caching to a particular area when a profiler clearly
+  shows that that area is a performance bottleneck. First write clean and correct code, then profile it, and
+  only then optimize parts of it.
+
 **** Warnings
+- Apply language-level optimizations judiciously. I recommend to make a clean, well-structured design and
+  implementation first. Then use a profiler, and only invest time optimizing those parts that are flagged by a
+  profiler as being a performance bottleneck.
+- Objects should rarely be passed by value to a function or method.
+
 *** Chapter 26 - Conquering Debugging
 **** Notes
+
 **** Warnings
+
 ** Appendix A - C++ Interviews
 ** Appendix B - Annotated Bibliography
 ** Appendix C - Standard Library Header Files
@@ -1335,7 +1366,7 @@ only.
   template<typename T1, typename T2>
   class MyTemplateClass {/* ... */};
 
-  typedef MyTemplateClass<int, double> OtherName; // Wors as expected
+  typedef MyTemplateClass<int, double> OtherName; // Works as expected
 
   template<typenamt T1>
   typedef MyTemplateClass<T1, double> OtherName; // Error
@@ -4208,3 +4239,51 @@ libraries, as much as possible because these are written by experts. You should 
 multithreading in your design.
 
 Here are two more design techniques for optimizing your program: caching, and object pools.
+
+**** Cache
+Caching means storing items for future use in order to avoid retrieving or recalculating them. You might be
+familiar with the principle from its use in computer hardware. Modern computer processors are built with
+memory caches that store recently and frequently accessed memory values in a location that is quicker to
+access than main memory. Most memory locations that are accessed at all are accessed more than once in a short
+time period, so caching at the hardware level can significantly speed up computations.
+
+Caching in software follows the same approach. If a task or computation is particularly slow, you should make
+sure that you are not performing it more than necessary. Store the results in memory the first time you
+perform the task so that they are available for future needs. Here is a list of tasks that are usually slow:
+
+- Disk access :: You should avoid opening and reading the same file more than once in your program. If memory
+     is available, save the file contents in RAM if you need to access it frequently.
+- Network communication :: Whenever you need to communicate over a network, your program is subject to the
+     vagaries of the network load. Treat network accesses like file accesses, and cache as much static
+     information as possible.
+- Mathematical computations :: If you need the result of a very complex computation in more than one place,
+     perform the calculation once and share the result. However, if it's not very complex, then it's probably
+     faster to just calculate it instead of retrieving it from a cache. Use a profiler if you want to make
+     sure.
+- Object allocation :: If you need to create and use a large number of short-lived objects in your program,
+     consider using an object pool.
+- Thread creation :: This task can also be slow. You can "cache" threads in a thread-pool, similar to caching
+     objects in an object-pool.
+
+One common problem with caching is that the data you store are often only copies of the underlying
+information. The original data might change during the lifetime of the cache. For example, you might want to
+cache the values in a configuration file so that you don't need to read it repeatedly. However, the user might
+be allowed to change the configuration file while your program is running, which would make your cached
+version of the information obsolete. In cases like this, you need a mechanism for cache invalidation: When the
+underlying data change, you must either stop using your cached information, or repopulate your cache.
+
+One technique for cache invalidation is to request that the entity managing the underlying data notifies your
+program of the data change. It could do this through a callback that your program registers with the manager.
+Alternatively, your program could poll for certain events that would trigger it to repopulate the cache
+automatically. Regardless of your specific cache invalidation technique, make sure you think about these
+issues before relying on a cache in your program.
+
+**** Object Pools
+If your program needs a large number of short-lived objects of the same type that have an expensive
+constructor (for example, a constructor creating a large, pre-sized vector for storing data), and a profiler
+confirms that allocating and deallocating these objects is a bottleneck, then you can create a pool, or cache,
+of those objects. Whenever you need an object in your code, you ask the pool for one. When you are done with
+the object, you return it to the pool. The object pool creates the objects only once, so their constructor is
+called only once, not each time they are used. Thus, object pools are appropriate when the constructor
+performs some setup actions that apply to many uses of the object, and when you can set instance-specific
+parameters on the object through non-constructor method calls.
