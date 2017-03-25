@@ -385,3 +385,10 @@ ch25: clean
 	@$(CP) $(SRC)/ch25/03_NameDB/boys_long.txt $(BIN)/boys_long.txt
 	$(CC) $(CFLAGS) -pg -o $(BIN)/03_NameDb1 $(SRC)/ch25/03_NameDB/FirstAttempt/*.cpp
 	$(CC) $(CFLAGS) -pg -o $(BIN)/03_NameDb2 $(SRC)/ch25/03_NameDB/SecondAttempt/*.cpp
+
+ch26: clean
+	$(CC) $(CFLAGS) -o $(BIN)/01_STDebug $(SRC)/ch26/01_StartTimeDebugMode/STDebug.cpp
+	$(CC) $(CFLAGS) -DDEBUG_MODE -o $(BIN)/02_CTDebug $(SRC)/ch26/02_CompileTimeDebugMode/CTDebug.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/02_CTDebugNoDebug $(SRC)/ch26/02_CompileTimeDebugMode/CTDebug.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/03_RingBuffer $(SRC)/ch26/03_RingBuffer/*.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/04_StaticAssert $(SRC)/ch26/04_StaticAssert/StaticAssert.cpp

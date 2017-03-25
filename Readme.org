@@ -1058,8 +1058,30 @@
 
 *** Chapter 26 - Conquering Debugging
 **** Notes
+- Be careful with logging to much detail. You don't want to leak intellectual property through your
+  log files.
+- The behavior of the standard ~assert~ macro depends on the ~NDEBUG~ pre-processor symbol: If the
+  symbol is not defined, the assertion takes place, otherwise it is ignored. Compilers often define
+  this symbol when compiling "release" builds. If you want to leave assertions in release builds,
+  you may have to change your compiler settings, or write your own version of assert that isn't
+  affected by the value of ~NDEBUG~.
+- Make sure your program creates crash dumps, also called memory dumps, core dumps, and so on. How
+  you create such dumps is platform dependent, so you should consult the documentation of your
+  platform. A crash dump is often worth more than a thousand bug reports.
 
 **** Warnings
+- The Fundamental Law of Debugging: Avoid bugs when you're coding, but plan for bugs in your code.
+- Macros in C++ should be avoided as much as possible because they can be hard to debug. However,
+  for logging purposes, using a simple macro is acceptable and it makes using the logging code much
+  easier.
+- Normally, you should avoid any library functions or macros that can terminate your program. The
+  assert macro is an exception. If an assertion triggers, it means that some assumption is wrong or
+  that something is catastrophically, unrecoverable wrong, and the only sane thing to do is to
+  terminate the application at that very moment, instead of continuing.
+- Be careful not to put any code that must be executed for correct program functioning inside
+  assertions. For example, a line like this is probably asking for trouble: ~assert(myFunctionCall()
+  != nullptr)~. If a release build of your code strips assertions, then the call to
+  ~myFunctionCall()~ is stripped as well.
 
 ** Appendix A - C++ Interviews
 ** Appendix B - Annotated Bibliography
